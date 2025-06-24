@@ -1,0 +1,21 @@
+reviewer: "code-review-bot"
+language: "ko"
+frameworks:
+  - "Spring Boot"
+  - "JPA"
+rules:
+  - name: "Spring Boot Best Practices"
+  - name: "Avoid Field Injection"
+  - name: "Avoid N+1 Queries"
+  - name: "Use Constructor Injection"
+style: "concise"
+ignore:
+  - path: "src/test/"
+  - path: "**/*.md"
+reviews:
+  enabled: true
+  review_status: true
+  profile: "chill"
+  branches:
+    include:
+      - "*"
