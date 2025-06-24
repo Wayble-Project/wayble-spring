@@ -15,6 +15,7 @@ ignore:
 reviews:
   enabled: true
   review_status: true
+  profile: "chill"
   branches:
     include:
       - "*"
