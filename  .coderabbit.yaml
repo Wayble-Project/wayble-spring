@@ -19,8 +19,5 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-  branches:
-    include:
-      - "*"
 chat:
   auto_reply: true
