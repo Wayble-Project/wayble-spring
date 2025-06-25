@@ -1,5 +1,5 @@
 reviewer: "code-review-bot"
-language: "ko"
+language: "ko-KR"
 frameworks:
   - "Spring Boot"
   - "JPA"
@@ -16,6 +16,11 @@ reviews:
   enabled: true
   review_status: true
   profile: "chill"
+  auto_review:
+    enabled: true
+    drafts: false
   branches:
     include:
       - "*"
+  chat:
+    auto_reply: true
