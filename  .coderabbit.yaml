@@ -22,5 +22,5 @@ reviews:
   branches:
     include:
       - "*"
-  chat:
-    auto_reply: true
+chat:
+  auto_reply: true
