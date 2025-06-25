@@ -1,5 +1,5 @@
 reviewer: "code-review-bot"
-language: "ko"
+language: "ko-KR"
 frameworks:
   - "Spring Boot"
   - "JPA"
@@ -13,9 +13,10 @@ ignore:
   - path: "src/test/"
   - path: "**/*.md"
 reviews:
-  enabled: true
   review_status: true
   profile: "chill"
-  branches:
-    include:
-      - "*"
+  auto_review:
+    enabled: true
+    drafts: false
+chat:
+  auto_reply: true
