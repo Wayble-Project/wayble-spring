@@ -13,7 +13,6 @@ ignore:
   - path: "src/test/"
   - path: "**/*.md"
 reviews:
-  enabled: true
   review_status: true
   profile: "chill"
   auto_review:
