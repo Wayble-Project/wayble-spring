@@ -1,4 +1,4 @@
-package com.wayble.server.common.user.domain;
+package com.wayble.server.user.domain;
 
 public enum UserType {
     /** 장애인 사용자 */

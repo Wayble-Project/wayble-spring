@@ -1,4 +1,4 @@
-package com.wayble.server.common.user.exception;
+package com.wayble.server.user.exception;
 
 import com.wayble.server.common.exception.ErrorCase;
 import lombok.Getter;

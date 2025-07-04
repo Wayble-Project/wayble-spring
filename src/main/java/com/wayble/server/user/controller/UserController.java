@@ -1,9 +1,9 @@
-package com.wayble.server.common.user.controller;
+package com.wayble.server.user.controller;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
-import com.wayble.server.common.user.exception.UserErrorCase;
-import com.wayble.server.common.user.service.UserService;
+import com.wayble.server.user.exception.UserErrorCase;
+import com.wayble.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
