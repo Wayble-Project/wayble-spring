@@ -1,4 +1,4 @@
-package com.wayble.server.user.domain;
+package com.wayble.server.user.entity;
 
 import com.wayble.server.common.entity.BaseEntity;
 import jakarta.persistence.*;
