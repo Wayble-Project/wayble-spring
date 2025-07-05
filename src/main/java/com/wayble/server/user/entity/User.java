@@ -53,7 +53,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserType userType;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
 
     // TODO 장애 종류 필드 등록 필요

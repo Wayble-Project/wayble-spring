@@ -28,10 +28,10 @@ public class Address {
     private String detailAddress;
 
     /** 위도 */
-    @Column(name = "latitude", precision = 10, scale = 7, nullable = false)
+    @Column(name = "latitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
     private Double latitude;
 
     /** 경도 */
-    @Column(name = "longitude", precision = 10, scale = 7, nullable = false)
+    @Column(name = "longitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
     private Double longitude;
 }

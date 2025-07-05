@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +29,8 @@ public class Review extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false, precision = 2, scale = 1)
-    private BigDecimal rating;
+    @Column(nullable = false)
+    private double rating = 0.0;
 
     @Column(nullable = false)
     private Integer likeCount = 0;
