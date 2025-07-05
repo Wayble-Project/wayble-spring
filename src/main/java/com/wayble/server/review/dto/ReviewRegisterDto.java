@@ -10,7 +10,7 @@ public record ReviewRegisterDto(
 
         @Schema(description = "작성자 ID", example = "1")
         @NotNull(message = "작성자 ID는 필수입니다.")
-        Long user_id,
+        Long userId,
 
         @Schema(description = "리뷰 내용", example = "뷰가 좋고 접근성이 좋은 카페예요.")
         @NotBlank(message = "리뷰 내용은 비어 있을 수 없습니다.")
@@ -24,7 +24,7 @@ public record ReviewRegisterDto(
 
         @Schema(description = "방문 날짜", example = "2025-06-30")
         @NotNull(message = "방문 날짜는 필수입니다.")
-        LocalDate visit_date,
+        LocalDate visitDate,
 
         @Schema(description = "시설 정보", example = "[\"주차장 있음\", \"장애인 화장실 있음\"]")
         @NotNull(message = "시설 정보는 필수입니다.")
