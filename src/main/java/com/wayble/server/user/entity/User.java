@@ -1,6 +1,7 @@
 package com.wayble.server.user.entity;
 
 import com.wayble.server.common.entity.BaseEntity;
+import com.wayble.server.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -50,5 +53,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserType userType;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviewList = new ArrayList<>();
+
     // TODO 장애 종류 필드 등록 필요
+
+    // TODO 프로필 이미지 관련 작업 필요
+
+    // TODO 내가 저장한 장소 관련 작업 필요
 }
