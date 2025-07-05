@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DirectionErrorCase implements ErrorCase {
 
-    REVIEW_NOT_FOUND(400, 4001, "길찾기 정보를 찾을 수 없습니다.");
+    PATH_NOT_FOUND(400, 4001, "해당하는 경로를 찾을 수 없습니다.");
 
     private final Integer httpStatusCode;
     private final Integer errorCode;

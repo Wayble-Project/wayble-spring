@@ -3,10 +3,7 @@ package com.wayble.server.user.entity;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -16,6 +13,7 @@ import java.util.List;
 
 @Getter
 @Entity
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE user SET deleted_at = now() WHERE id = ?")

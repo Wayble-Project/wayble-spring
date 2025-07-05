@@ -1,7 +1,7 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.review.exception.ReviewErrorCase;
+import com.wayble.server.direction.exception.DirectionErrorCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +10,6 @@ import org.springframework.stereotype.Service;
 public class DirectionService {
 
     public void makeException() {
-        throw new ApplicationException(ReviewErrorCase.REVIEW_NOT_FOUND);
+        throw new ApplicationException(DirectionErrorCase.PATH_NOT_FOUND);
     }
 }
