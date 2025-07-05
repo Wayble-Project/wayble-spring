@@ -36,6 +36,7 @@ public class ReviewService {
                 .user(user)
                 .content(dto.content())
                 .rating(dto.rating())
+                .likeCount(0)
                 .build();
 
         reviewRepository.save(review);
