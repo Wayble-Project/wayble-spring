@@ -1,8 +1,6 @@
 package com.wayble.server.user.controller;
 
-import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
-import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +23,7 @@ public class UserController {
     // 예외 사용 참고용 컨트롤러(지우셔도 돼요)
     @GetMapping("/ex")
     public CommonResponse<String> exception() {
-        throw new ApplicationException(UserErrorCase.USER_NOT_FOUND);
+        userService.makeException();
+        return CommonResponse.success("예외 발생!");
     }
 }
