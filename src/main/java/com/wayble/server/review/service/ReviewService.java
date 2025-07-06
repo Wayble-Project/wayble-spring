@@ -28,28 +28,23 @@ public class ReviewService {
         WaybleZone zone = waybleZoneRepository.findById(zoneId)
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
-        User user = userRepository.findById(dto.user_id())
+        User user = userRepository.findById(dto.userId())
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
-        Review review = Review.builder()
-                .waybleZone(zone)
-                .user(user)
-                .content(dto.content())
-                .rating(dto.rating())
-                .likeCount(0)
-                .build();
-
+        Review review = Review.of(user, zone, dto.content(), dto.rating());
         reviewRepository.save(review);
 
         if (dto.images() != null) {
             for (String imageUrl : dto.images()) {
-                reviewImageRepository.save(ReviewImage.builder()
-                        .review(review)
-                        .imageUrl(imageUrl)
-                        .build());
+                reviewImageRepository.save(
+                        ReviewImage.builder()
+                                .review(review)
+                                .imageUrl(imageUrl)
+                                .build()
+                );
             }
         }
 
-        // facilities 및 visit_date 저장 기능 필요 시 추가 구현
+        // visitDate 및 facilities 저장은 필요시 추가 구현
     }
 }

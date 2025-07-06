@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE review SET deleted_at = now() WHERE id = ?")
@@ -45,6 +45,16 @@ public class Review extends BaseEntity {
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImageList = new ArrayList<>();
+
+    public static Review of(User user, WaybleZone zone, String content, double rating) {
+        return Review.builder()
+                .user(user)
+                .waybleZone(zone)
+                .content(content)
+                .rating(rating)
+                .likeCount(0)
+                .build();
+    }
 
     /**
      * TODO: 접근성 정보 관련 구현 필요
