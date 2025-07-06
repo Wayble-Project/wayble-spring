@@ -46,10 +46,10 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImageList = new ArrayList<>();
 
-    public static Review of(User user, WaybleZone zone, String content, double rating) {
+    public static Review of(User user, WaybleZone waybleZone, String content, double rating) {
         return Review.builder()
                 .user(user)
-                .waybleZone(zone)
+                .waybleZone(waybleZone)
                 .content(content)
                 .rating(rating)
                 .likeCount(0)

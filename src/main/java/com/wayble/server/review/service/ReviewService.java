@@ -36,14 +36,10 @@ public class ReviewService {
 
         if (dto.images() != null) {
             for (String imageUrl : dto.images()) {
-                reviewImageRepository.save(
-                        ReviewImage.builder()
-                                .review(review)
-                                .imageUrl(imageUrl)
-                                .build()
-                );
+                reviewImageRepository.save(ReviewImage.of(review, imageUrl));
             }
         }
+
 
         // visitDate 및 facilities 저장은 필요시 추가 구현
     }
