@@ -19,11 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make application.yml  # application.yml 파일 생성
+      - name: Make application.yml  # application.yml 파일 생성 (오류 방지용 mkdir 추가)
         run: |
-          cd ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
-        shell: bash
+            mkdir -p ./src/main/resources
+            echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          shell: bash
 
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
         run: chmod +x gradlew
