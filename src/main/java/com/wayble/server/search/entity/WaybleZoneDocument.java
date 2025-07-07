@@ -18,20 +18,29 @@ import org.springframework.data.elasticsearch.annotations.Document;
 public class WaybleZoneDocument {
 
     @Id
-    private Long id;
+    private Long zoneId;
 
     private String zoneName;
 
     private WaybleZoneType zoneType;
 
+    private String thumbnailImageUrl;
+
     private Address address;
+
+    private double averageRating;
+
+    private long reviewCount;
 
     public static WaybleZoneDocument from(WaybleZone waybleZone) {
         return WaybleZoneDocument.builder()
-                .id(waybleZone.getId())
+                .zoneId(waybleZone.getId())
                 .zoneName(waybleZone.getZoneName())
                 .zoneType(waybleZone.getZoneType())
+                .thumbnailImageUrl("thumbnail image url")
                 .address(waybleZone.getAddress())
+                .averageRating(0.0)
+                .reviewCount(0L)
                 .build();
     }
 }

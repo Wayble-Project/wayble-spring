@@ -42,7 +42,10 @@ public class SearchService {
                 1L,
                 "testZone",
                 WaybleZoneType.CAFE,
-                address
+                "thumbnailImage",
+                address,
+                0.0,
+                0L
         );
         elasticsearchOperations.save(waybleZoneDocument);
     }
