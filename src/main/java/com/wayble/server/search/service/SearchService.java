@@ -28,7 +28,16 @@ public class SearchService {
     }
 
     public void save() {
-        Address address = new Address();
+        Address address = Address.builder()
+                .state("state")
+                .city("city")
+                .streetAddress("streetAddress")
+                .detailAddress("detailAddress")
+                .district("district")
+                .latitude(37.123456789)
+                .longitude(37.123456789)
+                .build();
+
         WaybleZoneDocument waybleZoneDocument = new WaybleZoneDocument(
                 1L,
                 "testZone",

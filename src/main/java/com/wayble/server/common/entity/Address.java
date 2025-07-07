@@ -2,10 +2,13 @@ package com.wayble.server.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Address {
     /** 시·도 */
     @Column(name = "state", length = 100, nullable = false)
