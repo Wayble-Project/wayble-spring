@@ -23,3 +23,5 @@ networks:
 volumes:
   esdata:
     driver: local
+
+# docker compose -f docker-els.yml up -d
