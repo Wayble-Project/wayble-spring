@@ -17,9 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.offset;
@@ -46,9 +44,22 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     private static final double RADIUS = 150.0;
 
+    List<String> nameList = new ArrayList<>(Arrays.asList(
+            "던킨도너츠",
+            "베스킨라빈스",
+            "투썸플레이스",
+            "스타벅스",
+            "메가엠지씨커피",
+            "공차",
+            "롯데리아",
+            "맥도날드",
+            "KFC",
+            "노브랜드버거"
+    ));
+
     @BeforeAll
     public void setup() {
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 10000; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
                     .state("state" + i)
@@ -63,7 +74,7 @@ public class WaybleZoneSearchApiIntegrationTest {
             WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
                     .builder()
                     .zoneId((long) i)
-                    .zoneName("waybleZone" + i)
+                    .zoneName(nameList.get((int) (Math.random() * nameList.size())))
                     .address(address)
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
                     .averageRating(Math.random() * 5)
@@ -145,7 +156,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     @DisplayName("특정 단어가 포함된 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAscending() throws Exception{
-        final String word = "Zone3";
+        final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         MvcResult result = mockMvc.perform(get("/search")
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -247,7 +258,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     @DisplayName("특정 단어가 포함된 특정 타입의 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAndZoneTypeAscending() throws Exception{
-        final String word = "Zone3";
+        final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
         MvcResult result = mockMvc.perform(get("/search")
                         .param("latitude",  String.valueOf(LATITUDE))
