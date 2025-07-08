@@ -9,6 +9,9 @@ import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
 import com.wayble.server.search.entity.WaybleZoneDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -26,7 +29,9 @@ public class WaybleZoneSearchRepositoryImpl implements WaybleZoneSearchRepositor
     private static final IndexCoordinates INDEX = IndexCoordinates.of("wayble_zone");
 
     @Override
-    public List<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto cond) {
+    public Slice<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto cond, Pageable pageable) {
+
+        int fetchSize = pageable.getPageSize() + 1;
 
         double radius = cond.radiusKm() != null ? cond.radiusKm() : 100.0;
         String radiusWithUnit = radius + "km"; // The new client often uses string representation for distance
@@ -85,9 +90,12 @@ public class WaybleZoneSearchRepositoryImpl implements WaybleZoneSearchRepositor
 
         // 3) Combine into a NativeQuery
         NativeQuery nativeQuery = NativeQuery.builder()
-                .withQuery(query) // Pass the new Query object
-                .withSort(geoSort) // Corrected: Changed from withSorts to withSort
-                .withPageable(PageRequest.of(0, 20))
+                .withQuery(query)
+                .withSort(geoSort)
+                .withPageable(PageRequest.of(
+                        pageable.getPageNumber(),
+                        fetchSize
+                ))
                 .build();
 
         // 4) Execute the search
@@ -95,7 +103,7 @@ public class WaybleZoneSearchRepositoryImpl implements WaybleZoneSearchRepositor
                 operations.search(nativeQuery, WaybleZoneDocument.class, INDEX);
 
         // 5) Map to DTO: The distance in sortValues is still accessible in the same way
-        return hits.stream()
+        List<WaybleZoneSearchResponseDto> dtos = hits.stream()
                 .map(hit -> {
                     WaybleZoneDocument doc = hit.getContent();
                     // The distance value is returned in meters by default when sorting.
@@ -105,5 +113,12 @@ public class WaybleZoneSearchRepositoryImpl implements WaybleZoneSearchRepositor
                     return WaybleZoneSearchResponseDto.from(doc, distanceInKm);
                 })
                 .toList();
+
+        boolean hasNext = dtos.size() > pageable.getPageSize();
+        if (hasNext) {
+            dtos = dtos.subList(0, pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(dtos, pageable, hasNext);
     }
 }

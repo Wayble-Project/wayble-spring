@@ -9,6 +9,8 @@ import com.wayble.server.search.exception.SearchErrorCase;
 import com.wayble.server.search.repository.WaybleZoneSearchRepository;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +37,10 @@ public class SearchService {
         waybleZoneSearchRepository.save(WaybleZoneDocument.fromDto(dto));
     }
 
-    public List<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto condition) {
-        return waybleZoneSearchRepository.searchWaybleZonesByCondition(condition);
+    public Slice<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(
+            WaybleZoneSearchConditionDto condition,
+            Pageable pageable)
+    {
+        return waybleZoneSearchRepository.searchWaybleZonesByCondition(condition, pageable);
     }
 }
