@@ -1,6 +1,7 @@
 package com.wayble.server.search.controller;
 
 import com.wayble.server.common.response.CommonResponse;
+import com.wayble.server.search.dto.SearchSilceDto;
 import com.wayble.server.search.dto.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.search.dto.WaybleZoneSearchConditionDto;
 import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
@@ -8,6 +9,8 @@ import com.wayble.server.search.entity.WaybleZoneDocument;
 import com.wayble.server.search.service.SearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +30,17 @@ public class SearchController {
     }
 
     @GetMapping("")
-    public CommonResponse<List<WaybleZoneSearchResponseDto>> findByCondition(@Valid @ModelAttribute WaybleZoneSearchConditionDto conditionDto) {
-        return CommonResponse.success(searchService.searchWaybleZonesByCondition(conditionDto));
+    public CommonResponse<SearchSilceDto<WaybleZoneSearchResponseDto>> findByCondition(
+            @Valid @ModelAttribute WaybleZoneSearchConditionDto conditionDto,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size)
+    {
+        Slice<WaybleZoneSearchResponseDto> slice =
+                searchService.searchWaybleZonesByCondition(conditionDto, PageRequest.of(page, size));
+        return CommonResponse.success(new SearchSilceDto<>(
+                slice.getContent(),
+                slice.hasNext()
+        ));
     }
 
     @PostMapping("")
