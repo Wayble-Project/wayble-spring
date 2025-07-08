@@ -108,8 +108,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        System.out.println(result.getResponse().getContentAsString());
-
         String json = result.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
@@ -145,7 +143,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     }
 
     @Test
-    @DisplayName("단어가 포함된 웨이블존을 거리 순으로 반환")
+    @DisplayName("특정 단어가 포함된 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAscending() throws Exception{
         final String word = "Zone3";
         MvcResult result = mockMvc.perform(get("/search")
@@ -157,8 +155,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
 
         String json = result.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(json);
@@ -195,6 +191,59 @@ public class WaybleZoneSearchApiIntegrationTest {
             System.out.println(dto.toString());
         }
     }
+
+    @Test
+    @DisplayName("특정 타입의 웨이블존을 거리 순으로 반환")
+    public void findWaybleZoneByZoneTypeAscending() throws Exception{
+        final WaybleZoneType zoneType = WaybleZoneType.CAFE;
+        MvcResult result = mockMvc.perform(get("/search")
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("radiusKm",  String.valueOf(RADIUS))
+                        .param("zoneType",  zoneType.name())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+
+        String json = result.getResponse().getContentAsString();
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneSearchResponseDto> dtoList =
+                objectMapper.convertValue(
+                        dataNode,
+                        new TypeReference<>() {}
+                );
+
+        assertThat(dtoList).isNotEmpty();
+        for (int i = 0; i < dtoList.size(); i++) {
+            WaybleZoneSearchResponseDto dto = dtoList.get(i);
+
+            assertThat(dto.zoneType()).isEqualTo(zoneType);
+            double expected = haversine(LATITUDE, LONGITUDE,
+                    dto.latitude(), dto.longitude());
+            // 허용 오차: 0.05 km (≈50m)
+            assertThat(dto.distance())
+                    .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
+                            dto.zoneId(), expected, dto.distance())
+                    .isCloseTo(expected, offset(0.05));
+
+            if (i > 0) {
+                assertThat(dto.distance())
+                        .withFailMessage("거리 정렬 오류: %f !> %f",
+                                dto.distance(), dtoList.get(i-1).distance())
+                        .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
+            }
+        }
+
+        for (WaybleZoneSearchResponseDto dto : dtoList) {
+            System.out.println(dto.toString());
+        }
+    }
+
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6_371; // 지구 반지름 (km)
