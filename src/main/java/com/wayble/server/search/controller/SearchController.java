@@ -6,13 +6,16 @@ import com.wayble.server.search.dto.WaybleZoneSearchConditionDto;
 import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
 import com.wayble.server.search.entity.WaybleZoneDocument;
 import com.wayble.server.search.service.SearchService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/search")
 public class SearchController {
 
@@ -24,7 +27,7 @@ public class SearchController {
     }
 
     @GetMapping("")
-    public CommonResponse<List<WaybleZoneSearchResponseDto>> findByCondition(@ModelAttribute WaybleZoneSearchConditionDto conditionDto) {
+    public CommonResponse<List<WaybleZoneSearchResponseDto>> findByCondition(@Valid @ModelAttribute WaybleZoneSearchConditionDto conditionDto) {
         return CommonResponse.success(searchService.searchWaybleZonesByCondition(conditionDto));
     }
 
