@@ -5,21 +5,24 @@ import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import jakarta.persistence.Id;
 import lombok.*;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 @ToString
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "wayble_zone")
+@Document(indexName = "wayble_zone", createIndex = true)
+@Setting(settingPath = "/elasticsearch/settings/wayble_zone_settings.json")
+@Mapping(mappingPath = "/elasticsearch/settings/wayble_zone_mappings.json")
 public class WaybleZoneDocument {
 
     @Id
     private Long id;
 
+    @Field(type = FieldType.Text,
+            analyzer = "korean_edge_ngram_analyzer",
+            searchAnalyzer = "korean_search_analyzer")
     private String zoneName;
 
     private WaybleZoneType zoneType;

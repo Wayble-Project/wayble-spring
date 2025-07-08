@@ -46,10 +46,9 @@ public class WaybleZoneSearchRepositoryImpl implements WaybleZoneSearchRepositor
                     // Must clause for name if it exists and is not blank
                     if (cond.zoneName() != null && !cond.zoneName().isBlank()) {
                         b.must(m -> m
-                                .wildcard(wc -> wc
-                                        .field("zoneName.keyword")
-                                        .value("*" + cond.zoneName().toLowerCase() + "*")
-                                        .caseInsensitive(true)    // ES 8.x
+                                .match(mp -> mp
+                                        .field("zoneName")
+                                        .query(cond.zoneName())
                                 )
                         );
                     }
