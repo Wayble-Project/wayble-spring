@@ -4,6 +4,7 @@ import com.wayble.server.search.entity.WaybleZoneDocument;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.ToString;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record WaybleZoneSearchResponseDto(
@@ -35,8 +36,8 @@ public record WaybleZoneSearchResponseDto(
                 .averageRating(waybleZoneDocument.getAverageRating())
                 .reviewCount(waybleZoneDocument.getReviewCount())
                 .distance(distance)
-                .latitude(waybleZoneDocument.getAddress().getLatitude())
-                .longitude(waybleZoneDocument.getAddress().getLongitude())
+                .latitude(waybleZoneDocument.getAddress().getLocation().getLat())
+                .longitude(waybleZoneDocument.getAddress().getLocation().getLon())
                 .build();
     }
 }
