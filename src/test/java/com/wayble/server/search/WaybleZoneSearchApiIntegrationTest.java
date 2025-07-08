@@ -88,7 +88,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @AfterAll
     public void teardown() {
-        waybleZoneSearchRepository.deleteAll();
+        //waybleZoneSearchRepository.deleteAll();
     }
 
     @Test
