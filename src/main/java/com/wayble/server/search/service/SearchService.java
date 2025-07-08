@@ -1,21 +1,21 @@
 package com.wayble.server.search.service;
 
-import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.exception.ApplicationException;
+import com.wayble.server.search.dto.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.search.dto.WaybleZoneSearchConditionDto;
+import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
 import com.wayble.server.search.entity.WaybleZoneDocument;
 import com.wayble.server.search.exception.SearchErrorCase;
 import com.wayble.server.search.repository.WaybleZoneSearchRepository;
 import com.wayble.server.wayblezone.entity.WaybleZone;
-import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SearchService {
-
-    private final ElasticsearchOperations elasticsearchOperations;
 
     private final WaybleZoneSearchRepository waybleZoneSearchRepository;
 
@@ -27,26 +27,15 @@ public class SearchService {
         return waybleZoneSearchRepository.findById(id).orElse(null);
     }
 
-    public void save() {
-        Address address = Address.builder()
-                .state("state")
-                .city("city")
-                .streetAddress("streetAddress")
-                .detailAddress("detailAddress")
-                .district("district")
-                .latitude(37.123456789)
-                .longitude(37.123456789)
-                .build();
+    public void saveDocumentFromEntity(WaybleZone waybleZone) {
+        waybleZoneSearchRepository.save(WaybleZoneDocument.fromEntity(waybleZone));
+    }
 
-        WaybleZoneDocument waybleZoneDocument = new WaybleZoneDocument(
-                1L,
-                "testZone",
-                WaybleZoneType.CAFE,
-                "thumbnailImage",
-                address,
-                0.0,
-                0L
-        );
-        elasticsearchOperations.save(waybleZoneDocument);
+    public void saveDocumentFromDto(WaybleZoneDocumentRegisterDto dto) {
+        waybleZoneSearchRepository.save(WaybleZoneDocument.fromDto(dto));
+    }
+
+    public List<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto condition) {
+        return waybleZoneSearchRepository.searchWaybleZonesByCondition(condition);
     }
 }
