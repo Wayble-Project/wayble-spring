@@ -1,7 +1,10 @@
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile.elasticsearch
     container_name: elasticsearch
+    image: es-with-nori:9.0.2
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -24,4 +27,6 @@ volumes:
   esdata:
     driver: local
 
+# docker compose -f docker-els.yml build
 # docker compose -f docker-els.yml up -d
+
