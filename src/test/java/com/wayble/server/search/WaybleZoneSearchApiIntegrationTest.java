@@ -1,23 +1,38 @@
 package com.wayble.server.search;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.search.dto.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
 import com.wayble.server.search.entity.WaybleZoneDocument;
 import com.wayble.server.search.repository.WaybleZoneSearchRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.offset;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureMockMvc
 public class WaybleZoneSearchApiIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private WaybleZoneSearchRepository waybleZoneSearchRepository;
@@ -25,7 +40,13 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
+    private static final double LATITUDE = 37.495;
+
+    private static final double LONGITUDE = 127.045;
+
+    private static final double RADIUS = 150.0;
+
+    @BeforeAll
     public void setup() {
         for (int i = 1; i <= 100; i++) {
             Map<String, Double> points = makeRandomPoint();
@@ -54,26 +75,88 @@ public class WaybleZoneSearchApiIntegrationTest {
         }
     }
 
-    @AfterEach
+    @AfterAll
     public void teardown() {
         waybleZoneSearchRepository.deleteAll();
     }
 
     @Test
-    public void test() {
-        List<WaybleZoneDocument> waybleZoneList = waybleZoneSearchRepository.findAll();
-        waybleZoneList.forEach(waybleZoneDocument -> {
-            System.out.println(waybleZoneDocument.toString());
-            System.out.println(waybleZoneDocument.getAddress().toString());
-        });
+    public void checkDataExists() {
+        List<WaybleZoneDocument> all = waybleZoneSearchRepository.findAll();
+        System.out.println("=== 저장된 데이터 확인 ===");
+        System.out.println("Total documents: " + all.size());
+
+        assertThat(all.size()).isGreaterThan(0);
+        for (WaybleZoneDocument doc : all) {
+            assertThat(doc.getId()).isNotNull();
+            assertThat(doc.getZoneName()).isNotNull();
+            assertThat(doc.getAddress().getLocation()).isNotNull();
+            System.out.println("존 정보: " + doc.toString());
+            System.out.println("주소: " + doc.getAddress().toString());
+        }
+    }
+
+    @Test
+    public void findWaybleZoneByDistanceAscending() throws Exception{
+        MvcResult result = mockMvc.perform(get("/search")
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("radiusKm",  String.valueOf(RADIUS))
+                        //.param("name",      "waybleZone")
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+
+        String json = result.getResponse().getContentAsString();
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneSearchResponseDto> dtoList =
+                objectMapper.convertValue(
+                        dataNode,
+                        new TypeReference<>() {}
+                );
+
+        assertThat(dtoList).isNotEmpty();
+        for (int i = 0; i < dtoList.size(); i++) {
+            WaybleZoneSearchResponseDto dto = dtoList.get(i);
+            double expected = haversine(LATITUDE, LONGITUDE,
+                    dto.latitude(), dto.longitude());
+            // 허용 오차: 0.05 km (≈50m)
+            assertThat(dto.distance())
+                    .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
+                            dto.zoneId(), expected, dto.distance())
+                    .isCloseTo(expected, offset(0.05));
+
+            if (i > 0) {
+                assertThat(dto.distance())
+                        .withFailMessage("거리 정렬 오류: %f !> %f",
+                                dto.distance(), dtoList.get(i-1).distance())
+                        .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
+            }
+        }
+
+        for (WaybleZoneSearchResponseDto dto : dtoList) {
+            System.out.println(dto.toString());
+        }
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6_371; // 지구 반지름 (km)
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
     }
 
     private Map<String, Double> makeRandomPoint() {
-        double centerLat = 37.495;   // 구 중심 위도
-        double centerLng = 127.045;  // 구 중심 경도
-        double radiusKm  = 150.0;      // 최대 반경
-
-        double radiusDeg = radiusKm / 111.0;
+        double radiusDeg = RADIUS / 111.0;
 
         Random rnd = new Random();
 
@@ -83,10 +166,10 @@ public class WaybleZoneSearchApiIntegrationTest {
         double t = 2 * Math.PI * v;
 
         double latOffset = w * Math.cos(t);
-        double lngOffset = w * Math.sin(t) / Math.cos(Math.toRadians(centerLat));
+        double lngOffset = w * Math.sin(t) / Math.cos(Math.toRadians(LATITUDE));
 
-        double randomLat = centerLat + latOffset;
-        double randomLng = centerLng + lngOffset;
+        double randomLat = LATITUDE + latOffset;
+        double randomLng = LONGITUDE + lngOffset;
 
         return Map.of("latitude", randomLat, "longitude", randomLng);
     }
