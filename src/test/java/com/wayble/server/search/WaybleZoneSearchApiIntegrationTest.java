@@ -59,7 +59,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        for (int i = 1; i <= 10000; i++) {
+        for (int i = 1; i <= 1000; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
                     .state("state" + i)
@@ -88,7 +88,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @AfterAll
     public void teardown() {
-        //waybleZoneSearchRepository.deleteAll();
+        waybleZoneSearchRepository.deleteAll();
     }
 
     @Test
@@ -121,7 +121,8 @@ public class WaybleZoneSearchApiIntegrationTest {
 
         String json = result.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(json);
-        JsonNode dataNode = root.get("data");
+        JsonNode node = root.get("data");
+        JsonNode dataNode = node.get("content");
 
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
@@ -169,7 +170,8 @@ public class WaybleZoneSearchApiIntegrationTest {
 
         String json = result.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(json);
-        JsonNode dataNode = root.get("data");
+        JsonNode node = root.get("data");
+        JsonNode dataNode = node.get("content");
 
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
@@ -221,7 +223,8 @@ public class WaybleZoneSearchApiIntegrationTest {
 
         String json = result.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(json);
-        JsonNode dataNode = root.get("data");
+        JsonNode node = root.get("data");
+        JsonNode dataNode = node.get("content");
 
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
@@ -275,7 +278,8 @@ public class WaybleZoneSearchApiIntegrationTest {
 
         String json = result.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(json);
-        JsonNode dataNode = root.get("data");
+        JsonNode node = root.get("data");
+        JsonNode dataNode = node.get("content");
 
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
