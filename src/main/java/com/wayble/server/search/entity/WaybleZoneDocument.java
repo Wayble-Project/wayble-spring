@@ -1,12 +1,13 @@
 package com.wayble.server.search.entity;
 
-import com.wayble.server.common.entity.Address;
 import com.wayble.server.search.dto.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @ToString
 @Builder
@@ -25,7 +26,8 @@ public class WaybleZoneDocument {
 
     private String thumbnailImageUrl;
 
-    private Address address;
+    @Field(type = FieldType.Object)
+    private EsAddress address;
 
     private double averageRating;
 
@@ -37,7 +39,7 @@ public class WaybleZoneDocument {
                 .zoneName(waybleZone.getZoneName())
                 .zoneType(waybleZone.getZoneType())
                 .thumbnailImageUrl("thumbnail image url")
-                .address(waybleZone.getAddress())
+                .address(EsAddress.from(waybleZone.getAddress()))
                 .averageRating(0.0)
                 .reviewCount(0L)
                 .build();
@@ -49,7 +51,7 @@ public class WaybleZoneDocument {
                 .zoneName(dto.zoneName())
                 .zoneType(dto.waybleZoneType())
                 .thumbnailImageUrl(dto.thumbnailImageUrl())
-                .address(dto.address())
+                .address(EsAddress.from(dto.address()))
                 .averageRating(dto.averageRating() != null ? dto.averageRating() : 0.0)
                 .reviewCount(dto.reviewCount() != null ? dto.reviewCount() : 0L)
                 .build();
