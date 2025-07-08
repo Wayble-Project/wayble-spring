@@ -97,12 +97,12 @@ public class WaybleZoneSearchApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("좌표를 전달받아 반경 이내의 웨이블 존을 거리 순으로 조회")
     public void findWaybleZoneByDistanceAscending() throws Exception{
         MvcResult result = mockMvc.perform(get("/search")
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
-                        //.param("name",      "waybleZone")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is2xxSuccessful())
@@ -123,6 +123,58 @@ public class WaybleZoneSearchApiIntegrationTest {
         assertThat(dtoList).isNotEmpty();
         for (int i = 0; i < dtoList.size(); i++) {
             WaybleZoneSearchResponseDto dto = dtoList.get(i);
+            double expected = haversine(LATITUDE, LONGITUDE,
+                    dto.latitude(), dto.longitude());
+            // 허용 오차: 0.05 km (≈50m)
+            assertThat(dto.distance())
+                    .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
+                            dto.zoneId(), expected, dto.distance())
+                    .isCloseTo(expected, offset(0.05));
+
+            if (i > 0) {
+                assertThat(dto.distance())
+                        .withFailMessage("거리 정렬 오류: %f !> %f",
+                                dto.distance(), dtoList.get(i-1).distance())
+                        .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
+            }
+        }
+
+        for (WaybleZoneSearchResponseDto dto : dtoList) {
+            System.out.println(dto.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("단어가 포함된 웨이블존을 거리 순으로 반환")
+    public void findWaybleZoneByNameAscending() throws Exception{
+        final String word = "Zone3";
+        MvcResult result = mockMvc.perform(get("/search")
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("radiusKm",  String.valueOf(RADIUS))
+                        .param("zoneName",      word)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+
+        String json = result.getResponse().getContentAsString();
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneSearchResponseDto> dtoList =
+                objectMapper.convertValue(
+                        dataNode,
+                        new TypeReference<>() {}
+                );
+
+        assertThat(dtoList).isNotEmpty();
+        for (int i = 0; i < dtoList.size(); i++) {
+            WaybleZoneSearchResponseDto dto = dtoList.get(i);
+
+            assertThat(dto.zoneName().contains(word)).isTrue();
             double expected = haversine(LATITUDE, LONGITUDE,
                     dto.latitude(), dto.longitude());
             // 허용 오차: 0.05 km (≈50m)
