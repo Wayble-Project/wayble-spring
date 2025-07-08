@@ -11,7 +11,7 @@ public record WaybleZoneSearchConditionDto(
         @NonNull
         Double longitude,
         Double radiusKm,
-        String name,
+        String zoneName,
         WaybleZoneType zoneType
 ) {
 }
