@@ -41,6 +41,7 @@ public class WaybleZoneOperatingHour extends BaseEntity {
     @Column(name = "is_closed", nullable = false)
     private Boolean isClosed = false; // 영업 여부
 
+    /* 필요하게 되면 나중에 사용
     @PrePersist
     @PreUpdate
     private void validateTimes() {
@@ -59,4 +60,5 @@ public class WaybleZoneOperatingHour extends BaseEntity {
             }
         }
     }
+     */
 }
