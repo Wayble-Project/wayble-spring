@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,7 @@ public class ReviewController {
     })
     public CommonResponse<List<ReviewResponseDto>> getReviews(
             @PathVariable Long waybleZoneId,
-            @RequestParam(defaultValue = "latest") String sort
+            @RequestParam(defaultValue = "latest") @Pattern(regexp = "^(latest|rating)$", message = "정렬 방식은 'latest' 또는 'rating'만 가능합니다.") String sort
     ) {
         return CommonResponse.success(reviewService.getReviews(waybleZoneId, sort));
     }

@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+
 
 @Entity
 @Getter
@@ -24,12 +27,13 @@ public class WaybleZoneOperatingHour extends BaseEntity {
     @JoinColumn(name = "wayble_zone_id", nullable = false)
     private WaybleZone waybleZone;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week", nullable = false)
-    private String dayOfWeek; // 요일 정보
+    private DayOfWeek dayOfWeek; // 요일 정보
 
     @Column(name = "start_time", nullable = false)
-    private String startTime; // 영업 시작 시간
+    private LocalTime startTime; // 영업 시작 시간
 
     @Column(name = "close_time", nullable = false)
-    private String closeTime; // 영업 종료 시간
+    private LocalTime closeTime; // 영업 종료 시간
 }
