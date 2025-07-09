@@ -1,5 +1,6 @@
 package com.wayble.server.wayblezone.entity;
 
+import com.wayble.server.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,8 +10,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "wayble_zone_facility")
-public class WaybleZoneFacility {
+@Table(name = "wayble_zone_facility") // 웨이블존 편의 시설 정보 
+public class WaybleZoneFacility extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
