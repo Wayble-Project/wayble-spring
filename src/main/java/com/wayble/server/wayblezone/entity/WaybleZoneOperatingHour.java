@@ -44,8 +44,19 @@ public class WaybleZoneOperatingHour extends BaseEntity {
     @PrePersist
     @PreUpdate
     private void validateTimes() {
-        if (!isClosed && startTime != null && closeTime != null && startTime.isAfter(closeTime)) {
-            throw new IllegalStateException("시작 시간은 종료 시간보다 앞서야 합니다.");
+        if (isClosed) {
+            // 휴무일에는 시간 정보가 있어서는 안 됨
+            if (startTime != null || closeTime != null) {
+                throw new IllegalStateException("휴무일에는 시간 정보가 있을 수 없습니다.");
+            }
+        } else {
+            // 영업일에는 시간 정보가 필수
+            if (startTime == null || closeTime == null) {
+                throw new IllegalStateException("영업일에는 시작 시간과 종료 시간이 필요합니다.");
+            }
+            if (startTime.equals(closeTime)) {
+                throw new IllegalStateException("시작 시간과 종료 시간이 동일할 수 없습니다.");
+            }
         }
     }
 }
