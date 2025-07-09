@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
 
 @RestController
@@ -51,7 +52,7 @@ public class ReviewController {
     })
     public CommonResponse<List<ReviewResponseDto>> getReviews(
             @PathVariable Long waybleZoneId,
-            @RequestParam(defaultValue = "latest") @Pattern(regexp = "^(latest|rating)$", message = "정렬 방식은 'latest' 또는 'rating'만 가능합니다.") String sort
+            @RequestParam(defaultValue = "latest") String sort
     ) {
         return CommonResponse.success(reviewService.getReviews(waybleZoneId, sort));
     }

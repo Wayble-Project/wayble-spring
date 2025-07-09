@@ -16,7 +16,8 @@ import java.time.LocalTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "wayble_zone_operating_hours") // 웨이블존 영업 정보
+@Table(name = "wayble_zone_operating_hours",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"wayble_zone_id", "day_of_week"})) // 웨이블존 영업 정보
 public class WaybleZoneOperatingHour extends BaseEntity {
 
     @Id
@@ -36,4 +37,15 @@ public class WaybleZoneOperatingHour extends BaseEntity {
 
     @Column(name = "close_time", nullable = false)
     private LocalTime closeTime; // 영업 종료 시간
+
+    @Column(name = "is_closed", nullable = false)
+    private Boolean isClosed = false; // 영업 여부
+
+    @PrePersist
+    @PreUpdate
+    private void validateTimes() {
+        if (!isClosed && startTime != null && closeTime != null && startTime.isAfter(closeTime)) {
+            throw new IllegalStateException("시작 시간은 종료 시간보다 앞서야 합니다.");
+        }
+    }
 }
