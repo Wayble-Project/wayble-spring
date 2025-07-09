@@ -3,6 +3,7 @@ package com.wayble.server.wayblezone.entity;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
+import com.wayble.server.user.entity.UserPlaceWaybleZoneMapping;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -18,23 +19,29 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE wayble_zone SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@Table(name = "wayble_zone")
+@Table(name = "wayble_zone") // 웨이블 존
 public class WaybleZone extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String zoneName;
+    private String zoneName; // 가게 이름
 
-    private String contactNumber;
+    private String contactNumber; // 가게 전화 번호
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WaybleZoneType zoneType;
+    private WaybleZoneType zoneType; // 가게 타입 (음식점,카페,편의점)
 
     @Embedded
-    private Address address;
+    private Address address; // 주소
+
+    @Column(nullable = false)
+    private double rating = 0.0; // 누적 평균 평점
+
+    @Column(nullable = false)
+    private int reviewCount = 0; // 리뷰 수
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WaybleZoneImage> waybleZoneImageList = new ArrayList<>();
@@ -42,19 +49,12 @@ public class WaybleZone extends BaseEntity {
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
 
-    /**
-     * TODO: 영업 시간 구현 필요
-     */
+    @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WaybleZoneOperatingHour> operatingHours = new ArrayList<>();
 
-    /**
-     * TODO: 장애 시설 정보 구현 필요
-     */
+    @OneToOne(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WaybleZoneFacility facility;
 
-    /**
-     * TODO: Review 관련 엔티티 구현 필요
-     */
-
-    /**
-     * TODO: 내가 저장한 장소 관련 엔티티 구현 필요
-     */
+    @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPlaceWaybleZoneMapping> userPlaceMappings = new ArrayList<>();
 }
