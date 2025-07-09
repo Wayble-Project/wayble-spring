@@ -2,6 +2,7 @@ package com.wayble.server.review.controller;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.review.dto.ReviewRegisterDto;
+import com.wayble.server.review.dto.ReviewResponseDto;
 import com.wayble.server.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,5 +40,18 @@ public class ReviewController {
     ) {
         reviewService.registerReview(waybleZoneId, dto, authorizationHeader);
         return CommonResponse.success("리뷰가 등록되었습니다.");
+    }
+
+    @GetMapping
+    @Operation(summary = "웨이블존 리뷰 목록 조회", description = "웨이블존에 대한 리뷰를 최신순 또는 평점순으로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 목록 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 웨이블존이 존재하지 않음")
+    })
+    public CommonResponse<List<ReviewResponseDto>> getReviews(
+            @PathVariable Long waybleZoneId,
+            @RequestParam(defaultValue = "latest") String sort
+    ) {
+        return CommonResponse.success(reviewService.getReviews(waybleZoneId, sort));
     }
 }
