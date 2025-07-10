@@ -41,7 +41,7 @@ public class WaybleZoneDocument {
                 .id(waybleZone.getId())
                 .zoneName(waybleZone.getZoneName())
                 .zoneType(waybleZone.getZoneType())
-                .thumbnailImageUrl("thumbnail image url")
+                .thumbnailImageUrl("thumbnail image url")   // TODO: 이미지 경로 추가
                 .address(EsAddress.from(waybleZone.getAddress()))
                 .averageRating(0.0)
                 .reviewCount(0L)
