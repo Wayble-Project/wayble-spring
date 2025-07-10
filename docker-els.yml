@@ -5,12 +5,11 @@ services:
       dockerfile: Dockerfile.elasticsearch
     container_name: elasticsearch
     image: es-with-nori:9.0.2
+    restart: unless-stopped
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms256m -Xmx256m
-#      - xpack.security.enabled=true
-#      - ELASTIC_PASSWORD=<PASSWORD>
     ports:
       - "9200:9200"
       - "9300:9300"
