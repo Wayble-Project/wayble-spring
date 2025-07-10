@@ -18,7 +18,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 public class WaybleZoneDocument {
 
     @Id
-    private Long zoneId;
+    private Long id;
 
     private String zoneName;
 
@@ -34,7 +34,7 @@ public class WaybleZoneDocument {
 
     public static WaybleZoneDocument from(WaybleZone waybleZone) {
         return WaybleZoneDocument.builder()
-                .zoneId(waybleZone.getId())
+                .id(waybleZone.getId())
                 .zoneName(waybleZone.getZoneName())
                 .zoneType(waybleZone.getZoneType())
                 .thumbnailImageUrl("thumbnail image url")
