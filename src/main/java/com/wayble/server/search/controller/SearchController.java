@@ -22,11 +22,6 @@ public class SearchController {
 
     private final SearchService searchService;
 
-    @GetMapping("/test")
-    public CommonResponse<WaybleZoneDocument> findEntity() {
-        return CommonResponse.success(searchService.getWaybleZoneDocumentById(1L));
-    }
-
     @GetMapping("")
     public CommonResponse<SearchSliceDto<WaybleZoneSearchResponseDto>> findByCondition(
             @Valid @ModelAttribute WaybleZoneSearchConditionDto conditionDto,

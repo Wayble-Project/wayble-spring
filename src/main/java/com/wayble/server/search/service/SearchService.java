@@ -26,7 +26,8 @@ public class SearchService {
     }
 
     public WaybleZoneDocument getWaybleZoneDocumentById(Long id) {
-        return waybleZoneSearchRepository.findById(id).orElse(null);
+        return waybleZoneSearchRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(SearchErrorCase.NO_SUCH_DOCUMENT));
     }
 
     public void saveDocumentFromEntity(WaybleZone waybleZone) {
