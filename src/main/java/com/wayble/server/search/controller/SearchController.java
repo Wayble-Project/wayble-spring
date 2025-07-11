@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/search")
+@RequestMapping("/api/v1/wayble-zones/search")
 public class SearchController {
 
     private final SearchService searchService;
