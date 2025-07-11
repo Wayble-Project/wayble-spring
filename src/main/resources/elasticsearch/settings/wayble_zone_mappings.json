@@ -1,0 +1,12 @@
+{
+  "properties": {
+    "zoneName": {
+      "type":           "text",
+      "analyzer":       "korean_edge_ngram_analyzer",
+      "search_analyzer":"korean_search_analyzer"
+    },
+    "address.location": {
+      "type": "geo_point"
+    }
+  }
+}
