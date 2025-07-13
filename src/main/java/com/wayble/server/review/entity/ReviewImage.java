@@ -8,7 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "review_image")
@@ -26,4 +26,11 @@ public class ReviewImage extends BaseEntity {
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
+
+    public static ReviewImage of(Review review, String imageUrl) {
+        return ReviewImage.builder()
+                .review(review)
+                .imageUrl(imageUrl)
+                .build();
+    }
 }
