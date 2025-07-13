@@ -38,7 +38,9 @@ public class ReviewController {
     public CommonResponse<String> registerReview(
             @PathVariable Long waybleZoneId,
             @RequestBody @Valid ReviewRegisterDto dto,
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader // 테스트를 위해 임시로 토큰 없이도 접근하도록 설정
+
+            // TODO: 로그인 구현 후 Authorization 헤더 필수로 변경 필요
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
     ) {
         reviewService.registerReview(waybleZoneId, dto, authorizationHeader);
         return CommonResponse.success("리뷰가 등록되었습니다.");

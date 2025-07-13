@@ -12,6 +12,7 @@ import com.wayble.server.user.repository.UserPlaceWaybleZoneMappingRepository;
 import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class UserPlaceService {
     private final UserPlaceRepository userPlaceRepository;
     private final UserPlaceWaybleZoneMappingRepository mappingRepository;
 
+    @Transactional
     public void saveUserPlace(UserPlaceRequestDto request) {
         // 유저 존재 확인
         User user = userRepository.findById(request.userId())

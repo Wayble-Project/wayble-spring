@@ -1,11 +1,14 @@
 package com.wayble.server.user.controller;
 
+import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserPlaceRequestDto;
+import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserPlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +28,16 @@ public class UserPlaceController {
     })
     public CommonResponse<String> saveUserPlace(
             @PathVariable Long userId,
-            @RequestBody UserPlaceRequestDto request,
+            @RequestBody @Valid UserPlaceRequestDto request,
 
-            // 테스트를 위해 임시 허용 (로그인 구현되면 삭제)
+            // TODO: 로그인 구현 후 Authorization 헤더 필수로 변경 필요
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader
     ) {
+        // Path variable과 request body의 userId 일치 여부 확인
+        if (!userId.equals(request.userId())) {
+            throw new ApplicationException(UserErrorCase.INVALID_USER_ID);
+        }
+
         userPlaceService.saveUserPlace(request);
         return CommonResponse.success("장소가 저장되었습니다.");
     }
