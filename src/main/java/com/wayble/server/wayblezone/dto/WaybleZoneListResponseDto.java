@@ -1,5 +1,6 @@
 package com.wayble.server.wayblezone.dto;
 
+import com.wayble.server.common.dto.FacilityDto;
 import lombok.Builder;
 
 @Builder
@@ -13,15 +14,5 @@ public record WaybleZoneListResponseDto(
         String imageUrl,
         String contactNumber,
         FacilityDto facilities
-) {
-    @Builder
-    public record FacilityDto(
-            boolean hasSlope,
-            boolean hasNoDoorStep,
-            boolean hasElevator,
-            boolean hasTableSeat,
-            boolean hasDisabledToilet,
-            String floorInfo
-    ) {}
-}
+) {}
 
