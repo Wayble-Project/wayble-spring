@@ -34,6 +34,10 @@ public class WaybleZoneService {
 
         return zones.stream().map(zone -> {
             WaybleZoneFacility f = zone.getFacility();
+            if (f == null) {
+                throw new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_FACILITY_NOT_FOUND);
+            }
+
             WaybleZoneImage image = zone.getWaybleZoneImageList().stream().findFirst().orElse(null);
 
             return WaybleZoneListResponseDto.builder()
