@@ -1,5 +1,6 @@
 package com.wayble.server.wayblezone.dto;
 
+import com.wayble.server.common.dto.FacilityDto;
 import lombok.Builder;
 
 import java.util.List;
@@ -19,16 +20,6 @@ public record WaybleZoneDetailResponseDto(
         Map<String, BusinessHourDto> businessHours,
         List<String> photos
 ) {
-    @Builder
-    public record FacilityDto(
-            boolean hasSlope,
-            boolean hasNoDoorStep,
-            boolean hasElevator,
-            boolean hasTableSeat,
-            boolean hasDisabledToilet,
-            String floorInfo
-    ) {}
-
     @Builder
     public record BusinessHourDto(
             String open,
