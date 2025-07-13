@@ -1,6 +1,7 @@
 package com.wayble.server.wayblezone.controller;
 
 import com.wayble.server.common.response.CommonResponse;
+import com.wayble.server.wayblezone.dto.WaybleZoneDetailResponseDto;
 import com.wayble.server.wayblezone.dto.WaybleZoneListResponseDto;
 import com.wayble.server.wayblezone.service.WaybleZoneService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,11 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,5 +41,17 @@ public class WaybleZoneController {
             @RequestParam @NotBlank(message = "category는 필수입니다.") String category
     ) {
         return CommonResponse.success(waybleZoneService.getWaybleZones(city, category));
+    }
+
+    @GetMapping("/{waybleZoneId}")
+    @Operation(summary = "웨이블존 상세 조회", description = "웨이블존의 상세 정보를 조회합니다. (운영시간 포함)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "웨이블존이 존재하지 않음")
+    })
+    public CommonResponse<WaybleZoneDetailResponseDto> getWaybleZoneDetail(
+            @PathVariable @NotNull Long waybleZoneId
+    ) {
+        return CommonResponse.success(waybleZoneService.getWaybleZoneDetail(waybleZoneId));
     }
 }
