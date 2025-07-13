@@ -66,7 +66,7 @@ public class WaybleZoneService {
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
         WaybleZoneFacility f = zone.getFacility();
-        if (f == null) throw new ApplicationException(WaybleZoneErrorCase.FACILITY_NOT_FOUND);
+        if (f == null) throw new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_FACILITY_NOT_FOUND);
 
         List<WaybleZoneImage> images = zone.getWaybleZoneImageList();
         String imageUrl = images.stream().findFirst().map(WaybleZoneImage::getImageUrl).orElse(null);
