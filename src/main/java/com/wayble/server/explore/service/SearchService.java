@@ -22,10 +22,6 @@ public class SearchService {
 
     private final WaybleZoneQuerySearchRepository waybleZoneQuerySearchRepository;
 
-    public void makeException() {
-        throw new ApplicationException(SearchErrorCase.SEARCH_EXCEPTION);
-    }
-
     public WaybleZoneDocument getWaybleZoneDocumentById(Long id) {
         return waybleZoneDocumentRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(SearchErrorCase.NO_SUCH_DOCUMENT));
