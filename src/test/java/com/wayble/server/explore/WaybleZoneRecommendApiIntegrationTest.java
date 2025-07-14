@@ -1,8 +1,12 @@
 package com.wayble.server.explore;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.entity.Address;
+import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.AgeGroup;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
@@ -16,19 +20,25 @@ import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -58,7 +68,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     private static final Long SAMPLES = 100L;
 
-    private static final String baseUrl = "/api/v1/wayble-zones/search";
+    private static final String baseUrl = "/api/v1/wayble-zones/recommend";
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -133,6 +143,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("데이터 저장 테스트")
     public void checkDataExists() {
         List<WaybleZoneDocument> waybleZoneDocumentList = waybleZoneDocumentRepository.findAll();
         System.out.println("=== 웨이블존 목록 ===");
@@ -154,6 +165,40 @@ public class WaybleZoneRecommendApiIntegrationTest {
             System.out.println("방문 정보" + doc.toString());
         }
     }
+
+    @Test
+    @DisplayName("추천 기능 테스트")
+    public void recommendWaybleZone() throws Exception {
+        Long userId = (long) (Math.random() * SAMPLES) + 1;
+        MvcResult result = mockMvc.perform(get(baseUrl)
+                        .param("userId", String.valueOf(userId))
+                        .param("latitude", String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        WaybleZoneRecommendResponseDto dto = objectMapper.convertValue(
+                dataNode,
+                new TypeReference<>() {}
+        );
+
+        System.out.println("zoneId = " + dto.zoneId());
+        System.out.println("zoneName = " + dto.zoneName());
+        System.out.println("zoneType = " + dto.zoneType());
+        System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
+        System.out.println("latitude = " + dto.latitude());
+        System.out.println("longitude = " + dto.longitude());
+        System.out.println("rating = " + dto.averageRating());
+        System.out.println("reviewCount = " + dto.reviewCount());
+        System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+    }
+
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6_371; // 지구 반지름 (km)

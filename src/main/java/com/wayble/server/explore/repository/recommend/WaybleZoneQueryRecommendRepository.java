@@ -83,7 +83,7 @@ public class WaybleZoneQueryRecommendRepository {
                     WaybleZoneDocument zone = hit.getContent();
                     double distanceScore = 1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0)); // km 기준
                     double similarityScore = zoneVisitCountMap.getOrDefault(zone.getZoneId(), 0L) / 10.0;
-                    double recencyScore = Math.random(); // TODO: 방문 시간 정보 있으면 최근일수록 점수 ↓
+                    double recencyScore = 1.0; // TODO: 방문 시간 정보 있으면 최근일수록 점수 ↓
                     double totalScore = distanceScore * DISTANCE_WEIGHT + recencyScore * RECENCY_WEIGHT + similarityScore * SIMILARITY_WEIGHT;
                     return Map.entry(zone, totalScore);
                 })
