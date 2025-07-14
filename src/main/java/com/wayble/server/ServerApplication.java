@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 		exclude = ReactiveElasticsearchRepositoriesAutoConfiguration.class
 )
 @EnableJpaAuditing
-@EnableElasticsearchRepositories(basePackages = {"com.wayble.server.search.repository", "com.wayble.server.recommend.repository"})
+@EnableElasticsearchRepositories(basePackages = "com.wayble.server.explore.repository")
 public class ServerApplication {
 
 	public static void main(String[] args) {

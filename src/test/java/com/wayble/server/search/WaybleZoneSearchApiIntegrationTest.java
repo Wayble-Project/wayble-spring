@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.entity.Address;
-import com.wayble.server.search.dto.WaybleZoneDocumentRegisterDto;
-import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
-import com.wayble.server.search.entity.WaybleZoneDocument;
-import com.wayble.server.search.repository.WaybleZoneSearchRepository;
+import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.entity.WaybleZoneDocument;
+import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +34,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private WaybleZoneSearchRepository waybleZoneSearchRepository;
+    private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -42,7 +43,9 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     private static final double LONGITUDE = 127.045;
 
-    private static final double RADIUS = 150.0;
+    private static final double RADIUS = 50.0;
+
+    private static final String baseUrl = "/api/v1/wayble-zones/search";
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -59,7 +62,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        for (int i = 1; i <= 1000; i++) {
+        for (int i = 1; i <= 5000; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
                     .state("state" + i)
@@ -82,18 +85,18 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .build();
 
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
-            waybleZoneSearchRepository.save(waybleZoneDocument);
+            waybleZoneDocumentRepository.save(waybleZoneDocument);
         }
     }
 
     @AfterAll
     public void teardown() {
-        waybleZoneSearchRepository.deleteAll();
+        waybleZoneDocumentRepository.deleteAll();
     }
 
     @Test
     public void checkDataExists() {
-        List<WaybleZoneDocument> all = waybleZoneSearchRepository.findAll();
+        List<WaybleZoneDocument> all = waybleZoneDocumentRepository.findAll();
         System.out.println("=== 저장된 데이터 확인 ===");
         System.out.println("Total documents: " + all.size());
 
@@ -110,7 +113,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     @DisplayName("좌표를 전달받아 반경 이내의 웨이블 존을 거리 순으로 조회")
     public void findWaybleZoneByDistanceAscending() throws Exception{
-        MvcResult result = mockMvc.perform(get("/search")
+        MvcResult result = mockMvc.perform(get(baseUrl)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -119,7 +122,7 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        String json = result.getResponse().getContentAsString();
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
@@ -158,7 +161,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 단어가 포함된 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
-        MvcResult result = mockMvc.perform(get("/search")
+        MvcResult result = mockMvc.perform(get(baseUrl)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -168,7 +171,9 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        String json = result.getResponse().getContentAsString();
+        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
@@ -209,7 +214,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 타입의 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByZoneTypeAscending() throws Exception{
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
-        MvcResult result = mockMvc.perform(get("/search")
+        MvcResult result = mockMvc.perform(get(baseUrl)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -219,9 +224,9 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        System.out.println(result.getResponse().getContentAsString());
+        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
 
-        String json = result.getResponse().getContentAsString();
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
@@ -263,7 +268,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void findWaybleZoneByNameAndZoneTypeAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
-        MvcResult result = mockMvc.perform(get("/search")
+        MvcResult result = mockMvc.perform(get(baseUrl)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -274,9 +279,9 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        System.out.println(result.getResponse().getContentAsString());
+        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
 
-        String json = result.getResponse().getContentAsString();
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
