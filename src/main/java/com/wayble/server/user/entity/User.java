@@ -58,5 +58,6 @@ public class User extends BaseEntity {
 
     // TODO 프로필 이미지 관련 작업 필요
 
-    // TODO 내가 저장한 장소 관련 작업 필요
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPlace> userPlaces = new ArrayList<>();
 }
