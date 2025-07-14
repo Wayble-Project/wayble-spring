@@ -1,10 +1,13 @@
 package com.wayble.server.explore.entity;
 
+import org.springframework.data.annotation.Id;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.User;
-import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+
+import java.util.UUID;
 
 @ToString
 @Builder
@@ -15,6 +18,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 public class WaybleZoneVisitLogDocument {
 
     @Id
+    @Field(name = "id")
     private Long logId;
 
     private Long userId;
@@ -27,7 +31,7 @@ public class WaybleZoneVisitLogDocument {
 
     public static WaybleZoneVisitLogDocument fromEntity(User user, Long zoneId) {
         return WaybleZoneVisitLogDocument.builder()
-                .userId(user.getId())
+                .logId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE)
                 .zoneId(zoneId)
                 .gender(user.getGender())
                 .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))

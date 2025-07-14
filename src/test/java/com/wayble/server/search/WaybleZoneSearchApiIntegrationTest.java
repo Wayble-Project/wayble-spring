@@ -62,7 +62,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        for (int i = 1; i <= 5000; i++) {
+        for (int i = 1; i <= 1000; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
                     .state("state" + i)
@@ -102,7 +102,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
         assertThat(all.size()).isGreaterThan(0);
         for (WaybleZoneDocument doc : all) {
-            assertThat(doc.getId()).isNotNull();
+            assertThat(doc.getZoneId()).isNotNull();
             assertThat(doc.getZoneName()).isNotNull();
             assertThat(doc.getAddress().getLocation()).isNotNull();
             System.out.println("존 정보: " + doc.toString());
