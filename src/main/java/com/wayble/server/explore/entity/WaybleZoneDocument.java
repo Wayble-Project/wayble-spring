@@ -3,7 +3,7 @@ package com.wayble.server.explore.entity;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.*;
 import org.springframework.data.elasticsearch.annotations.*;
 
@@ -18,7 +18,8 @@ import org.springframework.data.elasticsearch.annotations.*;
 public class WaybleZoneDocument {
 
     @Id
-    private Long id;
+    @Field(name = "id")
+    private Long zoneId;
 
     @Field(type = FieldType.Text,
             analyzer = "korean_edge_ngram_analyzer",
@@ -38,7 +39,7 @@ public class WaybleZoneDocument {
 
     public static WaybleZoneDocument fromEntity(WaybleZone waybleZone) {
         return WaybleZoneDocument.builder()
-                .id(waybleZone.getId())
+                .zoneId(waybleZone.getId())
                 .zoneName(waybleZone.getZoneName())
                 .zoneType(waybleZone.getZoneType())
                 .thumbnailImageUrl("thumbnail image url")   // TODO: 이미지 경로 추가
@@ -50,7 +51,7 @@ public class WaybleZoneDocument {
 
     public static WaybleZoneDocument fromDto(WaybleZoneDocumentRegisterDto dto) {
         return WaybleZoneDocument.builder()
-                .id(dto.zoneId())
+                .zoneId(dto.zoneId())
                 .zoneName(dto.zoneName())
                 .zoneType(dto.waybleZoneType())
                 .thumbnailImageUrl(dto.thumbnailImageUrl())

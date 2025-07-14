@@ -28,7 +28,7 @@ public record WaybleZoneSearchResponseDto(
 ) {
     public static WaybleZoneSearchResponseDto from(WaybleZoneDocument waybleZoneDocument, Double distance) {
         return WaybleZoneSearchResponseDto.builder()
-                .zoneId(waybleZoneDocument.getId())
+                .zoneId(waybleZoneDocument.getZoneId())
                 .zoneName(waybleZoneDocument.getZoneName())
                 .zoneType(waybleZoneDocument.getZoneType())
                 .thumbnailImageUrl(waybleZoneDocument.getThumbnailImageUrl())
