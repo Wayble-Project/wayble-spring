@@ -5,7 +5,7 @@ import com.wayble.server.explore.dto.search.SearchSliceDto;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
-import com.wayble.server.explore.service.SearchService;
+import com.wayble.server.explore.service.WaybleZoneSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/wayble-zones/search")
 public class WaybleZoneSearchController {
 
-    private final SearchService searchService;
+    private final WaybleZoneSearchService waybleZoneSearchService;
 
     @GetMapping("")
     public CommonResponse<SearchSliceDto<WaybleZoneSearchResponseDto>> findByCondition(
@@ -28,7 +28,7 @@ public class WaybleZoneSearchController {
             @RequestParam(name = "size", defaultValue = "20") int size)
     {
         Slice<WaybleZoneSearchResponseDto> slice =
-                searchService.searchWaybleZonesByCondition(conditionDto, PageRequest.of(page, size));
+                waybleZoneSearchService.searchWaybleZonesByCondition(conditionDto, PageRequest.of(page, size));
         return CommonResponse.success(new SearchSliceDto<>(
                 slice.getContent(),
                 slice.hasNext()
@@ -37,7 +37,7 @@ public class WaybleZoneSearchController {
 
     @PostMapping("")
     public CommonResponse<String> registerDocumentFromDto(@RequestBody WaybleZoneDocumentRegisterDto registerDto) {
-        searchService.saveDocumentFromDto(registerDto);
+        waybleZoneSearchService.saveDocumentFromDto(registerDto);
         return CommonResponse.success("Wayble Zone Document 등록 완료!");
     }
 }

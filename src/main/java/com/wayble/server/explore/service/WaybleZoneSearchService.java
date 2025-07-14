@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class SearchService {
+public class WaybleZoneSearchService {
 
     private final WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
