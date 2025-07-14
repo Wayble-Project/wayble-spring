@@ -5,7 +5,7 @@ import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.AccessLevel;
 import lombok.Builder;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public record WaybleZoneRecommendResponseDto(
 
         Long zoneId,
@@ -22,7 +22,15 @@ public record WaybleZoneRecommendResponseDto(
 
         Double averageRating,
 
-        Long reviewCount
+        Long reviewCount,
+
+        Double distanceScore,
+
+        Double similarityScore,
+
+        Double recencyScore,
+
+        Double totalScore
 
 ) {
     public static WaybleZoneRecommendResponseDto from(WaybleZoneDocument waybleZoneDocument) {

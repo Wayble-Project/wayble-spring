@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.AgeGroup;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
@@ -19,10 +18,7 @@ import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -142,6 +138,12 @@ public class WaybleZoneRecommendApiIntegrationTest {
         }
     }
 
+    @AfterAll
+    public void teardown() {
+        waybleZoneDocumentRepository.deleteAll();
+        waybleZoneVisitLogDocumentRepository.deleteAll();
+    }
+
     @Test
     @DisplayName("데이터 저장 테스트")
     public void checkDataExists() {
@@ -197,6 +199,46 @@ public class WaybleZoneRecommendApiIntegrationTest {
         System.out.println("rating = " + dto.averageRating());
         System.out.println("reviewCount = " + dto.reviewCount());
         System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+    }
+
+    @Test
+    @DisplayName("추천 결과 상위 20개 값 테스트")
+    public void recommendWaybleZoneTop20() throws Exception {
+        Long userId = (long) (Math.random() * SAMPLES) + 1;
+        MvcResult result = mockMvc.perform(get(baseUrl + "/multiple")
+                        .param("userId", String.valueOf(userId))
+                        .param("latitude", String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("count", String.valueOf(30))
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneRecommendResponseDto> WaybleZoneRecommendResponseDtoList = objectMapper.convertValue(
+                dataNode,
+                new TypeReference<>() {}
+        );
+
+        for (WaybleZoneRecommendResponseDto dto : WaybleZoneRecommendResponseDtoList) {
+            System.out.println("zoneId = " + dto.zoneId());
+            //System.out.println("zoneName = " + dto.zoneName());
+            //System.out.println("zoneType = " + dto.zoneType());
+            //System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
+            System.out.println("latitude = " + dto.latitude());
+            System.out.println("longitude = " + dto.longitude());
+            //System.out.println("rating = " + dto.averageRating());
+            //System.out.println("reviewCount = " + dto.reviewCount());
+            System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+            System.out.println("distanceScore = " + dto.distanceScore());
+            System.out.println("similarityScore = " + dto.similarityScore());
+            System.out.println("recencyScore = " + dto.recencyScore());
+            System.out.println("totalScore = " + dto.totalScore());
+        }
     }
 
 
