@@ -1,0 +1,198 @@
+package com.wayble.server.explore;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wayble.server.common.entity.Address;
+import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.explore.entity.AgeGroup;
+import com.wayble.server.explore.entity.WaybleZoneDocument;
+import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
+import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
+import com.wayble.server.explore.repository.WaybleZoneVisitLogDocumentRepository;
+import com.wayble.server.user.dto.UserRegisterDto;
+import com.wayble.server.user.entity.Gender;
+import com.wayble.server.user.entity.LoginType;
+import com.wayble.server.user.entity.User;
+import com.wayble.server.user.entity.UserType;
+import com.wayble.server.user.repository.UserRepository;
+import com.wayble.server.wayblezone.entity.WaybleZoneType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureMockMvc
+public class WaybleZoneRecommendApiIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
+
+    @Autowired
+    private WaybleZoneVisitLogDocumentRepository waybleZoneVisitLogDocumentRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private static final double LATITUDE = 37.495;
+
+    private static final double LONGITUDE = 127.045;
+
+    private static final double RADIUS = 50.0;
+
+    private static final Long SAMPLES = 100L;
+
+    private static final String baseUrl = "/api/v1/wayble-zones/search";
+
+    List<String> nameList = new ArrayList<>(Arrays.asList(
+            "던킨도너츠",
+            "베스킨라빈스",
+            "투썸플레이스",
+            "스타벅스",
+            "메가엠지씨커피",
+            "공차",
+            "롯데리아",
+            "맥도날드",
+            "KFC",
+            "노브랜드버거"
+    ));
+
+    @BeforeAll
+    public void setup() {
+        for (int i = 1; i <= SAMPLES; i++) {
+            Map<String, Double> points = makeRandomPoint();
+            Address address = Address.builder()
+                    .state("state" + i)
+                    .city("city" + i)
+                    .district("district" + i)
+                    .streetAddress("street address" + i)
+                    .detailAddress("detail address" + i)
+                    .latitude(points.get("latitude"))
+                    .longitude(points.get("longitude"))
+                    .build();
+
+            WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
+                    .builder()
+                    .zoneId((long) i)
+                    .zoneName(nameList.get((int) (Math.random() * nameList.size())))
+                    .address(address)
+                    .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
+                    .averageRating(Math.random() * 5)
+                    .reviewCount((long)(Math.random() * 500))
+                    .build();
+
+            WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
+            waybleZoneDocumentRepository.save(waybleZoneDocument);
+
+            UserRegisterDto userRegisterDto = UserRegisterDto
+                    .builder()
+                    .userId((long) i)
+                    .nickname("user" + i)
+                    .username("user" + i)
+                    .email("user email" + i)
+                    .password("user password" + i)
+                    .birthDate(generateRandomBirthDate())
+                    .gender(Gender.values()[i % Gender.values().length])
+                    .userType(UserType.DISABLED)
+                    .loginType(LoginType.BASIC)
+                    .build();
+
+            User user = User.from(userRegisterDto);
+            userRepository.save(user);
+
+            int count = (int) (Math.random() * 10) + 1;
+            for (int j = 0; j < count; j++) {
+                Long zoneId = (long) (Math.random() * SAMPLES) + 1;
+                WaybleZoneVisitLogDocument visitLogDocument = WaybleZoneVisitLogDocument
+                        .builder()
+                        .userId(user.getId())
+                        .zoneId(zoneId)
+                        .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))
+                        .gender(user.getGender())
+                        .build();
+
+                waybleZoneVisitLogDocumentRepository.save(visitLogDocument);
+            }
+        }
+    }
+
+    @Test
+    public void checkDataExists() {
+        List<WaybleZoneDocument> waybleZoneDocumentList = waybleZoneDocumentRepository.findAll();
+        System.out.println("=== 웨이블존 목록 ===");
+
+        assertThat(waybleZoneDocumentList.size()).isGreaterThan(0);
+        for (WaybleZoneDocument doc : waybleZoneDocumentList) {
+            assertThat(doc.getZoneId()).isNotNull();
+            assertThat(doc.getZoneName()).isNotNull();
+            assertThat(doc.getAddress().getLocation()).isNotNull();
+            System.out.println("존 정보: " + doc.toString());
+            System.out.println("주소: " + doc.getAddress().toString());
+        }
+
+        List<WaybleZoneVisitLogDocument> waybleZoneVisitLogList = waybleZoneVisitLogDocumentRepository.findAll();
+        System.out.println("=== 웨이블존 방문 목록 ===");
+
+        assertThat(waybleZoneVisitLogList.size()).isGreaterThan(0);
+        for (WaybleZoneVisitLogDocument doc : waybleZoneVisitLogList) {
+            System.out.println("방문 정보" + doc.toString());
+        }
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6_371; // 지구 반지름 (km)
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    private Map<String, Double> makeRandomPoint() {
+        double radiusDeg = RADIUS / 111.0;
+
+        Random rnd = new Random();
+
+        double u = rnd.nextDouble();
+        double v = rnd.nextDouble();
+        double w = radiusDeg * Math.sqrt(u);
+        double t = 2 * Math.PI * v;
+
+        double latOffset = w * Math.cos(t);
+        double lngOffset = w * Math.sin(t) / Math.cos(Math.toRadians(LATITUDE));
+
+        double randomLat = LATITUDE + latOffset;
+        double randomLng = LONGITUDE + lngOffset;
+
+        return Map.of("latitude", randomLat, "longitude", randomLng);
+    }
+
+    private LocalDate generateRandomBirthDate() {
+        LocalDate today = LocalDate.now();
+        LocalDate start = today.minusYears(90); // 90세
+        LocalDate end = today.minusYears(10);   // 10세
+
+        long daysBetween = ChronoUnit.DAYS.between(start, end);
+        long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
+
+        return start.plusDays(randomDays);
+    }
+}
