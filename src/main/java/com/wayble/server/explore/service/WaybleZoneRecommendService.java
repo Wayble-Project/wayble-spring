@@ -19,10 +19,10 @@ public class WaybleZoneRecommendService {
 
     private final UserRepository userRepository;
 
-    public WaybleZoneRecommendResponseDto getWaybleZonePersonalRecommend(Long userId) {
+    public WaybleZoneRecommendResponseDto getWaybleZonePersonalRecommend(Long userId, double latitude, double longitude) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
 
-        return waybleZoneRecommendRepository.searchPersonalWaybleZone(user);
+        return waybleZoneRecommendRepository.searchPersonalWaybleZone(user, latitude, longitude);
     }
 }
