@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,5 +26,12 @@ public class WaybleZoneRecommendService {
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
 
         return waybleZoneRecommendRepository.searchPersonalWaybleZone(user, latitude, longitude);
+    }
+
+    public List<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommendTopN(Long userId, double latitude, double longitude, int count) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
+
+        return waybleZoneRecommendRepository.searchTopPersonalWaybleZones(user, latitude, longitude, count);
     }
 }

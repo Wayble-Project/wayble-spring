@@ -32,7 +32,7 @@ public class WaybleZoneQueryRecommendRepository {
     // === [가중치 설정] === //
     private static final double DISTANCE_WEIGHT = 0.6;
     private static final double RECENCY_WEIGHT = 0.2;
-    private static final double SIMILARITY_WEIGHT = 0.2;
+    private static final double SIMILARITY_WEIGHT = 0.4;
 
     public WaybleZoneRecommendResponseDto searchPersonalWaybleZone(User user, double latitude, double longitude) {
 
@@ -78,20 +78,104 @@ public class WaybleZoneQueryRecommendRepository {
                 .collect(Collectors.groupingBy(hit -> hit.getContent().getZoneId(), Collectors.counting()));
 
         // 4. 점수 계산
-        WaybleZoneDocument best = zoneHits.stream()
+        return zoneHits.stream()
                 .map(hit -> {
                     WaybleZoneDocument zone = hit.getContent();
-                    double distanceScore = 1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0)); // km 기준
+                    double distanceScore = 1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0));
                     double similarityScore = zoneVisitCountMap.getOrDefault(zone.getZoneId(), 0L) / 10.0;
-                    double recencyScore = 1.0; // TODO: 방문 시간 정보 있으면 최근일수록 점수 ↓
-                    double totalScore = distanceScore * DISTANCE_WEIGHT + recencyScore * RECENCY_WEIGHT + similarityScore * SIMILARITY_WEIGHT;
-                    return Map.entry(zone, totalScore);
-                })
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
+                    double recencyScore = 1.0;
 
-        if (best == null) return null;
-        return WaybleZoneRecommendResponseDto.from(best);
+                    double totalScore = distanceScore * DISTANCE_WEIGHT +
+                            similarityScore * SIMILARITY_WEIGHT +
+                            recencyScore * RECENCY_WEIGHT;
+
+                    return WaybleZoneRecommendResponseDto.builder()
+                            .zoneId(zone.getZoneId())
+                            .zoneName(zone.getZoneName())
+                            .zoneType(zone.getZoneType())
+                            .thumbnailImageUrl(zone.getThumbnailImageUrl())
+                            .latitude(zone.getAddress().getLocation().getLat())
+                            .longitude(zone.getAddress().getLocation().getLon())
+                            .averageRating(zone.getAverageRating())
+                            .reviewCount(zone.getReviewCount())
+                            .distanceScore(distanceScore)
+                            .similarityScore(similarityScore)
+                            .recencyScore(recencyScore)
+                            .totalScore(totalScore)
+                            .build();
+                })
+                .max(Comparator.comparingDouble(WaybleZoneRecommendResponseDto::totalScore))
+                .orElse(null);
+    }
+
+    public List<WaybleZoneRecommendResponseDto> searchTopPersonalWaybleZones(User user, double latitude, double longitude, int topN) {
+
+        AgeGroup userAgeGroup = AgeGroup.fromBirthDate(user.getBirthDate());
+        Gender userGender = user.getGender();
+
+        Query geoQuery = Query.of(q -> q
+                .bool(b -> b
+                        .filter(f -> f.geoDistance(gd -> gd
+                                .field("address.location")
+                                .location(loc -> loc.latlon(ll -> ll.lat(latitude).lon(longitude)))
+                                .distance("50km")))
+                )
+        );
+
+        NativeQuery nativeQuery = NativeQuery.builder()
+                .withQuery(geoQuery)
+                .withSort(s -> s.geoDistance(gds -> gds
+                        .field("address.location")
+                        .location(GeoLocation.of(gl -> gl.latlon(ll -> ll.lat(latitude).lon(longitude))))
+                        .order(SortOrder.Asc)))
+                .withMaxResults(100)
+                .build();
+
+        SearchHits<WaybleZoneDocument> zoneHits = operations.search(nativeQuery, WaybleZoneDocument.class, ZONE_INDEX);
+
+        NativeQuery logQuery = NativeQuery.builder()
+                .withQuery(Query.of(q -> q
+                        .bool(b -> b
+                                .must(m1 -> m1.term(t -> t.field("gender").value(userGender.name())))
+                                .must(m2 -> m2.term(t -> t.field("ageGroup").value(userAgeGroup.name())))
+                        )
+                ))
+                .withMaxResults(10000)
+                .build();
+
+        SearchHits<WaybleZoneVisitLogDocument> logHits = operations.search(logQuery, WaybleZoneVisitLogDocument.class, LOG_INDEX);
+
+        Map<Long, Long> zoneVisitCountMap = logHits.stream()
+                .collect(Collectors.groupingBy(hit -> hit.getContent().getZoneId(), Collectors.counting()));
+
+        return zoneHits.stream()
+                .map(hit -> {
+                    WaybleZoneDocument zone = hit.getContent();
+                    double distanceScore = 1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0));
+                    double similarityScore = zoneVisitCountMap.getOrDefault(zone.getZoneId(), 0L) / 10.0;
+                    double recencyScore = 1.0; // 추후 방문 시각 기반 점수로 확장 가능
+
+                    double totalScore = distanceScore * DISTANCE_WEIGHT +
+                            similarityScore * SIMILARITY_WEIGHT +
+                            recencyScore * RECENCY_WEIGHT;
+
+                    return WaybleZoneRecommendResponseDto.builder()
+                            .zoneId(zone.getZoneId())
+                            .zoneName(zone.getZoneName())
+                            .zoneType(zone.getZoneType())
+                            .thumbnailImageUrl(zone.getThumbnailImageUrl())
+                            .latitude(zone.getAddress().getLocation().getLat())
+                            .longitude(zone.getAddress().getLocation().getLon())
+                            .averageRating(zone.getAverageRating())
+                            .reviewCount(zone.getReviewCount())
+                            .distanceScore(distanceScore)
+                            .similarityScore(similarityScore)
+                            .recencyScore(recencyScore)
+                            .totalScore(totalScore)
+                            .build();
+                })
+                .sorted(Comparator.comparingDouble(WaybleZoneRecommendResponseDto::totalScore).reversed())
+                .limit(topN)
+                .toList();
     }
 }
