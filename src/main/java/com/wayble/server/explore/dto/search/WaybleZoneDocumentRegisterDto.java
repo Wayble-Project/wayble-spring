@@ -1,4 +1,4 @@
-package com.wayble.server.search.dto;
+package com.wayble.server.explore.dto.search;
 
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;

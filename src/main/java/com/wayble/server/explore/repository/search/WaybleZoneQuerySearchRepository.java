@@ -1,12 +1,12 @@
-package com.wayble.server.search.repository;
+package com.wayble.server.explore.repository.search;
 
 import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import com.wayble.server.search.dto.WaybleZoneSearchConditionDto;
-import com.wayble.server.search.dto.WaybleZoneSearchResponseDto;
-import com.wayble.server.search.entity.WaybleZoneDocument;
+import com.wayble.server.explore.dto.search.WaybleZoneSearchConditionDto;
+import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.entity.WaybleZoneDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,18 +22,17 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class WaybleZoneSearchRepositoryImpl implements WaybleZoneSearchRepositoryCustom {
+public class WaybleZoneQuerySearchRepository{
 
     private final ElasticsearchOperations operations;
 
     private static final IndexCoordinates INDEX = IndexCoordinates.of("wayble_zone");
 
-    @Override
     public Slice<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto cond, Pageable pageable) {
 
         int fetchSize = pageable.getPageSize() + 1;
 
-        double radius = cond.radiusKm() != null ? cond.radiusKm() : 100.0;
+        double radius = cond.radiusKm() != null ? cond.radiusKm() : 50.0;
         String radiusWithUnit = radius + "km"; // The new client often uses string representation for distance
 
         // 1) Build the query using the new lambda-based builders
