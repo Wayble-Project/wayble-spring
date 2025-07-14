@@ -32,6 +32,7 @@ public class WaybleZoneVisitLogDocument {
     public static WaybleZoneVisitLogDocument fromEntity(User user, Long zoneId) {
         return WaybleZoneVisitLogDocument.builder()
                 .logId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE)
+                .userId(user.getId())
                 .zoneId(zoneId)
                 .gender(user.getGender())
                 .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))
