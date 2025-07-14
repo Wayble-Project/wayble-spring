@@ -20,6 +20,10 @@ public class WaybleZoneVisitLogService {
     private final UserRepository userRepository;
 
     public void saveVisitLog(Long userId, Long zoneId) {
+        if(userId == null || zoneId == null) {
+            return;
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(VisitLogErrorCase.USER_NOT_EXIST));
 
