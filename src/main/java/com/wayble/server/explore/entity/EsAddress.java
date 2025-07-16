@@ -1,4 +1,4 @@
-package com.wayble.server.search.entity;
+package com.wayble.server.explore.entity;
 
 import com.wayble.server.common.entity.Address;
 import lombok.*;

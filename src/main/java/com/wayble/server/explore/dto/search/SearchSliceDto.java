@@ -1,4 +1,4 @@
-package com.wayble.server.search.dto;
+package com.wayble.server.explore.dto.search;
 
 import java.util.List;
 

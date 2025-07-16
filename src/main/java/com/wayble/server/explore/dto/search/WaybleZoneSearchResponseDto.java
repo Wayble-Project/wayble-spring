@@ -1,10 +1,9 @@
-package com.wayble.server.search.dto;
+package com.wayble.server.explore.dto.search;
 
-import com.wayble.server.search.entity.WaybleZoneDocument;
+import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.ToString;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record WaybleZoneSearchResponseDto(
@@ -29,7 +28,7 @@ public record WaybleZoneSearchResponseDto(
 ) {
     public static WaybleZoneSearchResponseDto from(WaybleZoneDocument waybleZoneDocument, Double distance) {
         return WaybleZoneSearchResponseDto.builder()
-                .zoneId(waybleZoneDocument.getId())
+                .zoneId(waybleZoneDocument.getZoneId())
                 .zoneName(waybleZoneDocument.getZoneName())
                 .zoneType(waybleZoneDocument.getZoneType())
                 .thumbnailImageUrl(waybleZoneDocument.getThumbnailImageUrl())
