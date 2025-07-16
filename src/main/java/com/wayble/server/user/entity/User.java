@@ -30,7 +30,7 @@ public class User extends BaseEntity {
 
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     // TODO: 비밀번호 암호화 필요
