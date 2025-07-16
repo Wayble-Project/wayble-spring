@@ -36,9 +36,6 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// ✅ QueryDSL 수동 설정
-	// implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	// annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testCompileOnly 'org.projectlombok:lombok'
@@ -49,17 +46,3 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-
-def querydslDir = "src/main/generated"
-
-sourceSets {
-	main.java.srcDirs += [ querydslDir ]
-}
-
-tasks.withType(JavaCompile) {
-	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-}
-
-tasks.named('clean') {
-	delete fileTree(dir: querydslDir, include: '**/*.java')
-}
