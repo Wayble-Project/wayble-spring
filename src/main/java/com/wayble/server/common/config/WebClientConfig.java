@@ -1,6 +1,6 @@
 package com.wayble.server.common.config;
 
-import com.wayble.server.common.client.tmap.TMapProperties;
+import com.wayble.server.direction.external.tmap.TMapProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
