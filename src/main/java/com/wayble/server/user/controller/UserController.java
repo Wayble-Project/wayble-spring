@@ -3,6 +3,7 @@ package com.wayble.server.user.controller;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserLoginRequestDto;
 import com.wayble.server.user.dto.UserRegisterRequestDto;
+import com.wayble.server.user.dto.token.TokenResponseDto;
 import com.wayble.server.user.service.UserService;
 import com.wayble.server.user.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,9 +52,9 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "아이디 혹은 비밀번호가 잘못됨",
                     content = @Content(schema = @Schema(implementation = com.wayble.server.common.response.CommonResponse.class)))
     })
-    public CommonResponse<String> login(@RequestBody @Valid UserLoginRequestDto req) {
-        authService.login(req);
-        return CommonResponse.success("로그인 성공!");
+    public CommonResponse<TokenResponseDto> login(@RequestBody @Valid UserLoginRequestDto req) {
+        TokenResponseDto tokenDto = authService.login(req);
+        return CommonResponse.success(tokenDto);
     }
 
 }
