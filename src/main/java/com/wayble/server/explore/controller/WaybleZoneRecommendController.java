@@ -1,8 +1,10 @@
 package com.wayble.server.explore.controller;
 
 import com.wayble.server.common.response.CommonResponse;
+import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendConditionDto;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.service.WaybleZoneRecommendService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +21,15 @@ public class WaybleZoneRecommendController {
 
     @GetMapping()
     public CommonResponse<List<WaybleZoneRecommendResponseDto>> getWaybleZonePersonalRecommend(
-            @RequestParam("userId") Long userId,
-            @RequestParam("latitude") double latitude,
-            @RequestParam("longitude") double longitude,
+            @Valid @ModelAttribute WaybleZoneRecommendConditionDto conditionDto,
             @RequestParam(name = "count", defaultValue = "1") int count) {
-        List<WaybleZoneRecommendResponseDto> result = waybleZoneRecommendService.getWaybleZonePersonalRecommend(userId, latitude, longitude, count);
+
+        List<WaybleZoneRecommendResponseDto> result = waybleZoneRecommendService.getWaybleZonePersonalRecommend(
+                conditionDto.userId(),
+                conditionDto.latitude(),
+                conditionDto.longitude(),
+                count
+        );
         return CommonResponse.success(result);
     }
 }
