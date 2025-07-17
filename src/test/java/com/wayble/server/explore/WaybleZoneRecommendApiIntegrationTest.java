@@ -66,6 +66,8 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     private static final String baseUrl = "/api/v1/wayble-zones/recommend";
 
+    private Long userId = 1L;
+
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
             "베스킨라빈스",
@@ -81,6 +83,8 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
+        userId = (long) (Math.random() * SAMPLES) + 1;
+
         for (int i = 1; i <= SAMPLES; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
@@ -98,6 +102,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .zoneId((long) i)
                     .zoneName(nameList.get((int) (Math.random() * nameList.size())))
                     .address(address)
+                    .thumbnailImageUrl("thumbnail url" + i)
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
                     .averageRating(Math.random() * 5)
                     .reviewCount((long)(Math.random() * 500))
@@ -114,7 +119,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .email("user email" + i)
                     .password("user password" + i)
                     .birthDate(generateRandomBirthDate())
-                    .gender(Gender.values()[i % Gender.values().length])
+                    .gender(Gender.values()[i % 2])
                     .userType(UserType.DISABLED)
                     .loginType(LoginType.BASIC)
                     .build();
@@ -122,7 +127,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
             User user = User.from(userRegisterDto);
             userRepository.save(user);
 
-            int count = (int) (Math.random() * 10) + 1;
+            int count = (int) (Math.random() * 30) + 1;
             for (int j = 0; j < count; j++) {
                 Long zoneId = (long) (Math.random() * SAMPLES) + 1;
                 WaybleZoneVisitLogDocument visitLogDocument = WaybleZoneVisitLogDocument
@@ -171,45 +176,11 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @Test
     @DisplayName("추천 기능 테스트")
     public void recommendWaybleZone() throws Exception {
-        Long userId = (long) (Math.random() * SAMPLES) + 1;
+
         MvcResult result = mockMvc.perform(get(baseUrl)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
-                        .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-
-        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        JsonNode root = objectMapper.readTree(json);
-        JsonNode dataNode = root.get("data");
-
-        WaybleZoneRecommendResponseDto dto = objectMapper.convertValue(
-                dataNode,
-                new TypeReference<>() {}
-        );
-
-        System.out.println("zoneId = " + dto.zoneId());
-        System.out.println("zoneName = " + dto.zoneName());
-        System.out.println("zoneType = " + dto.zoneType());
-        System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
-        System.out.println("latitude = " + dto.latitude());
-        System.out.println("longitude = " + dto.longitude());
-        System.out.println("rating = " + dto.averageRating());
-        System.out.println("reviewCount = " + dto.reviewCount());
-        System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
-    }
-
-    @Test
-    @DisplayName("추천 결과 상위 20개 값 테스트")
-    public void recommendWaybleZoneTop20() throws Exception {
-        Long userId = (long) (Math.random() * SAMPLES) + 1;
-        MvcResult result = mockMvc.perform(get(baseUrl + "/multiple")
-                        .param("userId", String.valueOf(userId))
-                        .param("latitude", String.valueOf(LATITUDE))
-                        .param("longitude", String.valueOf(LONGITUDE))
-                        .param("count", String.valueOf(30))
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is2xxSuccessful())
@@ -224,7 +195,88 @@ public class WaybleZoneRecommendApiIntegrationTest {
                 new TypeReference<>() {}
         );
 
-        for (WaybleZoneRecommendResponseDto dto : WaybleZoneRecommendResponseDtoList) {
+        assertThat(WaybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
+        for (WaybleZoneRecommendResponseDto dto : WaybleZoneRecommendResponseDtoList){
+            assertThat(dto.zoneId()).isNotNull();
+            assertThat(dto.zoneName()).isNotNull();
+            assertThat(dto.zoneType()).isNotNull();
+            assertThat(dto.latitude()).isNotNull();
+            assertThat(dto.longitude()).isNotNull();
+            assertThat(dto.distanceScore()).isGreaterThan(0.0);
+            assertThat(dto.similarityScore()).isGreaterThan(0.0);
+            assertThat(dto.recencyScore()).isGreaterThan(0.0);
+            assertThat(dto.totalScore()).isGreaterThan(0.0);
+
+            System.out.println("zoneId = " + dto.zoneId());
+            System.out.println("zoneName = " + dto.zoneName());
+            System.out.println("zoneType = " + dto.zoneType());
+            System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
+            System.out.println("latitude = " + dto.latitude());
+            System.out.println("longitude = " + dto.longitude());
+            System.out.println("rating = " + dto.averageRating());
+            System.out.println("reviewCount = " + dto.reviewCount());
+            System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+            System.out.println("distanceScore = " + dto.distanceScore());
+            System.out.println("similarityScore = " + dto.similarityScore());
+            System.out.println("recencyScore = " + dto.recencyScore());
+            System.out.println("totalScore = " + dto.totalScore());
+        }
+    }
+
+    @Test
+    @DisplayName("추천 결과 상위 N개 값 테스트")
+    public void recommendWaybleZoneTop20() throws Exception {
+        MvcResult result = mockMvc.perform(get(baseUrl)
+                        .param("userId", String.valueOf(userId))
+                        .param("latitude", String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("count", String.valueOf(20))
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneRecommendResponseDto> waybleZoneRecommendResponseDtoList = objectMapper.convertValue(
+                dataNode,
+                new TypeReference<>() {}
+        );
+
+        assertThat(waybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
+        for (int i = 0; i < waybleZoneRecommendResponseDtoList.size(); i++) {
+            WaybleZoneRecommendResponseDto dto = waybleZoneRecommendResponseDtoList.get(i);
+            assertThat(dto.zoneId()).isNotNull();
+            assertThat(dto.zoneName()).isNotNull();
+            assertThat(dto.zoneType()).isNotNull();
+            assertThat(dto.latitude()).isNotNull();
+            assertThat(dto.longitude()).isNotNull();
+            assertThat(dto.distanceScore()).isGreaterThan(0.0);
+            assertThat(dto.similarityScore()).isGreaterThan(0.0);
+            assertThat(dto.recencyScore()).isGreaterThan(0.0);
+            assertThat(dto.totalScore()).isGreaterThan(0.0);
+            if (i > 0) {
+                assertThat(waybleZoneRecommendResponseDtoList.get(i - 1).totalScore()).isGreaterThan(dto.totalScore());
+            }
+
+            System.out.println("zoneId = " + dto.zoneId());
+            System.out.println("zoneName = " + dto.zoneName());
+            System.out.println("zoneType = " + dto.zoneType());
+            System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
+            System.out.println("latitude = " + dto.latitude());
+            System.out.println("longitude = " + dto.longitude());
+            System.out.println("rating = " + dto.averageRating());
+            System.out.println("reviewCount = " + dto.reviewCount());
+            System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+            System.out.println("distanceScore = " + dto.distanceScore());
+            System.out.println("similarityScore = " + dto.similarityScore());
+            System.out.println("recencyScore = " + dto.recencyScore());
+            System.out.println("totalScore = " + dto.totalScore());
+        }
+
+        for (WaybleZoneRecommendResponseDto dto : waybleZoneRecommendResponseDtoList) {
             System.out.println("zoneId = " + dto.zoneId());
             //System.out.println("zoneName = " + dto.zoneName());
             //System.out.println("zoneType = " + dto.zoneType());

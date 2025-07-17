@@ -31,84 +31,10 @@ public class WaybleZoneQueryRecommendRepository {
 
     // === [가중치 설정] === //
     private static final double DISTANCE_WEIGHT = 0.6;
+    private static final double SIMILARITY_WEIGHT = 0.2;
     private static final double RECENCY_WEIGHT = 0.2;
-    private static final double SIMILARITY_WEIGHT = 0.4;
 
-    public WaybleZoneRecommendResponseDto searchPersonalWaybleZone(User user, double latitude, double longitude) {
-
-        AgeGroup userAgeGroup = AgeGroup.fromBirthDate(user.getBirthDate());
-        Gender userGender = user.getGender();
-
-        // 1. 모든 zone을 거리순으로 가져오기 (최대 100개)
-        Query geoQuery = Query.of(q -> q
-                .bool(b -> b
-                        .filter(f -> f.geoDistance(gd -> gd
-                                .field("address.location")
-                                .location(loc -> loc.latlon(ll -> ll.lat(latitude).lon(longitude)))
-                                .distance("50km")))
-                )
-        );
-
-        NativeQuery nativeQuery = NativeQuery.builder()
-                .withQuery(geoQuery)
-                .withSort(s -> s.geoDistance(gds -> gds
-                        .field("address.location")
-                        .location(GeoLocation.of(gl -> gl.latlon(ll -> ll.lat(latitude).lon(longitude))))
-                        .order(SortOrder.Asc)))
-                .withMaxResults(100)
-                .build();
-
-        SearchHits<WaybleZoneDocument> zoneHits = operations.search(nativeQuery, WaybleZoneDocument.class, ZONE_INDEX);
-
-        // 2. 유사 사용자 방문 기록 가져오기
-        NativeQuery logQuery = NativeQuery.builder()
-                .withQuery(Query.of(q -> q
-                        .bool(b -> b
-                                .must(m1 -> m1.term(t -> t.field("gender").value(userGender.name())))
-                                .must(m2 -> m2.term(t -> t.field("ageGroup").value(userAgeGroup.name())))
-                        )
-                ))
-                .withMaxResults(10000)
-                .build();
-
-        SearchHits<WaybleZoneVisitLogDocument> logHits = operations.search(logQuery, WaybleZoneVisitLogDocument.class, LOG_INDEX);
-
-        // 3. 유사 사용자 zone 방문 카운트 계산
-        Map<Long, Long> zoneVisitCountMap = logHits.stream()
-                .collect(Collectors.groupingBy(hit -> hit.getContent().getZoneId(), Collectors.counting()));
-
-        // 4. 점수 계산
-        return zoneHits.stream()
-                .map(hit -> {
-                    WaybleZoneDocument zone = hit.getContent();
-                    double distanceScore = 1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0));
-                    double similarityScore = zoneVisitCountMap.getOrDefault(zone.getZoneId(), 0L) / 10.0;
-                    double recencyScore = 1.0;
-
-                    double totalScore = distanceScore * DISTANCE_WEIGHT +
-                            similarityScore * SIMILARITY_WEIGHT +
-                            recencyScore * RECENCY_WEIGHT;
-
-                    return WaybleZoneRecommendResponseDto.builder()
-                            .zoneId(zone.getZoneId())
-                            .zoneName(zone.getZoneName())
-                            .zoneType(zone.getZoneType())
-                            .thumbnailImageUrl(zone.getThumbnailImageUrl())
-                            .latitude(zone.getAddress().getLocation().getLat())
-                            .longitude(zone.getAddress().getLocation().getLon())
-                            .averageRating(zone.getAverageRating())
-                            .reviewCount(zone.getReviewCount())
-                            .distanceScore(distanceScore)
-                            .similarityScore(similarityScore)
-                            .recencyScore(recencyScore)
-                            .totalScore(totalScore)
-                            .build();
-                })
-                .max(Comparator.comparingDouble(WaybleZoneRecommendResponseDto::totalScore))
-                .orElse(null);
-    }
-
-    public List<WaybleZoneRecommendResponseDto> searchTopPersonalWaybleZones(User user, double latitude, double longitude, int topN) {
+    public List<WaybleZoneRecommendResponseDto> searchPersonalWaybleZones(User user, double latitude, double longitude, int topN) {
 
         AgeGroup userAgeGroup = AgeGroup.fromBirthDate(user.getBirthDate());
         Gender userGender = user.getGender();
@@ -134,30 +60,39 @@ public class WaybleZoneQueryRecommendRepository {
         SearchHits<WaybleZoneDocument> zoneHits = operations.search(nativeQuery, WaybleZoneDocument.class, ZONE_INDEX);
 
         NativeQuery logQuery = NativeQuery.builder()
-                .withQuery(Query.of(q -> q
-                        .bool(b -> b
-                                .must(m1 -> m1.term(t -> t.field("gender").value(userGender.name())))
-                                .must(m2 -> m2.term(t -> t.field("ageGroup").value(userAgeGroup.name())))
-                        )
-                ))
                 .withMaxResults(10000)
                 .build();
 
         SearchHits<WaybleZoneVisitLogDocument> logHits = operations.search(logQuery, WaybleZoneVisitLogDocument.class, LOG_INDEX);
 
-        Map<Long, Long> zoneVisitCountMap = logHits.stream()
-                .collect(Collectors.groupingBy(hit -> hit.getContent().getZoneId(), Collectors.counting()));
+        Map<Long, Double> zoneVisitScoreMap = new HashMap<>();
+
+        for (var hit : logHits) {
+            WaybleZoneVisitLogDocument log = hit.getContent();
+
+            double weight = 0.0;
+            boolean ageMatch = log.getAgeGroup() == userAgeGroup;
+            boolean genderMatch = log.getGender() == userGender;
+
+            if (ageMatch && genderMatch) {
+                weight = 1.0;
+            } else if (ageMatch) {
+                weight = 0.7;
+            } else if (genderMatch) {
+                weight = 0.2;
+            }
+
+            zoneVisitScoreMap.merge(log.getZoneId(), weight, Double::sum);
+        }
 
         return zoneHits.stream()
                 .map(hit -> {
                     WaybleZoneDocument zone = hit.getContent();
-                    double distanceScore = 1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0));
-                    double similarityScore = zoneVisitCountMap.getOrDefault(zone.getZoneId(), 0L) / 10.0;
-                    double recencyScore = 1.0; // 추후 방문 시각 기반 점수로 확장 가능
+                    double distanceScore = (1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0))) * DISTANCE_WEIGHT;
+                    double similarityScore = (zoneVisitScoreMap.getOrDefault(zone.getZoneId(), 0.0) / 10.0) * SIMILARITY_WEIGHT;
+                    double recencyScore = RECENCY_WEIGHT;
 
-                    double totalScore = distanceScore * DISTANCE_WEIGHT +
-                            similarityScore * SIMILARITY_WEIGHT +
-                            recencyScore * RECENCY_WEIGHT;
+                    double totalScore = distanceScore + similarityScore + recencyScore;
 
                     return WaybleZoneRecommendResponseDto.builder()
                             .zoneId(zone.getZoneId())
