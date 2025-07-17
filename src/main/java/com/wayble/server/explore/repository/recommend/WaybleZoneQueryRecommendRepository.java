@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
+import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.user.entity.User;
@@ -16,7 +17,8 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,13 +30,16 @@ public class WaybleZoneQueryRecommendRepository {
 
     private static final IndexCoordinates ZONE_INDEX = IndexCoordinates.of("wayble_zone");
     private static final IndexCoordinates LOG_INDEX = IndexCoordinates.of("wayble_zone_visit_log");
+    private static final IndexCoordinates RECOMMEND_LOG_INDEX = IndexCoordinates.of("recommend_log");
 
     // === [가중치 설정] === //
-    private static final double DISTANCE_WEIGHT = 0.6;
-    private static final double SIMILARITY_WEIGHT = 0.2;
-    private static final double RECENCY_WEIGHT = 0.2;
+    private static final double DISTANCE_WEIGHT = 0.55;
+    private static final double SIMILARITY_WEIGHT = 0.15;
+    private static final double RECENCY_WEIGHT = 0.3;
 
-    public List<WaybleZoneRecommendResponseDto> searchPersonalWaybleZones(User user, double latitude, double longitude, int topN) {
+    private static final int MAX_DAY_DIFF = 30;
+
+    public List<WaybleZoneRecommendResponseDto> searchPersonalWaybleZones(User user, double latitude, double longitude, int size) {
 
         AgeGroup userAgeGroup = AgeGroup.fromBirthDate(user.getBirthDate());
         Gender userGender = user.getGender();
@@ -85,12 +90,31 @@ public class WaybleZoneQueryRecommendRepository {
             zoneVisitScoreMap.merge(log.getZoneId(), weight, Double::sum);
         }
 
+        // 최근 추천 날짜 조회
+        NativeQuery recommendLogQuery = NativeQuery.builder()
+                .withQuery(Query.of(q -> q.term(t -> t.field("userId").value(user.getId()))))
+                .withMaxResults(1000)
+                .build();
+
+        SearchHits<RecommendLogDocument> recommendHits = operations.search(recommendLogQuery, RecommendLogDocument.class, RECOMMEND_LOG_INDEX);
+        Map<Long, LocalDate> recentRecommendDateMap = recommendHits.stream()
+                .map(hit -> hit.getContent())
+                .collect(Collectors.toMap(RecommendLogDocument::getZoneId, RecommendLogDocument::getRecommendationDate));
+
+
         return zoneHits.stream()
                 .map(hit -> {
                     WaybleZoneDocument zone = hit.getContent();
                     double distanceScore = (1.0 / (1.0 + ((Double) hit.getSortValues().get(0) / 1000.0))) * DISTANCE_WEIGHT;
                     double similarityScore = (zoneVisitScoreMap.getOrDefault(zone.getZoneId(), 0.0) / 10.0) * SIMILARITY_WEIGHT;
                     double recencyScore = RECENCY_WEIGHT;
+                    LocalDate lastRecommendDate = recentRecommendDateMap.get(zone.getZoneId());
+
+                    if (lastRecommendDate != null) {
+                        long daysSince = ChronoUnit.DAYS.between(lastRecommendDate, LocalDate.now());
+                        double factor = 1.0 - Math.min(daysSince, MAX_DAY_DIFF) / (double) MAX_DAY_DIFF; // 0~1
+                        recencyScore = RECENCY_WEIGHT * (1.0 - factor); // days=0 -> 0점, days=30 -> full 점수
+                    }
 
                     double totalScore = distanceScore + similarityScore + recencyScore;
 
@@ -110,7 +134,7 @@ public class WaybleZoneQueryRecommendRepository {
                             .build();
                 })
                 .sorted(Comparator.comparingDouble(WaybleZoneRecommendResponseDto::totalScore).reversed())
-                .limit(topN)
+                .limit(size)
                 .toList();
     }
 }
