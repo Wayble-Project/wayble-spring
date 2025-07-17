@@ -97,6 +97,8 @@ public class User extends BaseEntity {
                 .password(dto.password())
                 .birthDate(dto.birthDate())
                 .gender(dto.gender())
+                .userType(dto.userType())
+                .loginType(dto.loginType())
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.wayble.server.user.dto;
 
 import com.wayble.server.user.entity.Gender;
+import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.UserType;
 import lombok.Builder;
 
@@ -15,7 +16,8 @@ public record UserRegisterDto(
         String password,
         LocalDate birthDate,
         Gender gender,
-        UserType userType
+        UserType userType,
+        LoginType loginType
 ) {
 
 }
