@@ -13,9 +13,13 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
+    private Key signingKey;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        if (signingKey == null) {
+            signingKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        }
+        return signingKey;
     }
 
     public String generateToken(String email, String role) {
@@ -38,6 +42,9 @@ public class JwtTokenProvider {
     }
 
     public String getEmail(String token) {
+        if (!validateToken(token)) {
+            throw new IllegalArgumentException("Invalid token");
+        }
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
