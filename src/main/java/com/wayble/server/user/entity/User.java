@@ -2,7 +2,6 @@ package com.wayble.server.user.entity;
 
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
-import com.wayble.server.user.dto.UserRegisterDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -85,20 +84,6 @@ public class User extends BaseEntity {
                 .gender(gender)
                 .loginType(loginType)
                 .userType(userType)
-                .build();
-    }
-
-    public User from(UserRegisterDto dto) {
-        return User.builder()
-                .id(dto.userId() != null ? dto.userId() : this.id)
-                .nickname(dto.nickname())
-                .username(dto.username())
-                .email(dto.email())
-                .password(dto.password())
-                .birthDate(dto.birthDate())
-                .gender(dto.gender())
-                .userType(dto.userType())
-                .loginType(dto.loginType())
                 .build();
     }
 }

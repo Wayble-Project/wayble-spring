@@ -14,7 +14,6 @@ import com.wayble.server.explore.repository.RecommendLogDocumentRepository;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
 import com.wayble.server.explore.repository.WaybleZoneVisitLogDocumentRepository;
 import com.wayble.server.explore.repository.recommend.WaybleZoneQueryRecommendRepository;
-import com.wayble.server.user.dto.UserRegisterDto;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
@@ -134,20 +133,16 @@ public class WaybleZoneRecommendApiIntegrationTest {
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
             waybleZoneDocumentRepository.save(waybleZoneDocument);
 
-            UserRegisterDto userRegisterDto = UserRegisterDto
-                    .builder()
-                    .userId((long) i)
-                    .nickname("user" + i)
-                    .username("user" + i)
-                    .email("user email" + i)
-                    .password("user password" + i)
-                    .birthDate(generateRandomBirthDate())
-                    .gender(Gender.values()[i % 2])
-                    .userType(UserType.DISABLED)
-                    .loginType(LoginType.BASIC)
-                    .build();
-
-            User user = User.from(userRegisterDto);
+            User user = User.createUser(
+                    "user" + i,
+                    "user" + i,
+                    "user email" + i,
+                    "user password" + i,
+                    generateRandomBirthDate(),
+                    Gender.values()[i % 2],
+                    LoginType.BASIC,
+                    UserType.DISABLED
+            );
             userRepository.save(user);
 
             int count = (int) (Math.random() * 30) + 1;
