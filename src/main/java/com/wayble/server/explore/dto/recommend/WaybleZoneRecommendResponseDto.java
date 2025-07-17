@@ -2,7 +2,6 @@ package com.wayble.server.explore.dto.recommend;
 
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
-import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder
