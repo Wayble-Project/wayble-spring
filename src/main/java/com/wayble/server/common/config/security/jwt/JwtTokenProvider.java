@@ -3,38 +3,37 @@ package com.wayble.server.common.config.security.jwt;
 import com.wayble.server.common.config.security.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
-    private Key signingKey;
+    private final Key signingKey;
 
-    private Key getSigningKey() {
-        if (signingKey == null) {
-            signingKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
-        }
-        return signingKey;
+    public JwtTokenProvider(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.signingKey = Keys.hmacShaKeyFor(
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     public String generateToken(Long userId, String role) {
         return Jwts.builder()
-                .setSubject(String.valueOf(userId)) // email -> userId로 변경
+                .setSubject(String.valueOf(userId))
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExp()))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -46,8 +45,12 @@ public class JwtTokenProvider {
         if (!validateToken(token)) {
             throw new IllegalArgumentException("Invalid token");
         }
-        String subject = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        String subject = Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
         return Long.parseLong(subject);
     }
 }
