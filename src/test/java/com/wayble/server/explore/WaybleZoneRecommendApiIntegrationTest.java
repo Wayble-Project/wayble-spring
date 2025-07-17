@@ -71,11 +71,11 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     private static final double RADIUS = 50.0;
 
-    private static final Long SAMPLES = 100L;
+    private static final Long SAMPLES = 1000L;
 
     private static final String baseUrl = "/api/v1/wayble-zones/recommend";
 
-    private Long userId = 1L;
+    private final Long userId = 1L;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -92,7 +92,21 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        userId = (long) (Math.random() * SAMPLES) + 1;
+        for (int i = 1; i <= SAMPLES / 2; i++) {
+            Long zoneId = (long) (Math.random() * SAMPLES) + 1;
+            if(!recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId)) {
+                RecommendLogDocument recommendLogDocument = RecommendLogDocument
+                        .builder()
+                        .id(UUID.randomUUID().toString())
+                        .userId(userId)
+                        .zoneId(zoneId)
+                        .recommendationDate(makeRandomDate())
+                        .recommendCount(1L)
+                        .build();
+
+                recommendLogDocumentRepository.save(recommendLogDocument);
+            }
+        }
 
         for (int i = 1; i <= SAMPLES; i++) {
             Map<String, Double> points = makeRandomPoint();
@@ -157,6 +171,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
         waybleZoneDocumentRepository.deleteAll();
         waybleZoneVisitLogDocumentRepository.deleteAll();
         recommendLogDocumentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -326,6 +341,12 @@ public class WaybleZoneRecommendApiIntegrationTest {
                 * Math.sin(dLon/2) * Math.sin(dLon/2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return R * c;
+    }
+
+    private LocalDate makeRandomDate() {
+        Random random = new Random();
+        int daysAgo = random.nextInt(40) + 1;
+        return LocalDate.now().minusDays(daysAgo);
     }
 
     private Map<String, Double> makeRandomPoint() {
