@@ -18,7 +18,7 @@ public class UserService {
 
     // 회원가입
     public void signup(UserRegisterRequestDto req) {
-        if (userRepository.existsByEmail(req.email())) {
+        if (userRepository.existsByEmailAndLoginType(req.email(), req.loginType())) {
             throw new ApplicationException(UserErrorCase.USER_ALREADY_EXISTS);
         }
         User user = User.createUser(
