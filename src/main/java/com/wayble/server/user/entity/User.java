@@ -18,7 +18,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE user SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
-@Table(name = "user")
+@Table(
+        name = "user",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"email", "login_type"})
+)
 public class User extends BaseEntity {
 
     @Id
@@ -30,7 +33,7 @@ public class User extends BaseEntity {
 
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     // TODO: 비밀번호 암호화 필요
