@@ -1,9 +1,10 @@
 package com.wayble.server.explore.entity;
-
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.*;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,7 @@ public class RecommendLogDocument {
 
     private Long zoneId;
 
+    @Field(type = FieldType.Date, format = DateFormat.date)
     private LocalDate recommendationDate;
 
     private Long recommendCount;
