@@ -22,9 +22,9 @@ public class JwtTokenProvider {
         return signingKey;
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(Long userId, String role) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(String.valueOf(userId)) // email -> userId로 변경
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExp()))
@@ -41,11 +41,13 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getEmail(String token) {
+    // userId 파싱 메서드 추가
+    public Long getUserId(String token) {
         if (!validateToken(token)) {
             throw new IllegalArgumentException("Invalid token");
         }
-        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
+        String subject = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
                 .parseClaimsJws(token).getBody().getSubject();
+        return Long.parseLong(subject);
     }
 }
