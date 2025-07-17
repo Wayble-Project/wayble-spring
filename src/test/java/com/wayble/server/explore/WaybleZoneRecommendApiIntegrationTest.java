@@ -184,6 +184,45 @@ public class WaybleZoneRecommendApiIntegrationTest {
     }
 
     @Test
+    @DisplayName("추천 기록 저장 테스트")
+    public void saveRecommendLogTest() throws Exception {
+        MvcResult result = mockMvc.perform(get(baseUrl)
+                        .param("userId", String.valueOf(userId))
+                        .param("latitude", String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneRecommendResponseDto> waybleZoneRecommendResponseDtoList = objectMapper.convertValue(
+                dataNode,
+                new TypeReference<>() {}
+        );
+
+        assertThat(waybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
+
+        WaybleZoneRecommendResponseDto dto = waybleZoneRecommendResponseDtoList.get(0);
+        Long zoneId = dto.zoneId();
+
+        Optional<RecommendLogDocument> recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndZoneId(userId, zoneId);
+        assertThat(recommendLogDocument.isPresent()).isTrue();
+        assertThat(recommendLogDocument.get().getUserId()).isEqualTo(userId);
+        assertThat(recommendLogDocument.get().getZoneId()).isEqualTo(zoneId);
+        assertThat(recommendLogDocument.get().getRecommendationDate()).isEqualTo(LocalDate.now());
+        System.out.println("===recommend log===");
+        System.out.println("id = " + recommendLogDocument.get().getId());
+        System.out.println("userId = " +recommendLogDocument.get().getUserId());
+        System.out.println("zoneId = " +recommendLogDocument.get().getZoneId());
+        System.out.println("recommendationDate = " +recommendLogDocument.get().getRecommendationDate());
+        System.out.println("recommendCount " +recommendLogDocument.get().getRecommendCount());
+    }
+
+    @Test
     @DisplayName("추천 기능 테스트")
     public void recommendWaybleZone() throws Exception {
 
@@ -205,32 +244,27 @@ public class WaybleZoneRecommendApiIntegrationTest {
                 new TypeReference<>() {}
         );
 
-        assertThat(WaybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
-        for (WaybleZoneRecommendResponseDto dto : WaybleZoneRecommendResponseDtoList){
-            assertThat(dto.zoneId()).isNotNull();
-            assertThat(dto.zoneName()).isNotNull();
-            assertThat(dto.zoneType()).isNotNull();
-            assertThat(dto.latitude()).isNotNull();
-            assertThat(dto.longitude()).isNotNull();
-            //assertThat(dto.distanceScore()).isGreaterThan(0.0);
-            //assertThat(dto.similarityScore()).isGreaterThan(0.0);
-            //assertThat(dto.recencyScore()).isGreaterThan(0.0);
-            //assertThat(dto.totalScore()).isGreaterThan(0.0);
+        assertThat(WaybleZoneRecommendResponseDtoList.size()).isEqualTo(1);
+        WaybleZoneRecommendResponseDto dto = WaybleZoneRecommendResponseDtoList.get(0);
+        assertThat(dto.zoneId()).isNotNull();
+        assertThat(dto.zoneName()).isNotNull();
+        assertThat(dto.zoneType()).isNotNull();
+        assertThat(dto.latitude()).isNotNull();
+        assertThat(dto.longitude()).isNotNull();
 
-            System.out.println("zoneId = " + dto.zoneId());
-            System.out.println("zoneName = " + dto.zoneName());
-            System.out.println("zoneType = " + dto.zoneType());
-            System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
-            System.out.println("latitude = " + dto.latitude());
-            System.out.println("longitude = " + dto.longitude());
-            System.out.println("rating = " + dto.averageRating());
-            System.out.println("reviewCount = " + dto.reviewCount());
-            System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
-            System.out.println("distanceScore = " + dto.distanceScore());
-            System.out.println("similarityScore = " + dto.similarityScore());
-            System.out.println("recencyScore = " + dto.recencyScore());
-            System.out.println("totalScore = " + dto.totalScore());
-        }
+        System.out.println("zoneId = " + dto.zoneId());
+        System.out.println("zoneName = " + dto.zoneName());
+        System.out.println("zoneType = " + dto.zoneType());
+        System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
+        System.out.println("latitude = " + dto.latitude());
+        System.out.println("longitude = " + dto.longitude());
+        System.out.println("rating = " + dto.averageRating());
+        System.out.println("reviewCount = " + dto.reviewCount());
+        System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+        System.out.println("distanceScore = " + dto.distanceScore());
+        System.out.println("similarityScore = " + dto.similarityScore());
+        System.out.println("recencyScore = " + dto.recencyScore());
+        System.out.println("totalScore = " + dto.totalScore());
     }
 
     @Test
@@ -281,61 +315,6 @@ public class WaybleZoneRecommendApiIntegrationTest {
             System.out.println("recencyScore = " + dto.recencyScore());
             System.out.println("totalScore = " + dto.totalScore());
         }
-
-        for (WaybleZoneRecommendResponseDto dto : waybleZoneRecommendResponseDtoList) {
-            System.out.println("zoneId = " + dto.zoneId());
-            //System.out.println("zoneName = " + dto.zoneName());
-            //System.out.println("zoneType = " + dto.zoneType());
-            //System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
-            System.out.println("latitude = " + dto.latitude());
-            System.out.println("longitude = " + dto.longitude());
-            //System.out.println("rating = " + dto.averageRating());
-            //System.out.println("reviewCount = " + dto.reviewCount());
-            System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
-            System.out.println("distanceScore = " + dto.distanceScore());
-            System.out.println("similarityScore = " + dto.similarityScore());
-            System.out.println("recencyScore = " + dto.recencyScore());
-            System.out.println("totalScore = " + dto.totalScore());
-        }
-    }
-
-    @Test
-    @DisplayName("추천 기록 저장 테스트")
-    public void saveRecommendLogTest() throws Exception {
-        MvcResult result = mockMvc.perform(get(baseUrl)
-                        .param("userId", String.valueOf(userId))
-                        .param("latitude", String.valueOf(LATITUDE))
-                        .param("longitude", String.valueOf(LONGITUDE))
-                        .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-
-        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        JsonNode root = objectMapper.readTree(json);
-        JsonNode dataNode = root.get("data");
-
-        List<WaybleZoneRecommendResponseDto> waybleZoneRecommendResponseDtoList = objectMapper.convertValue(
-                dataNode,
-                new TypeReference<>() {}
-        );
-
-        assertThat(waybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
-
-        WaybleZoneRecommendResponseDto dto = waybleZoneRecommendResponseDtoList.get(0);
-        Long zoneId = dto.zoneId();
-
-        Optional<RecommendLogDocument> recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndZoneId(userId, zoneId);
-        assertThat(recommendLogDocument.isPresent()).isTrue();
-        assertThat(recommendLogDocument.get().getUserId()).isEqualTo(userId);
-        assertThat(recommendLogDocument.get().getZoneId()).isEqualTo(zoneId);
-        assertThat(recommendLogDocument.get().getRecommendationDate()).isEqualTo(LocalDate.now());
-        System.out.println("===recommend log===");
-        System.out.println("id = " + recommendLogDocument.get().getId());
-        System.out.println("userId = " +recommendLogDocument.get().getUserId());
-        System.out.println("zoneId = " +recommendLogDocument.get().getZoneId());
-        System.out.println("recommendationDate = " +recommendLogDocument.get().getRecommendationDate());
-        System.out.println("recommendCount " +recommendLogDocument.get().getRecommendCount());
     }
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
