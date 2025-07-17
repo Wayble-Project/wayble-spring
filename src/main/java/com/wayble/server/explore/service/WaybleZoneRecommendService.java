@@ -1,7 +1,9 @@
 package com.wayble.server.explore.service;
 
 import com.wayble.server.explore.entity.RecommendLogDocument;
+import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.repository.RecommendLogDocumentRepository;
+import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
 import com.wayble.server.explore.repository.recommend.WaybleZoneQueryRecommendRepository;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,11 +28,18 @@ public class WaybleZoneRecommendService {
 
     private final RecommendLogDocumentRepository recommendLogDocumentRepository;
 
+    private final WaybleZoneDocumentRepository waybleZoneDocumentRepository;
+
     private final UserRepository userRepository;
 
     public List<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommend(Long userId, double latitude, double longitude, int count) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
+
+        WaybleZoneRecommendResponseDto todayRecommendZone = getTodayRecommendZone(userId);
+        if(count == 1 && todayRecommendZone != null) {
+            return List.of(todayRecommendZone);
+        }
 
         List<WaybleZoneRecommendResponseDto> recommendResponseDtoList = waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, count);
 
@@ -47,6 +57,21 @@ public class WaybleZoneRecommendService {
         return recommendResponseDtoList;
     }
 
+    public WaybleZoneRecommendResponseDto getTodayRecommendZone(Long userId) {
+        LocalDate today = LocalDate.now();
+        Optional<RecommendLogDocument> recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndRecommendationDate(userId, today);
+
+        if(recommendLogDocument.isPresent()) {
+            Long zoneId = recommendLogDocument.get().getZoneId();
+            WaybleZoneDocument waybleZoneDocument = waybleZoneDocumentRepository.findById(zoneId)
+                    .orElseThrow(() -> new ApplicationException(RecommendErrorCase.WAYBLE_ZONE_NOT_EXIST));
+
+            return WaybleZoneRecommendResponseDto.from(waybleZoneDocument);
+        } else {
+            return null;
+        }
+    }
+
     public void saveRecommendLog(Long userId, Long zoneId) {
         String logId = UUID.randomUUID().toString();
         LocalDate dateNow = LocalDate.now();
@@ -57,6 +82,7 @@ public class WaybleZoneRecommendService {
                 .userId(userId)
                 .zoneId(zoneId)
                 .recommendationDate(dateNow)
+                .recommendCount(1L)
                 .build();
 
         recommendLogDocumentRepository.save(recommendLogDocument);
