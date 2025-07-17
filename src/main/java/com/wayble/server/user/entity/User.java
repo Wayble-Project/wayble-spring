@@ -30,10 +30,11 @@ public class User extends BaseEntity {
 
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     // TODO: 비밀번호 암호화 필요
+    @Column(nullable = false)
     private String password;
 
     @Column(name = "birth_date", columnDefinition = "DATE")
@@ -44,19 +45,45 @@ public class User extends BaseEntity {
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "login_type", nullable = false)
     private LoginType loginType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "user_type", nullable = false)
     private UserType userType;
+
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
 
-    // TODO 장애 종류 필드 등록 필요
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserDisabilityMapping> userDisabilities = new ArrayList<>();
 
-    // TODO 프로필 이미지 관련 작업 필요
 
-    // TODO 내가 저장한 장소 관련 작업 필요
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPlace> userPlaces = new ArrayList<>();
+
+    public static User createUser(
+            String nickname,
+            String username,
+            String email,
+            String password,
+            LocalDate birthDate,
+            Gender gender,
+            LoginType loginType,
+            UserType userType
+    ) {
+        return User.builder()
+                .nickname(nickname)
+                .username(username)
+                .email(email)
+                .password(password)
+                .birthDate(birthDate)
+                .gender(gender)
+                .loginType(loginType)
+                .userType(userType)
+                .build();
+    }
 }

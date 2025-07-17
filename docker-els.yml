@@ -21,6 +21,8 @@ services:
 networks:
   es-network:
     driver: bridge
+    external: false
+    attachable: true
 
 volumes:
   esdata:
