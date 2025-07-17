@@ -32,18 +32,18 @@ public class WaybleZoneRecommendService {
 
     private final UserRepository userRepository;
 
-    public List<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommend(Long userId, double latitude, double longitude, int count) {
+    public List<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommend(Long userId, double latitude, double longitude, int size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
 
         WaybleZoneRecommendResponseDto todayRecommendZone = getTodayRecommendZone(userId);
-        if(count == 1 && todayRecommendZone != null) {
+        if(size == 1 && todayRecommendZone != null) {
             return List.of(todayRecommendZone);
         }
 
-        List<WaybleZoneRecommendResponseDto> recommendResponseDtoList = waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, count);
+        List<WaybleZoneRecommendResponseDto> recommendResponseDtoList = waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, size);
 
-        if (count == 1 && !recommendResponseDtoList.isEmpty()) {
+        if (size == 1 && !recommendResponseDtoList.isEmpty()) {
             Long zoneId = recommendResponseDtoList.get(0).zoneId();
 
             boolean logExist = recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId);

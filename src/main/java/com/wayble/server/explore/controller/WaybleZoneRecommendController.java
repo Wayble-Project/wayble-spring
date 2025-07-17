@@ -22,13 +22,13 @@ public class WaybleZoneRecommendController {
     @GetMapping()
     public CommonResponse<List<WaybleZoneRecommendResponseDto>> getWaybleZonePersonalRecommend(
             @Valid @ModelAttribute WaybleZoneRecommendConditionDto conditionDto,
-            @RequestParam(name = "count", defaultValue = "1") int count) {
+            @RequestParam(name = "size", defaultValue = "1") int size) {
 
         List<WaybleZoneRecommendResponseDto> result = waybleZoneRecommendService.getWaybleZonePersonalRecommend(
                 conditionDto.userId(),
                 conditionDto.latitude(),
                 conditionDto.longitude(),
-                count
+                size
         );
         return CommonResponse.success(result);
     }
