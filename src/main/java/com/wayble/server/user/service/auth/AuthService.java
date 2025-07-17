@@ -20,7 +20,7 @@ public class AuthService {
     private final JwtTokenProvider jwtProvider;
 
     public TokenResponseDto login(UserLoginRequestDto req) {
-        User user = userRepository.findByEmail(req.email())
+        User user = userRepository.findByEmailAndLoginType(req.email(), req.loginType())
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.INVALID_CREDENTIALS));
         if (!encoder.matches(req.password(), user.getPassword())) {
             throw new ApplicationException(UserErrorCase.INVALID_CREDENTIALS);
