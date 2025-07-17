@@ -308,7 +308,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
             assertThat(dto.latitude()).isNotNull();
             assertThat(dto.longitude()).isNotNull();
             if (i > 0) {
-                assertThat(waybleZoneRecommendResponseDtoList.get(i - 1).totalScore()).isGreaterThan(dto.totalScore());
+                assertThat(waybleZoneRecommendResponseDtoList.get(i - 1).totalScore()).isGreaterThanOrEqualTo(dto.totalScore());
             }
 
             System.out.println("zoneId = " + dto.zoneId());

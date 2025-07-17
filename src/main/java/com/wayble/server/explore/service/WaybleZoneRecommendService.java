@@ -36,9 +36,9 @@ public class WaybleZoneRecommendService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
 
-        WaybleZoneRecommendResponseDto todayRecommendZone = getTodayRecommendZone(userId);
-        if(size == 1 && todayRecommendZone != null) {
-            return List.of(todayRecommendZone);
+        Optional<WaybleZoneRecommendResponseDto> todayRecommendZone = getTodayRecommendZone(userId);
+        if(size == 1 && todayRecommendZone.isPresent()) {
+            return List.of(todayRecommendZone.get());
         }
 
         List<WaybleZoneRecommendResponseDto> recommendResponseDtoList = waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, size);
@@ -57,7 +57,7 @@ public class WaybleZoneRecommendService {
         return recommendResponseDtoList;
     }
 
-    public WaybleZoneRecommendResponseDto getTodayRecommendZone(Long userId) {
+    public Optional<WaybleZoneRecommendResponseDto> getTodayRecommendZone(Long userId) {
         LocalDate today = LocalDate.now();
         Optional<RecommendLogDocument> recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndRecommendationDate(userId, today);
 
@@ -66,9 +66,9 @@ public class WaybleZoneRecommendService {
             WaybleZoneDocument waybleZoneDocument = waybleZoneDocumentRepository.findById(zoneId)
                     .orElseThrow(() -> new ApplicationException(RecommendErrorCase.WAYBLE_ZONE_NOT_EXIST));
 
-            return WaybleZoneRecommendResponseDto.from(waybleZoneDocument);
+            return Optional.of(WaybleZoneRecommendResponseDto.from(waybleZoneDocument));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 

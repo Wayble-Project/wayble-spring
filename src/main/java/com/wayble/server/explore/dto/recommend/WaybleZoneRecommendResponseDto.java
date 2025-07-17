@@ -42,6 +42,10 @@ public record WaybleZoneRecommendResponseDto(
                 .reviewCount(waybleZoneDocument.getReviewCount())
                 .latitude(waybleZoneDocument.getAddress().getLocation().getLat())
                 .longitude(waybleZoneDocument.getAddress().getLocation().getLon())
+                .distanceScore(0.0)
+                .similarityScore(0.0)
+                .recencyScore(0.0)
+                .totalScore(0.0)
                 .build();
     }
 }

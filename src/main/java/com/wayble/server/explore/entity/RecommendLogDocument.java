@@ -30,7 +30,11 @@ public class RecommendLogDocument {
     private Long recommendCount;
 
     public void updateRecommendLog(LocalDate recommendationDate, Long recommendCount) {
-        this.recommendationDate = recommendationDate;
-        this.recommendCount = recommendCount;
+        if(recommendationDate != null) {
+            this.recommendationDate = recommendationDate;
+        }
+        if(recommendCount != null) {
+            this.recommendCount = recommendCount;
+        }
     }
 }
