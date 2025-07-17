@@ -21,17 +21,10 @@ public class WaybleZoneRecommendService {
 
     private final UserRepository userRepository;
 
-    public WaybleZoneRecommendResponseDto getWaybleZonePersonalRecommend(Long userId, double latitude, double longitude) {
+    public List<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommend(Long userId, double latitude, double longitude, int count) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
 
-        return waybleZoneRecommendRepository.searchPersonalWaybleZone(user, latitude, longitude);
-    }
-
-    public List<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommendTopN(Long userId, double latitude, double longitude, int count) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(RecommendErrorCase.INVALID_USER));
-
-        return waybleZoneRecommendRepository.searchTopPersonalWaybleZones(user, latitude, longitude, count);
+        return waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, count);
     }
 }

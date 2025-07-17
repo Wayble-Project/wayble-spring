@@ -18,22 +18,12 @@ public class WaybleZoneRecommendController {
     private final WaybleZoneRecommendService waybleZoneRecommendService;
 
     @GetMapping()
-    public CommonResponse<WaybleZoneRecommendResponseDto> getWaybleZonePersonalRecommend(
-            @RequestParam("userId") Long userId,
-            @RequestParam("latitude") double latitude,
-            @RequestParam("longitude") double longitude) {
-        WaybleZoneRecommendResponseDto result = waybleZoneRecommendService.getWaybleZonePersonalRecommend(userId, latitude, longitude);
-        return CommonResponse.success(result);
-    }
-
-    @GetMapping("/multiple")
-    public CommonResponse<List<WaybleZoneRecommendResponseDto>> getWaybleZonePersonalRecommendTopN(
+    public CommonResponse<List<WaybleZoneRecommendResponseDto>> getWaybleZonePersonalRecommend(
             @RequestParam("userId") Long userId,
             @RequestParam("latitude") double latitude,
             @RequestParam("longitude") double longitude,
-            @RequestParam("count") int count){
-        List<WaybleZoneRecommendResponseDto> result = waybleZoneRecommendService.getWaybleZonePersonalRecommendTopN(userId, latitude, longitude, count);
-
+            @RequestParam(name = "count", defaultValue = "1") int count) {
+        List<WaybleZoneRecommendResponseDto> result = waybleZoneRecommendService.getWaybleZonePersonalRecommend(userId, latitude, longitude, count);
         return CommonResponse.success(result);
     }
 }
