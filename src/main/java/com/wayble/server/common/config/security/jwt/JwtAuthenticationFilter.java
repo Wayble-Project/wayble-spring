@@ -29,7 +29,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String email = jwtProvider.getEmail(token);
                 var authentication = new JwtAuthentication(email);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                // 토큰이 유효하지 않으면 Context 클리어
+                SecurityContextHolder.clearContext();
             }
+        } else {
+            // Authorization 헤더가 아예 없을 때도 Context 클리어
+            SecurityContextHolder.clearContext();
         }
 
         chain.doFilter(req, res);
