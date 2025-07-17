@@ -6,7 +6,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface RecommendLogDocumentRepository extends ElasticsearchRepository<RecommendLogDocument, Long> {
+public interface RecommendLogDocumentRepository extends ElasticsearchRepository<RecommendLogDocument, String> {
     Optional<RecommendLogDocument> findByUserIdAndZoneId(Long userId, Long zoneId);
 
     Boolean existsByUserIdAndZoneId(Long userId, Long zoneId);
