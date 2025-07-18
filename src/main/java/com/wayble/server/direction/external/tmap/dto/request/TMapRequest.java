@@ -9,8 +9,6 @@ public record TMapRequest(
         double endX,
         double endY,
         String startName,
-        String endName,
-        Integer searchOption,
-        String sort
+        String endName
 ) {
 }

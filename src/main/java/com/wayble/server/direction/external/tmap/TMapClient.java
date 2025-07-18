@@ -16,7 +16,7 @@ public class TMapClient {
 
     public TMapResponse response(TMapRequest request) {
         return tMapWebClient.post()
-                .uri("/tmap/routes/pedestrian?version=1")
+                .uri(tMapProperties.baseUrl())
                 .header("appKey", tMapProperties.secretKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
