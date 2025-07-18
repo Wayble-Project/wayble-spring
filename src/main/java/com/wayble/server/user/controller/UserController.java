@@ -90,7 +90,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
             @ApiResponse(responseCode = "401", description = "유효하지 않은 accessToken")
     })
-    public CommonResponse<Void> logout(
+    public CommonResponse<String> logout(
             @Parameter(
                     description = "사용자 인증용 accessToken (Bearer {token} 형태)",
                     required = true,
@@ -101,7 +101,7 @@ public class UserController {
         String token = accessToken.replace("Bearer ", "");
         Long userId = jwtProvider.getUserId(token);
         authService.logout(userId);
-        return CommonResponse.success(null);
+        return CommonResponse.success("로그아웃에 성공하였습니다.");
     }
 
 }
