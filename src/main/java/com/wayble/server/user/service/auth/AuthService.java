@@ -9,6 +9,7 @@ import com.wayble.server.user.entity.User;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.repository.RefreshTokenRepository;
 import com.wayble.server.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,7 @@ public class AuthService {
         return new TokenResponseDto(newAccessToken, refreshToken);
     }
 
+    @Transactional
     public void logout(Long userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
