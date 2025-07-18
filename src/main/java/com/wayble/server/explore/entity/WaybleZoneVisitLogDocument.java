@@ -19,7 +19,7 @@ public class WaybleZoneVisitLogDocument {
 
     @Id
     @Field(name = "id")
-    private Long logId;
+    private String logId;
 
     private Long userId;
 
@@ -31,7 +31,7 @@ public class WaybleZoneVisitLogDocument {
 
     public static WaybleZoneVisitLogDocument fromEntity(User user, Long zoneId) {
         return WaybleZoneVisitLogDocument.builder()
-                .logId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE)
+                .logId(UUID.randomUUID().toString())
                 .userId(user.getId())
                 .zoneId(zoneId)
                 .gender(user.getGender())

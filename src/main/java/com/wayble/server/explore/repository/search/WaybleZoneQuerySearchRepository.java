@@ -35,10 +35,10 @@ public class WaybleZoneQuerySearchRepository{
         double radius = cond.radiusKm() != null ? cond.radiusKm() : 50.0;
         String radiusWithUnit = radius + "km"; // The new client often uses string representation for distance
 
-        // 1) Build the query using the new lambda-based builders
+        // 필터 및 조건 정의
         Query query = Query.of(q -> q
                 .bool(b -> {
-                    // Must clause for zoneType if it exists
+                    // zoneType이 존재하면 must 조건으로 추가
                     if (cond.zoneType() != null) {
                         b.must(m -> m
                                 .term(t -> t
@@ -47,7 +47,7 @@ public class WaybleZoneQuerySearchRepository{
                                 )
                         );
                     }
-                    // Must clause for name if it exists and is not blank
+                    // zoneName이 비어있지 않으면 match 조건으로 추가
                     if (cond.zoneName() != null && !cond.zoneName().isBlank()) {
                         b.must(m -> m
                                 .match(mp -> mp
@@ -56,7 +56,7 @@ public class WaybleZoneQuerySearchRepository{
                                 )
                         );
                     }
-                    // Filter by geo distance
+                    // 위치 기반 필터 조건: 중심 좌표 기준 반경 필터링
                     b.filter(f -> f
                             .geoDistance(gd -> gd
                                     .field("address.location")
@@ -73,7 +73,7 @@ public class WaybleZoneQuerySearchRepository{
                 })
         );
 
-        // 2) Build the sort options using the new builder
+        // 정렬 옵션 설정: 거리 기준 오름차순 정렬
         SortOptions geoSort = SortOptions.of(s -> s
                 .geoDistance(gds -> gds
                         .field("address.location")
@@ -87,21 +87,21 @@ public class WaybleZoneQuerySearchRepository{
                 )
         );
 
-        // 3) Combine into a NativeQuery
+        // NativeQuery 구성: 쿼리 + 정렬 + 페이징 정보 포함
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(query)
                 .withSort(geoSort)
                 .withPageable(PageRequest.of(
                         pageable.getPageNumber(),
-                        fetchSize
+                        fetchSize   // 다음 페이지 유무를 판단하기 위해 +1 해서 조회
                 ))
                 .build();
 
-        // 4) Execute the search
+        // 실제 검색 수행
         SearchHits<WaybleZoneDocument> hits =
                 operations.search(nativeQuery, WaybleZoneDocument.class, INDEX);
 
-        // 5) Map to DTO: The distance in sortValues is still accessible in the same way
+        // 검색 결과를 DTO로 매핑
         List<WaybleZoneSearchResponseDto> dtos = hits.stream()
                 .map(hit -> {
                     WaybleZoneDocument doc = hit.getContent();
@@ -113,6 +113,7 @@ public class WaybleZoneQuerySearchRepository{
                 })
                 .toList();
 
+        // 다음 페이지가 존재하는지 여부 판단
         boolean hasNext = dtos.size() > pageable.getPageSize();
         if (hasNext) {
             dtos = dtos.subList(0, pageable.getPageSize());
