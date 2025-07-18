@@ -1,4 +1,4 @@
-package com.wayble.server.search;
+package com.wayble.server.explore;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
