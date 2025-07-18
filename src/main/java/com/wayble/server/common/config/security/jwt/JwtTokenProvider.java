@@ -31,6 +31,15 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateRefreshToken(Long userId) {
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshExp()))
+                .signWith(signingKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token);
@@ -52,5 +61,13 @@ public class JwtTokenProvider {
                 .getBody()
                 .getSubject();
         return Long.parseLong(subject);
+    }
+
+    public Long getTokenExpiry(String token) {
+        if (!validateToken(token)) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+        return Jwts.parserBuilder().setSigningKey(signingKey).build()
+                .parseClaimsJws(token).getBody().getExpiration().getTime();
     }
 }
