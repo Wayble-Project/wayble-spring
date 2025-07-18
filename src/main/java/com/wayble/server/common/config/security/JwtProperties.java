@@ -9,6 +9,7 @@ public class JwtProperties {
 
     private String secret;
     private long accessExp;
+    private long refreshExp;
 
 
     public String getSecret() {
@@ -26,4 +27,8 @@ public class JwtProperties {
     public void setAccessExp(long accessExp) {
         this.accessExp = accessExp;
     }
+
+    public long getRefreshExp() { return refreshExp; }
+
+    public void setRefreshExp(long refreshExp) { this.refreshExp = refreshExp; }
 }
