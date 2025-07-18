@@ -23,4 +23,12 @@ public class RefreshToken {
 
     @Column(nullable = false)
     private Long expiry; // 만료 시간
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public void setExpiry(Long expiry) {
+        this.expiry = expiry;
+    }
 }

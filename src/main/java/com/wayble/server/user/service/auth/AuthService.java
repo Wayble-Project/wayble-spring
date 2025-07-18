@@ -56,11 +56,24 @@ public class AuthService {
         if (!saved.getToken().equals(refreshToken)) {
             throw new ApplicationException(UserErrorCase.INVALID_CREDENTIALS);
         }
+
+        if (saved.getExpiry() < System.currentTimeMillis()) {
+            refreshTokenRepository.delete(saved);
+            throw new ApplicationException(UserErrorCase.INVALID_CREDENTIALS);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
-        String newAccessToken = jwtProvider.generateToken(userId, user.getUserType().name());
 
-        return new TokenResponseDto(newAccessToken, refreshToken);
+        String newRefreshToken = jwtProvider.generateRefreshToken(userId);
+        Long newExpiry = jwtProvider.getTokenExpiry(newRefreshToken);
+
+        saved.setToken(newRefreshToken);
+        saved.setExpiry(newExpiry);
+        refreshTokenRepository.save(saved);
+
+        String newAccessToken = jwtProvider.generateToken(userId, user.getUserType().name());
+        return new TokenResponseDto(newAccessToken, newRefreshToken);
     }
 
     @Transactional

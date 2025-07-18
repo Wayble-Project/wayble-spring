@@ -64,6 +64,9 @@ public class JwtTokenProvider {
     }
 
     public Long getTokenExpiry(String token) {
+        if (!validateToken(token)) {
+            throw new IllegalArgumentException("Invalid token");
+        }
         return Jwts.parserBuilder().setSigningKey(signingKey).build()
                 .parseClaimsJws(token).getBody().getExpiration().getTime();
     }

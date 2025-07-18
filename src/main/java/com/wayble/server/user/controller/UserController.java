@@ -1,10 +1,12 @@
 package com.wayble.server.user.controller;
 
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
+import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserLoginRequestDto;
 import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.dto.token.TokenResponseDto;
+import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserService;
 import com.wayble.server.user.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -98,7 +100,13 @@ public class UserController {
             )
             @RequestHeader("Authorization") String accessToken
     ) {
+        if (accessToken == null || !accessToken.startsWith("Bearer ")) {
+            throw new ApplicationException(UserErrorCase.INVALID_CREDENTIALS);
+        }
         String token = accessToken.replace("Bearer ", "");
+        if (token.isEmpty()) {
+            throw new ApplicationException(UserErrorCase.INVALID_CREDENTIALS);
+        }
         Long userId = jwtProvider.getUserId(token);
         authService.logout(userId);
         return CommonResponse.success("로그아웃에 성공하였습니다.");
