@@ -1,4 +1,4 @@
-package com.wayble.server.direction.external.tmap.response;
+package com.wayble.server.direction.external.tmap.dto.response;
 
 import java.util.List;
 
