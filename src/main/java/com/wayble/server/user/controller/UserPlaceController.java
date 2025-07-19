@@ -42,7 +42,11 @@ public class UserPlaceController {
 
         // Path variable과 request body의 userId 일치 여부 확인
         if (!userId.equals(request.userId()) || !userId.equals(tokenUserId)) {
-            throw new ApplicationException(UserErrorCase.INVALID_USER_ID);
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
+
+        if (!userId.equals(request.userId())) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
 
         userPlaceService.saveUserPlace(request);
@@ -68,7 +72,7 @@ public class UserPlaceController {
         Long tokenUserId = jwtProvider.getUserId(token);
 
         if (!userId.equals(tokenUserId)) {
-            return CommonResponse.error(403, "권한이 없습니다.");
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
 
         List<UserPlaceListResponseDto> places = userPlaceService.getUserPlaces(userId);
