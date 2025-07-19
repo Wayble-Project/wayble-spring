@@ -2,6 +2,7 @@ package com.wayble.server.user.controller;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
+import com.wayble.server.user.dto.UserPlaceListResponseDto;
 import com.wayble.server.user.dto.UserPlaceRequestDto;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserPlaceService;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users/{userId}/places")
@@ -40,5 +43,23 @@ public class UserPlaceController {
 
         userPlaceService.saveUserPlace(request);
         return CommonResponse.success("장소가 저장되었습니다.");
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "내가 저장한 장소 목록 조회",
+            description = "유저가 저장한 모든 장소 및 해당 웨이블존 정보를 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "장소 목록 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
+    })
+    public CommonResponse<List<UserPlaceListResponseDto>> getUserPlaces(
+            @PathVariable Long userId,
+            @RequestHeader("Authorization") String authorizationHeader
+    ) {
+
+        List<UserPlaceListResponseDto> places = userPlaceService.getUserPlaces(userId);
+        return CommonResponse.success(places);
     }
 }
