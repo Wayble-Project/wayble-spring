@@ -44,11 +44,6 @@ public class UserPlaceController {
         if (!userId.equals(request.userId()) || !userId.equals(tokenUserId)) {
             throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
-
-        if (!userId.equals(request.userId())) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
-
         userPlaceService.saveUserPlace(request);
         return CommonResponse.success("장소가 저장되었습니다.");
     }
