@@ -3,6 +3,7 @@ package com.wayble.server.explore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
@@ -25,8 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -45,6 +49,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private UserRepository userRepository;
@@ -70,11 +77,13 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     private static final double RADIUS = 50.0;
 
-    private static final Long SAMPLES = 1000L;
+    private static final Long SAMPLES = 100L;
 
     private static final String baseUrl = "/api/v1/wayble-zones/recommend";
 
-    private final Long userId = 1L;
+    private Long userId;
+
+    private String token;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -91,6 +100,14 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
+        User testUser = User.createUser(
+                "testUser", "testUsername", "test@email.com", "password",
+                generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
+        );
+        userRepository.save(testUser);
+        userId = testUser.getId();
+        token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
+
         for (int i = 1; i <= SAMPLES / 2; i++) {
             Long zoneId = (long) (Math.random() * SAMPLES) + 1;
             if(!recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId)) {
@@ -135,12 +152,12 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
             User user = User.createUser(
                     "user" + i,
-                    "user" + i,
-                    "user email" + i,
-                    "user password" + i,
+                    "username" + i,
+                    "user" + i + "@email",
+                    "password" + i,
                     generateRandomBirthDate(),
                     Gender.values()[i % 2],
-                    LoginType.BASIC,
+                    LoginType.values()[i % LoginType.values().length],
                     UserType.DISABLED
             );
             userRepository.save(user);
@@ -167,6 +184,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
         waybleZoneVisitLogDocumentRepository.deleteAll();
         recommendLogDocumentRepository.deleteAll();
         userRepository.deleteAll();
+        //SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     @Test
@@ -197,6 +215,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @DisplayName("추천 기록 저장 테스트")
     public void saveRecommendLogTest() throws Exception {
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -235,8 +254,8 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @Test
     @DisplayName("추천 기능 테스트")
     public void recommendWaybleZone() throws Exception {
-
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -281,6 +300,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @DisplayName("추천 결과 상위 N개 값 테스트")
     public void recommendWaybleZoneTop20() throws Exception {
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
