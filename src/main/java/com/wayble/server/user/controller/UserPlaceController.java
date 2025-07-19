@@ -38,6 +38,9 @@ public class UserPlaceController {
             @RequestHeader(value = "Authorization") String authorizationHeader
     ) {
         String token = authorizationHeader.replace("Bearer ", "");
+        if (!jwtProvider.validateToken(token)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
         Long tokenUserId = jwtProvider.getUserId(token);
 
         // Path variable과 request body의 userId 일치 여부 확인
@@ -63,7 +66,9 @@ public class UserPlaceController {
             @RequestHeader("Authorization") String authorizationHeader
     ) {
         String token = authorizationHeader.replace("Bearer ", "");
-
+        if (!jwtProvider.validateToken(token)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
         Long tokenUserId = jwtProvider.getUserId(token);
 
         if (!userId.equals(tokenUserId)) {
