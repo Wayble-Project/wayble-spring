@@ -1,5 +1,7 @@
 package com.wayble.server.direction.controller;
 
+import com.wayble.server.common.response.CommonResponse;
+import com.wayble.server.direction.controller.swagger.WalkingSwagger;
 import com.wayble.server.direction.external.tmap.dto.request.TMapRequest;
 import com.wayble.server.direction.external.tmap.dto.response.TMapParsingResponse;
 import com.wayble.server.direction.service.WalkingService;
@@ -12,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/directions/walking")
-public class WalkingController {
+public class WalkingController implements WalkingSwagger {
 
     private final WalkingService walkingService;
 
+    @Override
     @GetMapping()
-    public TMapParsingResponse callTMapApi(
+    public CommonResponse<TMapParsingResponse> callTMapApi(
             @RequestParam double startX,
             @RequestParam double startY,
             @RequestParam double endX,
@@ -26,6 +29,6 @@ public class WalkingController {
             @RequestParam String endName
     ) {
         TMapRequest request = new TMapRequest(startX, startY, endX, endY, startName, endName);
-        return walkingService.callTMapApi(request);
+        return CommonResponse.success(walkingService.callTMapApi(request));
     }
 }
