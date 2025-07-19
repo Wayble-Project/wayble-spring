@@ -1,5 +1,6 @@
 package com.wayble.server.user.controller;
 
+import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserPlaceListResponseDto;
@@ -21,6 +22,8 @@ import java.util.List;
 public class UserPlaceController {
 
     private final UserPlaceService userPlaceService;
+    private final JwtTokenProvider jwtProvider;
+
 
     @PostMapping
     @Operation(summary = "유저 장소 저장", description = "유저가 웨이블존을 장소로 저장합니다.")
@@ -32,12 +35,13 @@ public class UserPlaceController {
     public CommonResponse<String> saveUserPlace(
             @PathVariable Long userId,
             @RequestBody @Valid UserPlaceRequestDto request,
-
-            // TODO: 로그인 구현 후 Authorization 헤더 필수로 변경 필요
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
+            @RequestHeader(value = "Authorization") String authorizationHeader
     ) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        Long tokenUserId = jwtProvider.getUserId(token);
+
         // Path variable과 request body의 userId 일치 여부 확인
-        if (!userId.equals(request.userId())) {
+        if (!userId.equals(request.userId()) || !userId.equals(tokenUserId)) {
             throw new ApplicationException(UserErrorCase.INVALID_USER_ID);
         }
 
@@ -52,12 +56,20 @@ public class UserPlaceController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "장소 목록 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<List<UserPlaceListResponseDto>> getUserPlaces(
             @PathVariable Long userId,
             @RequestHeader("Authorization") String authorizationHeader
     ) {
+        String token = authorizationHeader.replace("Bearer ", "");
+
+        Long tokenUserId = jwtProvider.getUserId(token);
+
+        if (!userId.equals(tokenUserId)) {
+            return CommonResponse.error(403, "권한이 없습니다.");
+        }
 
         List<UserPlaceListResponseDto> places = userPlaceService.getUserPlaces(userId);
         return CommonResponse.success(places);
