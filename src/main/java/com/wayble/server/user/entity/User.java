@@ -89,4 +89,8 @@ public class User extends BaseEntity {
                 .userType(userType)
                 .build();
     }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
