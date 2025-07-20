@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,6 @@ import java.util.List;
 public class UserPlaceController {
 
     private final UserPlaceService userPlaceService;
-    private final JwtTokenProvider jwtProvider;
 
 
     @PostMapping
@@ -30,24 +30,20 @@ public class UserPlaceController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "장소 저장 성공"),
             @ApiResponse(responseCode = "400", description = "이미 저장한 장소입니다."),
-            @ApiResponse(responseCode = "404", description = "해당 유저 또는 웨이블존이 존재하지 않음")
+            @ApiResponse(responseCode = "404", description = "해당 유저 또는 웨이블존이 존재하지 않음"),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<String> saveUserPlace(
             @PathVariable Long userId,
             @RequestBody @Valid UserPlaceRequestDto request,
             @RequestHeader(value = "Authorization") String authorizationHeader
     ) {
-        String token = authorizationHeader.replace("Bearer ", "");
-        if (!jwtProvider.validateToken(token)) {
+        Long tokenUserId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!userId.equals(tokenUserId)) {
             throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
-        Long tokenUserId = jwtProvider.getUserId(token);
 
-        // Path variable과 request body의 userId 일치 여부 확인
-        if (!userId.equals(request.userId()) || !userId.equals(tokenUserId)) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
-        userPlaceService.saveUserPlace(request);
+        userPlaceService.saveUserPlace(userId, request); // userId 파라미터로 넘김
         return CommonResponse.success("장소가 저장되었습니다.");
     }
 
@@ -65,12 +61,7 @@ public class UserPlaceController {
             @PathVariable Long userId,
             @RequestHeader("Authorization") String authorizationHeader
     ) {
-        String token = authorizationHeader.replace("Bearer ", "");
-        if (!jwtProvider.validateToken(token)) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
-        Long tokenUserId = jwtProvider.getUserId(token);
-
+        Long tokenUserId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!userId.equals(tokenUserId)) {
             throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
