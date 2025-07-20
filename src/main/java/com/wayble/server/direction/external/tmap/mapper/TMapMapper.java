@@ -12,6 +12,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TMapMapper {
 
+    private static final String GEOMETRY_TYPE_POINT = "Point";
+    private static final String GEOMETRY_TYPE_LINESTRING = "LineString";
+    private static final String POINT_TYPE_START = "SP";
+    private static final String STEP_TYPE_POINT = "point";
+    private static final String STEP_TYPE_LINE = "line";
+
     public TMapParsingResponse parseResponse(TMapResponse response) {
         List<TMapParsingResponse.Step> steps = new ArrayList<>();
         int totalDistance = 0;
@@ -22,7 +28,7 @@ public class TMapMapper {
             TMapResponse.Properties properties = feature.properties();
 
             // 건물일 경우
-            if ("Point".equalsIgnoreCase(geometry.type())) {
+            if (GEOMETRY_TYPE_POINT.equalsIgnoreCase(geometry.type())) {
                 List<?> coordinates = geometry.coordinates();
 
                 if (coordinates.size() >= 2) {
@@ -30,13 +36,13 @@ public class TMapMapper {
                     double latitude = ((Number) coordinates.get(1)).doubleValue();
 
                     // 출발지일 경우
-                    if ("SP".equals(properties.pointType())) {
+                    if (POINT_TYPE_START.equals(properties.pointType())) {
                         totalDistance = properties.totalDistance() != null ? properties.totalDistance() : 0;
                         totalTime = properties.totalTime() != null ? properties.totalTime() : 0;
                     }
 
                     TMapParsingResponse.Step step = new TMapParsingResponse.Step(
-                            "point",
+                            STEP_TYPE_POINT,
                             properties.name(),
                             properties.description(),
                             new TMapParsingResponse.Coordinate(longitude, latitude),
@@ -49,7 +55,7 @@ public class TMapMapper {
                     steps.add(step);
                 }
             // 도로일 경우
-            } else if ("LineString".equalsIgnoreCase(geometry.type())) {
+            } else if (GEOMETRY_TYPE_LINESTRING.equalsIgnoreCase(geometry.type())) {
                 List<TMapParsingResponse.Coordinate> coordinates = new ArrayList<>();
 
                 for (Object object : geometry.coordinates()) {
@@ -61,7 +67,7 @@ public class TMapMapper {
                 }
 
                 TMapParsingResponse.Step step = new TMapParsingResponse.Step(
-                        "line",
+                        STEP_TYPE_LINE,
                         properties.name(),
                         properties.description(),
                         null,
