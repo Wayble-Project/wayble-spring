@@ -57,4 +57,13 @@ public class WaybleZone extends BaseEntity {
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPlaceWaybleZoneMapping> userPlaceMappings = new ArrayList<>();
+
+    // 대표 이미지 필드 추가
+    @Column(name = "main_image_url")
+    private String mainImageUrl;
+
+    // 혹시 필요할수도 있어서 추가해놓음
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+    }
 }
