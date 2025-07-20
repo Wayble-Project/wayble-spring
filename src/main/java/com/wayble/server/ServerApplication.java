@@ -1,8 +1,10 @@
 package com.wayble.server;
 
+import com.wayble.server.direction.external.tmap.TMapProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRepositoriesAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
@@ -11,6 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 )
 @EnableJpaAuditing
 @EnableElasticsearchRepositories(basePackages = "com.wayble.server.explore.repository")
+@EnableConfigurationProperties(TMapProperties.class)
 public class ServerApplication {
 
 	public static void main(String[] args) {
