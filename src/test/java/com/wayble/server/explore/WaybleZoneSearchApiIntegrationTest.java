@@ -144,7 +144,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     @DisplayName("좌표를 전달받아 반경 이내의 웨이블 존을 거리 순으로 조회")
     public void findWaybleZoneByDistanceAscending() throws Exception{
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -216,7 +216,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 단어가 포함된 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -270,7 +270,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 타입의 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByZoneTypeAscending() throws Exception{
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -325,7 +325,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void findWaybleZoneByNameAndZoneTypeAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
