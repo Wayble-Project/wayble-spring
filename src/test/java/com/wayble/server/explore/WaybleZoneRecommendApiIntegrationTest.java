@@ -20,6 +20,7 @@ import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
+import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,6 +135,8 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .longitude(points.get("longitude"))
                     .build();
 
+            WaybleZoneFacility facility = createRandomFacility(i);
+            
             WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
                     .builder()
                     .zoneId((long) i)
@@ -141,6 +144,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .address(address)
                     .thumbnailImageUrl("thumbnail url" + i)
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
+                    .facility(facility)
                     .averageRating(Math.random() * 5)
                     .reviewCount((long)(Math.random() * 500))
                     .build();
@@ -264,6 +268,13 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(dto.zoneType()).isNotNull();
         assertThat(dto.latitude()).isNotNull();
         assertThat(dto.longitude()).isNotNull();
+        assertThat(dto.facility()).isNotNull();
+        assertThat(dto.facility().hasSlope()).isNotNull();
+        assertThat(dto.facility().hasNoDoorStep()).isNotNull();
+        assertThat(dto.facility().hasElevator()).isNotNull();
+        assertThat(dto.facility().hasTableSeat()).isNotNull();
+        assertThat(dto.facility().hasDisabledToilet()).isNotNull();
+        assertThat(dto.facility().floorInfo()).isNotNull();
 
         System.out.println("zoneId = " + dto.zoneId());
         System.out.println("zoneName = " + dto.zoneName());
@@ -278,6 +289,17 @@ public class WaybleZoneRecommendApiIntegrationTest {
         System.out.println("similarityScore = " + dto.similarityScore());
         System.out.println("recencyScore = " + dto.recencyScore());
         System.out.println("totalScore = " + dto.totalScore());
+        System.out.println("=== Facility Info ===");
+        if (dto.facility() != null) {
+            System.out.println("hasSlope = " + dto.facility().hasSlope());
+            System.out.println("hasNoDoorStep = " + dto.facility().hasNoDoorStep());
+            System.out.println("hasElevator = " + dto.facility().hasElevator());
+            System.out.println("hasTableSeat = " + dto.facility().hasTableSeat());
+            System.out.println("hasDisabledToilet = " + dto.facility().hasDisabledToilet());
+            System.out.println("floorInfo = " + dto.facility().floorInfo());
+        } else {
+            System.out.println("facility info is null");
+        }
     }
 
     @Test
@@ -376,5 +398,20 @@ public class WaybleZoneRecommendApiIntegrationTest {
         long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
 
         return start.plusDays(randomDays);
+    }
+    
+    private WaybleZoneFacility createRandomFacility(int i) {
+        Random random = new Random(i); // 시드 고정으로 재현 가능한 랜덤
+        
+        String[] floors = {"B1", "1층", "2층", "3층"};
+        
+        return WaybleZoneFacility.builder()
+                .hasSlope(random.nextBoolean())
+                .hasNoDoorStep(random.nextBoolean())
+                .hasElevator(random.nextBoolean())
+                .hasTableSeat(random.nextBoolean())
+                .hasDisabledToilet(random.nextBoolean())
+                .floorInfo(floors[random.nextInt(floors.length)])
+                .build();
     }
 }
