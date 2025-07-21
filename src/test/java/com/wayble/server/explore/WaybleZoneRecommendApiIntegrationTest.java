@@ -188,24 +188,17 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @DisplayName("데이터 저장 테스트")
     public void checkDataExists() {
         List<WaybleZoneDocument> waybleZoneDocumentList = waybleZoneDocumentRepository.findAll();
-        System.out.println("=== 웨이블존 목록 ===");
-
         assertThat(waybleZoneDocumentList.size()).isGreaterThan(0);
+        System.out.println("Total documents: " + waybleZoneDocumentList.size());
         for (WaybleZoneDocument doc : waybleZoneDocumentList) {
             assertThat(doc.getZoneId()).isNotNull();
             assertThat(doc.getZoneName()).isNotNull();
             assertThat(doc.getAddress().getLocation()).isNotNull();
-            System.out.println("존 정보: " + doc.toString());
-            System.out.println("주소: " + doc.getAddress().toString());
         }
 
         List<WaybleZoneVisitLogDocument> waybleZoneVisitLogList = waybleZoneVisitLogDocumentRepository.findAll();
-        System.out.println("=== 웨이블존 방문 목록 ===");
-
         assertThat(waybleZoneVisitLogList.size()).isGreaterThan(0);
-        for (WaybleZoneVisitLogDocument doc : waybleZoneVisitLogList) {
-            System.out.println("방문 정보" + doc.toString());
-        }
+        System.out.println("visit log size: " + waybleZoneVisitLogList.size());
     }
 
     @Test
@@ -240,12 +233,6 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(recommendLogDocument.get().getUserId()).isEqualTo(userId);
         assertThat(recommendLogDocument.get().getZoneId()).isEqualTo(zoneId);
         assertThat(recommendLogDocument.get().getRecommendationDate()).isEqualTo(LocalDate.now());
-        System.out.println("===recommend log===");
-        System.out.println("id = " + recommendLogDocument.get().getId());
-        System.out.println("userId = " +recommendLogDocument.get().getUserId());
-        System.out.println("zoneId = " +recommendLogDocument.get().getZoneId());
-        System.out.println("recommendationDate = " +recommendLogDocument.get().getRecommendationDate());
-        System.out.println("recommendCount " +recommendLogDocument.get().getRecommendCount());
     }
 
     @Test
@@ -301,7 +288,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
-                        .param("count", String.valueOf(20))
+                        .param("size", String.valueOf(20))
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is2xxSuccessful())

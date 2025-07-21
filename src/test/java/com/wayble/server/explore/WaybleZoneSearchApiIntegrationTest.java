@@ -126,16 +126,14 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     public void checkDataExists() {
         List<WaybleZoneDocument> all = waybleZoneDocumentRepository.findAll();
-        System.out.println("=== 저장된 데이터 확인 ===");
-        System.out.println("Total documents: " + all.size());
+
 
         assertThat(all.size()).isGreaterThan(0);
+        System.out.println("Total documents: " + all.size());
         for (WaybleZoneDocument doc : all) {
             assertThat(doc.getZoneId()).isNotNull();
             assertThat(doc.getZoneName()).isNotNull();
             assertThat(doc.getAddress().getLocation()).isNotNull();
-            System.out.println("존 정보: " + doc.toString());
-            System.out.println("주소: " + doc.getAddress().toString());
         }
     }
 
