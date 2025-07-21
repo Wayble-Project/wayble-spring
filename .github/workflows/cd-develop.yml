@@ -67,6 +67,15 @@ jobs:
         run: |
           sudo docker network create wayble-network || true
 
+      - name: Check if Elasticsearch image exists locally
+        run: |
+          if sudo docker images | grep -q "elasticsearch.*9.0.2"; then
+            echo "✅ Elasticsearch image found locally - skipping download"
+          else
+            echo "⬇️ Downloading Elasticsearch image..."
+            sudo docker pull docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+          fi
+
       - name: Run Elasticsearch container
         run: |
           sudo docker run -d \
@@ -75,7 +84,7 @@ jobs:
             -p 9200:9200 -p 9300:9300 \
             -e "discovery.type=single-node" \
             -e "xpack.security.enabled=false" \
-            -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+            -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
             --restart unless-stopped \
             docker.elastic.co/elasticsearch/elasticsearch:9.0.2
 
