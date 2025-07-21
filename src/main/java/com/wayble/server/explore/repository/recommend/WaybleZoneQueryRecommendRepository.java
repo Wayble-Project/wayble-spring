@@ -139,6 +139,7 @@ public class WaybleZoneQueryRecommendRepository {
                             .longitude(zone.getAddress().getLocation().getLon())
                             .averageRating(zone.getAverageRating())
                             .reviewCount(zone.getReviewCount())
+                            .facility(com.wayble.server.explore.dto.FacilityResponseDto.from(zone.getFacility()))
                             .distanceScore(distanceScore)
                             .similarityScore(similarityScore)
                             .recencyScore(recencyScore)

@@ -3,11 +3,18 @@ package com.wayble.server.explore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
+import com.wayble.server.user.entity.Gender;
+import com.wayble.server.user.entity.LoginType;
+import com.wayble.server.user.entity.User;
+import com.wayble.server.user.entity.UserType;
+import com.wayble.server.user.repository.UserRepository;
+import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +25,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.offset;
@@ -37,6 +47,12 @@ public class WaybleZoneSearchApiIntegrationTest {
     private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private static final double LATITUDE = 37.495;
@@ -46,6 +62,10 @@ public class WaybleZoneSearchApiIntegrationTest {
     private static final double RADIUS = 50.0;
 
     private static final String baseUrl = "/api/v1/wayble-zones/search";
+
+    private Long userId;
+
+    private String token;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -62,6 +82,15 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
+        User testUser = User.createUser(
+                "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
+                generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
+        );
+
+        userRepository.save(testUser);
+        userId = testUser.getId();
+        token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
+
         for (int i = 1; i <= 1000; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
@@ -74,12 +103,15 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .longitude(points.get("longitude"))
                     .build();
 
+            WaybleZoneFacility facility = createRandomFacility(i);
+            
             WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
                     .builder()
                     .zoneId((long) i)
                     .zoneName(nameList.get((int) (Math.random() * nameList.size())))
                     .address(address)
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
+                    .facility(facility)
                     .averageRating(Math.random() * 5)
                     .reviewCount((long)(Math.random() * 500))
                     .build();
@@ -92,28 +124,28 @@ public class WaybleZoneSearchApiIntegrationTest {
     @AfterAll
     public void teardown() {
         waybleZoneDocumentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     public void checkDataExists() {
         List<WaybleZoneDocument> all = waybleZoneDocumentRepository.findAll();
-        System.out.println("=== 저장된 데이터 확인 ===");
-        System.out.println("Total documents: " + all.size());
+
 
         assertThat(all.size()).isGreaterThan(0);
+        System.out.println("Total documents: " + all.size());
         for (WaybleZoneDocument doc : all) {
             assertThat(doc.getZoneId()).isNotNull();
             assertThat(doc.getZoneName()).isNotNull();
             assertThat(doc.getAddress().getLocation()).isNotNull();
-            System.out.println("존 정보: " + doc.toString());
-            System.out.println("주소: " + doc.getAddress().toString());
         }
     }
 
     @Test
     @DisplayName("좌표를 전달받아 반경 이내의 웨이블 존을 거리 순으로 조회")
     public void findWaybleZoneByDistanceAscending() throws Exception{
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -150,10 +182,33 @@ public class WaybleZoneSearchApiIntegrationTest {
                                 dto.distance(), dtoList.get(i-1).distance())
                         .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
             }
+            
+            // facility 검증 추가
+            assertThat(dto.facility()).isNotNull();
+            assertThat(dto.facility().hasSlope()).isNotNull();
+            assertThat(dto.facility().hasNoDoorStep()).isNotNull();
+            assertThat(dto.facility().hasElevator()).isNotNull();
+            assertThat(dto.facility().hasTableSeat()).isNotNull();
+            assertThat(dto.facility().hasDisabledToilet()).isNotNull();
+            assertThat(dto.facility().floorInfo()).isNotNull();
         }
 
-        for (WaybleZoneSearchResponseDto dto : dtoList) {
-            System.out.println(dto.toString());
+
+        if (!dtoList.isEmpty()) {
+            WaybleZoneSearchResponseDto firstDto = dtoList.get(0);
+            System.out.println("=== Search Result - Facility Info ===");
+            System.out.println("zoneId = " + firstDto.zoneId());
+            System.out.println("zoneName = " + firstDto.zoneName());
+            if (firstDto.facility() != null) {
+                System.out.println("hasSlope = " + firstDto.facility().hasSlope());
+                System.out.println("hasNoDoorStep = " + firstDto.facility().hasNoDoorStep());
+                System.out.println("hasElevator = " + firstDto.facility().hasElevator());
+                System.out.println("hasTableSeat = " + firstDto.facility().hasTableSeat());
+                System.out.println("hasDisabledToilet = " + firstDto.facility().hasDisabledToilet());
+                System.out.println("floorInfo = " + firstDto.facility().floorInfo());
+            } else {
+                System.out.println("facility info is null");
+            }
         }
     }
 
@@ -161,7 +216,8 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 단어가 포함된 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -214,7 +270,8 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 타입의 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByZoneTypeAscending() throws Exception{
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -268,7 +325,8 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void findWaybleZoneByNameAndZoneTypeAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
-        MvcResult result = mockMvc.perform(get(baseUrl)
+        MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -347,6 +405,32 @@ public class WaybleZoneSearchApiIntegrationTest {
         double randomLng = LONGITUDE + lngOffset;
 
         return Map.of("latitude", randomLat, "longitude", randomLng);
+    }
+
+    private LocalDate generateRandomBirthDate() {
+        LocalDate today = LocalDate.now();
+        LocalDate start = today.minusYears(90); // 90세
+        LocalDate end = today.minusYears(10);   // 10세
+
+        long daysBetween = ChronoUnit.DAYS.between(start, end);
+        long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
+
+        return start.plusDays(randomDays);
+    }
+    
+    private WaybleZoneFacility createRandomFacility(int i) {
+        Random random = new Random(i); // 시드 고정으로 재현 가능한 랜덤
+        
+        String[] floors = {"B1", "1층", "2층", "3층"};
+        
+        return WaybleZoneFacility.builder()
+                .hasSlope(random.nextBoolean())
+                .hasNoDoorStep(random.nextBoolean())
+                .hasElevator(random.nextBoolean())
+                .hasTableSeat(random.nextBoolean())
+                .hasDisabledToilet(random.nextBoolean())
+                .floorInfo(floors[random.nextInt(floors.length)])
+                .build();
     }
 }
 

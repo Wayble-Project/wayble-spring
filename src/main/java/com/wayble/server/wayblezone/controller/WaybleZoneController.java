@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,7 +58,8 @@ public class WaybleZoneController {
     ) {
 
         // TODO: JWT에서 userId 추출해서 상세 조회 기록 남기기
-        // waybleZoneVisitLogService.saveVisitLog(null, waybleZoneId);
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        waybleZoneVisitLogService.saveVisitLog(userId, waybleZoneId);
         return CommonResponse.success(waybleZoneService.getWaybleZoneDetail(waybleZoneId));
     }
 }

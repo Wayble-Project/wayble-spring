@@ -21,7 +21,7 @@ public class WaybleZoneSearchController {
 
     private final WaybleZoneSearchService waybleZoneSearchService;
 
-    @GetMapping("")
+    @GetMapping("/maps")
     public CommonResponse<SearchSliceDto<WaybleZoneSearchResponseDto>> findByCondition(
             @Valid @ModelAttribute WaybleZoneSearchConditionDto conditionDto,
             @RequestParam(name = "page", defaultValue = "0") int page,

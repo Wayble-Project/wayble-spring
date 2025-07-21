@@ -1,5 +1,6 @@
 package com.wayble.server.explore.dto.recommend;
 
+import com.wayble.server.explore.dto.FacilityResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.Builder;
@@ -23,6 +24,8 @@ public record WaybleZoneRecommendResponseDto(
 
         Long reviewCount,
 
+        FacilityResponseDto facility,
+
         Double distanceScore,
 
         Double similarityScore,
@@ -42,6 +45,7 @@ public record WaybleZoneRecommendResponseDto(
                 .reviewCount(waybleZoneDocument.getReviewCount())
                 .latitude(waybleZoneDocument.getAddress().getLocation().getLat())
                 .longitude(waybleZoneDocument.getAddress().getLocation().getLon())
+                .facility(FacilityResponseDto.from(waybleZoneDocument.getFacility()))
                 .distanceScore(0.0)
                 .similarityScore(0.0)
                 .recencyScore(0.0)
