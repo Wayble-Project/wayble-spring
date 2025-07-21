@@ -33,6 +33,9 @@ public class WaybleZoneDocument {
     @Field(type = FieldType.Object)
     private EsAddress address;
 
+    @Field(type = FieldType.Object)
+    private EsWaybleZoneFacility facility;
+
     private double averageRating;
 
     private long reviewCount;
@@ -44,6 +47,7 @@ public class WaybleZoneDocument {
                 .zoneType(waybleZone.getZoneType())
                 .thumbnailImageUrl("thumbnail image url")   // TODO: 이미지 경로 추가
                 .address(EsAddress.from(waybleZone.getAddress()))
+                .facility(EsWaybleZoneFacility.from(waybleZone.getFacility()))
                 .averageRating(0.0)
                 .reviewCount(0L)
                 .build();
@@ -56,6 +60,7 @@ public class WaybleZoneDocument {
                 .zoneType(dto.waybleZoneType())
                 .thumbnailImageUrl(dto.thumbnailImageUrl())
                 .address(EsAddress.from(dto.address()))
+                .facility(EsWaybleZoneFacility.from(dto.facility()))
                 .averageRating(dto.averageRating() != null ? dto.averageRating() : 0.0)
                 .reviewCount(dto.reviewCount() != null ? dto.reviewCount() : 0L)
                 .build();
