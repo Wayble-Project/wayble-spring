@@ -1,6 +1,5 @@
 package com.wayble.server.user.controller;
 
-import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserPlaceListResponseDto;
@@ -35,8 +34,7 @@ public class UserPlaceController {
     })
     public CommonResponse<String> saveUserPlace(
             @PathVariable Long userId,
-            @RequestBody @Valid UserPlaceRequestDto request,
-            @RequestHeader(value = "Authorization") String authorizationHeader
+            @RequestBody @Valid UserPlaceRequestDto request
     ) {
         Long tokenUserId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!userId.equals(tokenUserId)) {
@@ -58,8 +56,7 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<List<UserPlaceListResponseDto>> getUserPlaces(
-            @PathVariable Long userId,
-            @RequestHeader("Authorization") String authorizationHeader
+            @PathVariable Long userId
     ) {
         Long tokenUserId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!userId.equals(tokenUserId)) {

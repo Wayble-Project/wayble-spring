@@ -44,7 +44,7 @@ public class User extends BaseEntity {
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
@@ -88,5 +88,9 @@ public class User extends BaseEntity {
                 .loginType(loginType)
                 .userType(userType)
                 .build();
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }
