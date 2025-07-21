@@ -49,18 +49,56 @@ jobs:
       - name: Pull latest image from Docker Hub
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
-      - name: Stop existing container if any
+      - name: Stop existing containers if any
         run: |
-          CONTAINER_ID=$(sudo docker ps -q --filter "name=github-actions-demo")
-          if [ ! -z "$CONTAINER_ID" ]; then
-            sudo docker stop $CONTAINER_ID
+          # Stop Spring Boot app container
+          APP_CONTAINER_ID=$(sudo docker ps -q --filter "name=github-actions-demo")
+          if [ ! -z "$APP_CONTAINER_ID" ]; then
+            sudo docker stop $APP_CONTAINER_ID
+          fi
+          
+          # Stop Elasticsearch container
+          ES_CONTAINER_ID=$(sudo docker ps -q --filter "name=elasticsearch")
+          if [ ! -z "$ES_CONTAINER_ID" ]; then
+            sudo docker stop $ES_CONTAINER_ID
           fi
 
-      - name: Run new container
+      - name: Create Docker network if not exists
+        run: |
+          sudo docker network create wayble-network || true
+
+      - name: Run Elasticsearch container
+        run: |
+          sudo docker run -d \
+            --name elasticsearch \
+            --network wayble-network \
+            -p 9200:9200 -p 9300:9300 \
+            -e "discovery.type=single-node" \
+            -e "xpack.security.enabled=false" \
+            -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+            --restart unless-stopped \
+            docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+
+      - name: Wait for Elasticsearch to be ready
+        run: |
+          echo "Waiting for Elasticsearch to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9200/_health > /dev/null 2>&1; then
+              echo "Elasticsearch is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 10
+          done
+
+      - name: Run new Spring Boot container
         run: |
           sudo docker run -d --rm \
             --name github-actions-demo \
+            --network wayble-network \
             -p 8080:8080 \
+            -e "ELASTICSEARCH_HOST=elasticsearch" \
+            -e "ELASTICSEARCH_PORT=9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
       - name: Prune unused docker resources

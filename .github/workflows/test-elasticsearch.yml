@@ -1,0 +1,153 @@
+name: Test Elasticsearch CI/CD
+
+on:
+  workflow_dispatch: # 수동 실행 전용
+  push:
+    branches: [ "feature/seungmin" ] # 본인 브랜치에서만 실행
+
+permissions:
+  contents: read
+
+jobs:
+  # 1. 도커 이미지 빌드 및 푸시
+  build-docker-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: clean bootJar
+
+      - name: Docker build with test tag
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest .
+
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
+
+  # 2. EC2에서 테스트 컨테이너 실행
+  test-elasticsearch-on-ec2:
+    needs: build-docker-image
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull latest test image from Docker Hub
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
+
+      - name: Stop existing test containers if any
+        run: |
+          # Stop test app container
+          TEST_APP_CONTAINER_ID=$(sudo docker ps -q --filter "name=wayble-test-app")
+          if [ ! -z "$TEST_APP_CONTAINER_ID" ]; then
+            sudo docker stop $TEST_APP_CONTAINER_ID
+            sudo docker rm $TEST_APP_CONTAINER_ID
+          fi
+          
+          # Stop test Elasticsearch container
+          TEST_ES_CONTAINER_ID=$(sudo docker ps -q --filter "name=elasticsearch-test")
+          if [ ! -z "$TEST_ES_CONTAINER_ID" ]; then
+            sudo docker stop $TEST_ES_CONTAINER_ID
+            sudo docker rm $TEST_ES_CONTAINER_ID
+          fi
+
+      - name: Create test Docker network if not exists
+        run: |
+          sudo docker network create wayble-test-network || true
+
+      - name: Run test Elasticsearch container
+        run: |
+          sudo docker run -d \
+            --name elasticsearch-test \
+            --network wayble-test-network \
+            -p 9201:9200 -p 9301:9300 \
+            -e "discovery.type=single-node" \
+            -e "xpack.security.enabled=false" \
+            -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+            docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+
+      - name: Wait for test Elasticsearch to be ready
+        run: |
+          echo "Waiting for test Elasticsearch to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9201/_cluster/health > /dev/null 2>&1; then
+              echo "Test Elasticsearch is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 10
+          done
+
+      - name: Run test Spring Boot container
+        run: |
+          sudo docker run -d \
+            --name wayble-test-app \
+            --network wayble-test-network \
+            -p 8081:8080 \
+            -e "ELASTICSEARCH_HOST=elasticsearch-test" \
+            -e "ELASTICSEARCH_PORT=9200" \
+            -e "SPRING_PROFILES_ACTIVE=develop" \
+            ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
+
+      - name: Test application health
+        run: |
+          echo "Waiting for application to start..."
+          sleep 30
+          
+          # 애플리케이션 헬스체크
+          if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
+            echo "✅ Application is healthy!"
+          else
+            echo "❌ Application health check failed"
+            exit 1
+          fi
+          
+          # Elasticsearch 연결 테스트
+          if curl -f http://localhost:9201/_cluster/health > /dev/null 2>&1; then
+            echo "✅ Elasticsearch is accessible!"
+          else
+            echo "❌ Elasticsearch connection failed"
+            exit 1
+          fi
+
+      - name: Cleanup test containers
+        if: always() # 성공/실패 관계없이 항상 실행
+        run: |
+          # 테스트 컨테이너들 정리
+          sudo docker stop wayble-test-app elasticsearch-test || true
+          sudo docker rm wayble-test-app elasticsearch-test || true
+          sudo docker network rm wayble-test-network || true
+
+      - name: Prune unused docker resources
+        run: sudo docker system prune -f
+
+      # ✅ 테스트 성공 알림
+      - name: Send test success notification
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"✅ Elasticsearch CI/CD 테스트 성공! 이제 develop에 머지해도 안전합니다.\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # ❌ 테스트 실패 알림
+      - name: Send test failure notification
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"❌ Elasticsearch CI/CD 테스트 실패! develop 머지 전에 수정이 필요합니다.\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
