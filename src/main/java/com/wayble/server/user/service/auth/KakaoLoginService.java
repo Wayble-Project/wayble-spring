@@ -90,8 +90,11 @@ public class KakaoLoginService {
                     .bodyToMono(String.class)
                     .block();
 
+            System.out.println("카카오 응답: " + response);
+
             return objectMapper.readValue(response, KakaoUserInfoDto.class);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ApplicationException(UserErrorCase.KAKAO_AUTH_FAILED);
         }
     }
