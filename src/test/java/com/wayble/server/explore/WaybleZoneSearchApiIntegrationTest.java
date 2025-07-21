@@ -3,11 +3,17 @@ package com.wayble.server.explore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
+import com.wayble.server.user.entity.Gender;
+import com.wayble.server.user.entity.LoginType;
+import com.wayble.server.user.entity.User;
+import com.wayble.server.user.entity.UserType;
+import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +24,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.offset;
@@ -37,6 +46,12 @@ public class WaybleZoneSearchApiIntegrationTest {
     private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private static final double LATITUDE = 37.495;
@@ -46,6 +61,10 @@ public class WaybleZoneSearchApiIntegrationTest {
     private static final double RADIUS = 50.0;
 
     private static final String baseUrl = "/api/v1/wayble-zones/search";
+
+    private Long userId;
+
+    private String token;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -62,6 +81,15 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
+        User testUser = User.createUser(
+                "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
+                generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
+        );
+
+        userRepository.save(testUser);
+        userId = testUser.getId();
+        token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
+
         for (int i = 1; i <= 1000; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
@@ -92,6 +120,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @AfterAll
     public void teardown() {
         waybleZoneDocumentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -114,6 +143,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("좌표를 전달받아 반경 이내의 웨이블 존을 거리 순으로 조회")
     public void findWaybleZoneByDistanceAscending() throws Exception{
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -162,6 +192,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void findWaybleZoneByNameAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -215,6 +246,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void findWaybleZoneByZoneTypeAscending() throws Exception{
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -269,6 +301,7 @@ public class WaybleZoneSearchApiIntegrationTest {
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
                         .param("radiusKm",  String.valueOf(RADIUS))
@@ -347,6 +380,17 @@ public class WaybleZoneSearchApiIntegrationTest {
         double randomLng = LONGITUDE + lngOffset;
 
         return Map.of("latitude", randomLat, "longitude", randomLng);
+    }
+
+    private LocalDate generateRandomBirthDate() {
+        LocalDate today = LocalDate.now();
+        LocalDate start = today.minusYears(90); // 90세
+        LocalDate end = today.minusYears(10);   // 10세
+
+        long daysBetween = ChronoUnit.DAYS.between(start, end);
+        long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
+
+        return start.plusDays(randomDays);
     }
 }
 

@@ -12,6 +12,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmailAndLoginType(String email, LoginType loginType);
     Optional<User> findByEmailAndLoginType(String email, LoginType loginType);
-    @Query(value = "SELECT * FROM user WHERE email = :email AND login_type = :#{#loginType.name()} AND deleted_at IS NOT NULL", nativeQuery = true)
-    Optional<User> findDeletedUserByEmailAndLoginType(String email, @Param("loginType") LoginType loginType);
 }

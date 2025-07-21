@@ -26,11 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -101,9 +98,10 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @BeforeAll
     public void setup() {
         User testUser = User.createUser(
-                "testUser", "testUsername", "test@email.com", "password",
+                "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
                 generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
         );
+
         userRepository.save(testUser);
         userId = testUser.getId();
         token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
@@ -153,7 +151,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
             User user = User.createUser(
                     "user" + i,
                     "username" + i,
-                    "user" + i + "@email",
+                    UUID.randomUUID() + "@email",
                     "password" + i,
                     generateRandomBirthDate(),
                     Gender.values()[i % 2],
@@ -184,7 +182,6 @@ public class WaybleZoneRecommendApiIntegrationTest {
         waybleZoneVisitLogDocumentRepository.deleteAll();
         recommendLogDocumentRepository.deleteAll();
         userRepository.deleteAll();
-        //SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     @Test
