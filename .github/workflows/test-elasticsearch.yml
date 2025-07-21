@@ -3,7 +3,7 @@ name: Test Elasticsearch CI/CD
 on:
   workflow_dispatch: # 수동 실행 전용
   push:
-    branches: [ "feature/seungmin" ] # 본인 브랜치에서만 실행
+    branches: [ "feature/seungmin-cicd" ] # 본인 브랜치에서만 실행
 
 permissions:
   contents: read
