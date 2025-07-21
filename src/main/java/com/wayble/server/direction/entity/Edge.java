@@ -15,6 +15,7 @@ public class Edge {
     private Long id;
 
     @Column(name = "edgeType", nullable = false)
+    @Enumerated(EnumType.STRING)
     private DirectionType edgeType;
 
     // 출발 노드

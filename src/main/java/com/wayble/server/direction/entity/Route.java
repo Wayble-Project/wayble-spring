@@ -18,6 +18,7 @@ public class Route {
     private String routeName; //노선명(번호/호선)
 
     @Column(name = "routeType", nullable = false)
+    @Enumerated(EnumType.STRING)
     private DirectionType routeType; // SUBWAY, BUS
 
     // 기점 정류장

@@ -19,6 +19,7 @@ public class Node {
     private String stationName;
 
     @Column(name = "nodeType", nullable = false)
+    @Enumerated(EnumType.STRING)
     private DirectionType nodeType;
 
     @Column(name = "latitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
@@ -41,5 +42,11 @@ public class Node {
 
     @OneToMany(mappedBy = "endNode")
     private List<Route> endRoutes;
+
+    public Node(String stationName, double latitude, double longitude) {
+        this.stationName = stationName;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
 }
