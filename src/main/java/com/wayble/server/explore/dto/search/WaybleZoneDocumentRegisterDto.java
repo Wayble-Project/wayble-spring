@@ -1,6 +1,7 @@
 package com.wayble.server.explore.dto.search;
 
 import com.wayble.server.common.entity.Address;
+import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.Builder;
 
@@ -11,6 +12,7 @@ public record WaybleZoneDocumentRegisterDto(
         WaybleZoneType waybleZoneType,
         String thumbnailImageUrl,
         Address address,
+        WaybleZoneFacility facility,
         Double averageRating,
         Long reviewCount
 ) {

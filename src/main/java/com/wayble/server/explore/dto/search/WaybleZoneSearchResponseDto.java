@@ -1,5 +1,6 @@
 package com.wayble.server.explore.dto.search;
 
+import com.wayble.server.explore.dto.FacilityResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.AccessLevel;
@@ -24,7 +25,9 @@ public record WaybleZoneSearchResponseDto(
 
         Double averageRating,
 
-        Long reviewCount
+        Long reviewCount,
+
+        FacilityResponseDto facility
 ) {
     public static WaybleZoneSearchResponseDto from(WaybleZoneDocument waybleZoneDocument, Double distance) {
         return WaybleZoneSearchResponseDto.builder()
@@ -37,6 +40,7 @@ public record WaybleZoneSearchResponseDto(
                 .distance(distance)
                 .latitude(waybleZoneDocument.getAddress().getLocation().getLat())
                 .longitude(waybleZoneDocument.getAddress().getLocation().getLon())
+                .facility(FacilityResponseDto.from(waybleZoneDocument.getFacility()))
                 .build();
     }
 }
