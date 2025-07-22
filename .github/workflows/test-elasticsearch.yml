@@ -89,7 +89,7 @@ jobs:
           sudo docker run -d \
             --name elasticsearch-test \
             --network wayble-test-network \
-            -p 9201:9200 -p 9301:9300 \
+            -p 9200:9200 -p 9300:9300 \
             -e "discovery.type=single-node" \
             -e "xpack.security.enabled=false" \
             -e "network.host=0.0.0.0" \
