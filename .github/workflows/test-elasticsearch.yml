@@ -175,16 +175,16 @@ jobs:
             exit 1
           fi
 
-      - name: Cleanup test containers
-        if: always() # 성공/실패 관계없이 항상 실행
-        run: |
-          # 테스트 컨테이너들 정리
-          sudo docker stop wayble-test-app elasticsearch-test || true
-          sudo docker rm wayble-test-app elasticsearch-test || true
-          sudo docker network rm wayble-test-network || true
-
-      - name: Prune unused docker resources
-        run: sudo docker container prune -f  # 컨테이너만 정리, 이미지 보존
+#      - name: Cleanup test containers
+#        if: always() # 성공/실패 관계없이 항상 실행
+#        run: |
+#          # 테스트 컨테이너들 정리
+#          sudo docker stop wayble-test-app elasticsearch-test || true
+#          sudo docker rm wayble-test-app elasticsearch-test || true
+#          sudo docker network rm wayble-test-network || true
+#
+#      - name: Prune unused docker resources
+#        run: sudo docker container prune -f  # 컨테이너만 정리, 이미지 보존
 
 #      # ✅ 테스트 성공 알림
 #      - name: Send test success notification
