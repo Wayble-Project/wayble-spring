@@ -143,20 +143,20 @@ jobs:
       - name: Prune unused docker resources
         run: sudo docker system prune -f
 
-      # ✅ 테스트 성공 알림
-      - name: Send test success notification
-        if: success()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"✅ Elasticsearch CI/CD 테스트 성공! 이제 develop에 머지해도 안전합니다.\"}" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-      # ❌ 테스트 실패 알림
-      - name: Send test failure notification
-        if: failure()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"❌ Elasticsearch CI/CD 테스트 실패! develop 머지 전에 수정이 필요합니다.\"}" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+#      # ✅ 테스트 성공 알림
+#      - name: Send test success notification
+#        if: success()
+#        run: |
+#          curl -H "Content-Type: application/json" \
+#               -X POST \
+#               -d "{\"content\": \"✅ Elasticsearch CI/CD 테스트 성공! 이제 develop에 머지해도 안전합니다.\"}" \
+#               ${{ secrets.DISCORD_WEBHOOK_URL }}
+#
+#      # ❌ 테스트 실패 알림
+#      - name: Send test failure notification
+#        if: failure()
+#        run: |
+#          curl -H "Content-Type: application/json" \
+#               -X POST \
+#               -d "{\"content\": \"❌ Elasticsearch CI/CD 테스트 실패! develop 머지 전에 수정이 필요합니다.\"}" \
+#               ${{ secrets.DISCORD_WEBHOOK_URL }}
