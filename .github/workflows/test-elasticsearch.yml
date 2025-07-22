@@ -50,6 +50,8 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - uses: actions/checkout@v3
+      
       - name: Pull latest test image from Docker Hub
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
@@ -75,11 +77,11 @@ jobs:
 
       - name: Check if Elasticsearch image exists locally
         run: |
-          if sudo docker images | grep -q "elasticsearch.*9.0.2"; then
-            echo "✅ Elasticsearch image found locally"
+          if sudo docker images | grep -q "es-with-nori.*9.0.2"; then
+            echo "✅ Elasticsearch with Nori image found locally"
           else
-            echo "⬇️ Downloading Elasticsearch image..."
-            sudo docker pull docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+            echo "⬇️ Building Elasticsearch with Nori image..."
+            sudo docker build -f Dockerfile.elasticsearch -t es-with-nori:9.0.2 .
           fi
 
       - name: Run test Elasticsearch container
@@ -91,7 +93,7 @@ jobs:
             -e "discovery.type=single-node" \
             -e "xpack.security.enabled=false" \
             -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
-            docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+            es-with-nori:9.0.2
 
       - name: Wait for test Elasticsearch to be ready
         run: |
