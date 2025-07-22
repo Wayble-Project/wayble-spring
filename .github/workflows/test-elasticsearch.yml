@@ -98,14 +98,20 @@ jobs:
       - name: Wait for test Elasticsearch to be ready
         run: |
           echo "Waiting for test Elasticsearch to start..."
-          for i in {1..30}; do
-            if curl -s http://localhost:9201/_cluster/health > /dev/null 2>&1; then
-              echo "Test Elasticsearch is ready!"
+          for i in {1..60}; do
+            if curl -s http://localhost:9201/_cluster/health?wait_for_status=yellow&timeout=1s | grep -q "yellow\|green"; then
+              echo "Test Elasticsearch is ready and healthy!"
+              echo "Elasticsearch status:"
+              curl -s http://localhost:9201/_cluster/health | jq .
               break
             fi
-            echo "Waiting... ($i/30)"
-            sleep 10
+            echo "Waiting... ($i/60)"
+            sleep 5
           done
+          
+          # 추가 안정화 시간
+          echo "Waiting additional 30 seconds for Elasticsearch to fully stabilize..."
+          sleep 30
 
       - name: Verify network connectivity
         run: |
