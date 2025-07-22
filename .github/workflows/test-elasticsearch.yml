@@ -55,21 +55,17 @@ jobs:
       - name: Pull latest test image from Docker Hub
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
-      - name: Stop existing test containers if any
+      - name: Cleanup all existing test containers before starting
         run: |
-          # Stop test app container
-          TEST_APP_CONTAINER_ID=$(sudo docker ps -q --filter "name=wayble-test-app")
-          if [ ! -z "$TEST_APP_CONTAINER_ID" ]; then
-            sudo docker stop $TEST_APP_CONTAINER_ID
-            sudo docker rm $TEST_APP_CONTAINER_ID
-          fi
-          
-          # Stop test Elasticsearch container
-          TEST_ES_CONTAINER_ID=$(sudo docker ps -q --filter "name=elasticsearch-test")
-          if [ ! -z "$TEST_ES_CONTAINER_ID" ]; then
-            sudo docker stop $TEST_ES_CONTAINER_ID
-            sudo docker rm $TEST_ES_CONTAINER_ID
-          fi
+          echo "🧹 Cleaning up all existing test containers (name starts with 'wayble-' or 'elasticsearch-')"
+          for container in $(sudo docker ps -a --format '{{.Names}}' | grep -E '^wayble-|^elasticsearch-'); do
+            echo "🛑 Stopping and removing $container"
+            sudo docker stop $container || true
+            sudo docker rm $container || true
+          done
+            
+          echo "🧯 Cleaning up unused Docker networks"
+          sudo docker network prune -f || true
 
       - name: Create test Docker network if not exists
         run: |
@@ -171,16 +167,16 @@ jobs:
             exit 1
           fi
 
-#      - name: Cleanup test containers
-#        if: always() # 성공/실패 관계없이 항상 실행
-#        run: |
-#          # 테스트 컨테이너들 정리
-#          sudo docker stop wayble-test-app elasticsearch-test || true
-#          sudo docker rm wayble-test-app elasticsearch-test || true
-#          sudo docker network rm wayble-test-network || true
-#
-#      - name: Prune unused docker resources
-#        run: sudo docker container prune -f  # 컨테이너만 정리, 이미지 보존
+      - name: Cleanup test containers
+        if: always() # 성공/실패 관계없이 항상 실행
+        run: |
+          # 테스트 컨테이너들 정리
+          sudo docker stop wayble-test-app elasticsearch-test || true
+          sudo docker rm wayble-test-app elasticsearch-test || true
+          sudo docker network rm wayble-test-network || true
+
+      - name: Prune unused docker resources
+        run: sudo docker container prune -f  # 컨테이너만 정리, 이미지 보존
 
 #      # ✅ 테스트 성공 알림
 #      - name: Send test success notification
