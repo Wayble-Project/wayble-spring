@@ -105,6 +105,17 @@ jobs:
             sleep 10
           done
 
+      - name: Verify network connectivity
+        run: |
+          echo "=== Network Information ==="
+          sudo docker network inspect wayble-test-network
+          
+          echo "=== Test DNS resolution from Spring Boot container ==="
+          sudo docker run --rm --network wayble-test-network alpine:latest nslookup elasticsearch-test || echo "DNS resolution failed"
+          
+          echo "=== Test ping from Spring Boot container ==="
+          sudo docker run --rm --network wayble-test-network alpine:latest ping -c 2 elasticsearch-test || echo "Ping failed"
+
       - name: Run test Spring Boot container
         run: |
           sudo docker run -d \
@@ -114,7 +125,6 @@ jobs:
             -e "ELASTICSEARCH_HOST=elasticsearch-test" \
             -e "ELASTICSEARCH_PORT=9200" \
             -e "SPRING_PROFILES_ACTIVE=develop" \
-            -e "SPRING_ELASTICSEARCH_URIS=elasticsearch-test:9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
       - name: Test application health
