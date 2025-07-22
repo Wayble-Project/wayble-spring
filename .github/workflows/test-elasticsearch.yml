@@ -130,7 +130,7 @@ jobs:
       - name: Test application health
         run: |
           echo "Waiting for application to start..."
-          sleep 30
+          sleep 60
           
           # 애플리케이션 로그 확인
           echo "=== Application Logs ==="
