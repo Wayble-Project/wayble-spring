@@ -105,7 +105,7 @@ jobs:
               curl -s http://localhost:9201/_cluster/health | jq .
               break
             fi
-            echo "Waiting... ($i/60)"
+            echo "Waiting... ($i/30)"
             sleep 5
           done
 
@@ -137,7 +137,7 @@ jobs:
             --network wayble-test-network \
             -p 8081:8080 \
             -e "SPRING_PROFILES_ACTIVE=develop" \
-            -e "SPRING_ELASTICSEARCH_URIS=http://$ELASTICSEARCH_IP:9200" \
+            -e "SPRING_ELASTICSEARCH_URIS=$ELASTICSEARCH_IP:9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
       - name: Test application health
