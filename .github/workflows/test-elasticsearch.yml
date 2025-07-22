@@ -100,10 +100,10 @@ jobs:
         run: |
           echo "Waiting for test Elasticsearch to start..."
           for i in {1..30}; do
-            if curl -s http://localhost:9201/_cluster/health?wait_for_status=yellow&timeout=1s | grep -q "yellow\|green"; then
+            if curl -s http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s | grep -q "yellow\|green"; then
               echo "Test Elasticsearch is ready and healthy!"
               echo "Elasticsearch status:"
-              curl -s http://localhost:9201/_cluster/health | jq .
+              curl -s http://localhost:9200/_cluster/health | jq .
               break
             fi
             echo "Waiting... ($i/30)"
@@ -129,15 +129,11 @@ jobs:
 
       - name: Run test Spring Boot container
         run: |
-          ELASTICSEARCH_IP=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' elasticsearch-test)
-          echo "Using Elasticsearch IP: $ELASTICSEARCH_IP"
-
           sudo docker run -d \
             --name wayble-test-app \
             --network wayble-test-network \
             -p 8081:8080 \
             -e "SPRING_PROFILES_ACTIVE=develop" \
-            -e "SPRING_DATA_ELASTICSEARCH_REST_URIS=http://$ELASTICSEARCH_IP:9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
       - name: Test application health
@@ -168,7 +164,7 @@ jobs:
           echo "✅ Debug information collected"
           
           # Elasticsearch 연결 테스트
-          if curl -f http://localhost:9201/_cluster/health > /dev/null 2>&1; then
+          if curl -f http://localhost:9200/_cluster/health > /dev/null 2>&1; then
             echo "✅ Elasticsearch is accessible!"
           else
             echo "❌ Elasticsearch connection failed"
