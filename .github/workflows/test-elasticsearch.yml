@@ -114,7 +114,7 @@ jobs:
             -e "ELASTICSEARCH_HOST=elasticsearch-test" \
             -e "ELASTICSEARCH_PORT=9200" \
             -e "SPRING_PROFILES_ACTIVE=develop" \
-            -e "SPRING_ELASTICSEARCH_URIS=http://elasticsearch-test:9200" \
+            -e "SPRING_ELASTICSEARCH_URIS=elasticsearch-test:9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
       - name: Test application health
