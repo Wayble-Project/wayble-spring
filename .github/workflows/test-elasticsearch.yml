@@ -138,8 +138,8 @@ jobs:
           echo "=== Application Logs ==="
           sudo docker logs wayble-test-app || echo "Failed to get app logs"
           
-          # 애플리케이션 헬스체크
-          if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
+          # 애플리케이션 헬스체크 (기본 엔드포인트 확인)
+          if curl -f http://localhost:8081/ > /dev/null 2>&1; then
             echo "✅ Application is healthy!"
           else
             echo "❌ Application health check failed"
