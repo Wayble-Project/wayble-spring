@@ -141,7 +141,7 @@ jobs:
           sudo docker network rm wayble-test-network || true
 
       - name: Prune unused docker resources
-        run: sudo docker system prune -f
+        run: sudo docker container prune -f  # 컨테이너만 정리, 이미지 보존
 
 #      # ✅ 테스트 성공 알림
 #      - name: Send test success notification
