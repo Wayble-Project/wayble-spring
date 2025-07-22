@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record TransportationRequestDto (
         Location origin,
         Location destination,
-        String cursor,
+        Integer cursor,
         Integer size
 
 ) {     public record Location(

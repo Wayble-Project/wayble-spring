@@ -19,7 +19,7 @@ public record TransportationResponseDto(
     ) {}
 
     public record PageInfo(
-            String nextCursor,
+            Integer nextCursor,
             boolean hasNext
     ) {}
 }

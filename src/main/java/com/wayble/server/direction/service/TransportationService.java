@@ -30,11 +30,11 @@ public class TransportationService {
         List<TransportationResponseDto.Step> steps = dijstra(start, end);
 
 
-        int startIndex = (request.cursor() != null) ? Integer.parseInt(request.cursor()) : 0;
-        int pageSize = request.size();
+        int startIndex = (request.cursor() != null) ? request.cursor() : 0;
+        int pageSize = request.size()    != null ? request.size()    : steps.size();
         int endIndex = Math.min(startIndex + pageSize, steps.size());
         boolean hasNext = endIndex < steps.size();
-        String nextCursor = hasNext ? String.valueOf(endIndex) : null;
+        Integer nextCursor = hasNext ? endIndex : null;
         TransportationResponseDto.PageInfo pageInfo = new TransportationResponseDto.PageInfo(nextCursor, hasNext);
 
         return new TransportationResponseDto(steps, pageInfo);
