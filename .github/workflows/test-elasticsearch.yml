@@ -100,13 +100,13 @@ jobs:
         run: |
           echo "Waiting for test Elasticsearch to start..."
           for i in {1..30}; do
-            if curl -s http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s | grep -q "yellow\|green"; then
-              echo "Test Elasticsearch is ready and healthy!"
-              echo "Elasticsearch status:"
+            HEALTH_STATUS=$(curl -s http://localhost:9200/_cluster/health | jq -r '.status' 2>/dev/null || echo "down")
+            if [ "$HEALTH_STATUS" = "green" ] || [ "$HEALTH_STATUS" = "yellow" ]; then
+              echo "✅ Test Elasticsearch is ready and healthy! Status: $HEALTH_STATUS"
               curl -s http://localhost:9200/_cluster/health | jq .
               break
             fi
-            echo "Waiting... ($i/30)"
+            echo "Waiting... ($i/30) - Current status: $HEALTH_STATUS"
             sleep 5
           done
 

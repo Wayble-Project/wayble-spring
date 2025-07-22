@@ -2,3 +2,9 @@ FROM docker.elastic.co/elasticsearch/elasticsearch:9.0.2
 
 # nori 플러그인 설치
 RUN elasticsearch-plugin install --batch analysis-nori
+
+
+# Elasticsearch 설정 파일 수정
+RUN echo "network.host: 0.0.0.0" >> /usr/share/elasticsearch/config/elasticsearch.yml && \
+    echo "discovery.type: single-node" >> /usr/share/elasticsearch/config/elasticsearch.yml && \
+    echo "xpack.security.enabled: false" >> /usr/share/elasticsearch/config/elasticsearch.yml
