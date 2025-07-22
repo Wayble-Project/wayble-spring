@@ -123,6 +123,12 @@ jobs:
           
           echo "=== Test ping from Spring Boot container ==="
           sudo docker run --rm --network wayble-test-network alpine:latest ping -c 2 elasticsearch-test || echo "Ping failed"
+          
+          echo "=== Test direct HTTP connection from container ==="
+          sudo docker run --rm --network wayble-test-network alpine/curl:latest curl -v http://elasticsearch-test:9200/_cluster/health || echo "HTTP connection failed"
+          
+          echo "=== Test Elasticsearch from same network context ==="
+          sudo docker run --rm --network wayble-test-network alpine/curl:latest curl -s http://elasticsearch-test:9200/_cluster/health | jq . || echo "JSON parsing failed"
 
       - name: Run test Spring Boot container
         run: |
@@ -138,7 +144,7 @@ jobs:
       - name: Test application health
         run: |
           echo "Waiting for application to start..."
-          sleep 60
+          sleep 30
           
           # 애플리케이션 로그 확인
           echo "=== Application Logs ==="
