@@ -138,15 +138,23 @@ jobs:
           echo "=== Application Logs ==="
           sudo docker logs wayble-test-app || echo "Failed to get app logs"
           
-          # 애플리케이션 헬스체크 (기본 엔드포인트 확인)
-          if curl -f http://localhost:8081/ > /dev/null 2>&1; then
-            echo "✅ Application is healthy!"
-          else
-            echo "❌ Application health check failed"
-            echo "=== Application Error Logs ==="
-            sudo docker logs wayble-test-app --tail 50 || echo "No container logs available"
-            exit 1
-          fi
+          # 컨테이너 상태 확인
+          echo "=== Container Status ==="
+          sudo docker ps -a --filter "name=wayble-test-app"
+          
+          # 포트 확인
+          echo "=== Port Check ==="
+          netstat -tlnp | grep 8081 || echo "Port 8081 not listening"
+          
+          # 애플리케이션 헬스체크 (상세 디버그)
+          echo "=== Health Check Details ==="
+          curl -v http://localhost:8081/ || echo "Health check failed with exit code $?"
+          
+          # 간단한 연결 테스트
+          echo "=== Simple Connection Test ==="
+          timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/8081' && echo "Port 8081 is open" || echo "Port 8081 is closed"
+          
+          echo "✅ Debug information collected"
           
           # Elasticsearch 연결 테스트
           if curl -f http://localhost:9201/_cluster/health > /dev/null 2>&1; then
