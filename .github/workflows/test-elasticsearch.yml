@@ -128,13 +128,16 @@ jobs:
 
       - name: Run test Spring Boot container
         run: |
+          # Elasticsearch IP 동적으로 얻기
+          ELASTICSEARCH_IP=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' elasticsearch-test)
+          echo "Using Elasticsearch IP: $ELASTICSEARCH_IP"
+          
           sudo docker run -d \
             --name wayble-test-app \
             --network wayble-test-network \
             -p 8081:8080 \
-            -e "ELASTICSEARCH_HOST=elasticsearch-test" \
-            -e "ELASTICSEARCH_PORT=9200" \
             -e "SPRING_PROFILES_ACTIVE=develop" \
+            -e "SPRING_ELASTICSEARCH_URIS=http://$ELASTICSEARCH_IP:9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
       - name: Test application health
