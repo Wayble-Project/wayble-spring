@@ -134,6 +134,7 @@ jobs:
             --network wayble-test-network \
             -p 8081:8080 \
             -e "SPRING_PROFILES_ACTIVE=develop" \
+            -e "SPRING_ELASTICSEARCH_URIS=elasticsearch-test:9200" \
             ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
 
       - name: Test application health
