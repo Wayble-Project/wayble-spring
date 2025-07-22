@@ -92,6 +92,7 @@ jobs:
             -p 9201:9200 -p 9301:9300 \
             -e "discovery.type=single-node" \
             -e "xpack.security.enabled=false" \
+            -e "network.host=0.0.0.0" \
             -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
             es-with-nori:9.0.2
 
