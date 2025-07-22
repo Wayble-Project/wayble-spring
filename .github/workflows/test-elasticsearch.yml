@@ -122,11 +122,17 @@ jobs:
           echo "Waiting for application to start..."
           sleep 30
           
+          # 애플리케이션 로그 확인
+          echo "=== Application Logs ==="
+          sudo docker logs wayble-test-app || echo "Failed to get app logs"
+          
           # 애플리케이션 헬스체크
           if curl -f http://localhost:8081/actuator/health > /dev/null 2>&1; then
             echo "✅ Application is healthy!"
           else
             echo "❌ Application health check failed"
+            echo "=== Application Error Logs ==="
+            sudo docker logs wayble-test-app --tail 50 || echo "No container logs available"
             exit 1
           fi
           
