@@ -1,12 +1,10 @@
 name: CI/CD
 
 on:
-  #  push:
-  #    branches: [ "develop" ]
-  #  pull_request:
-  #    branches: [ "develop" ]
-  push:
-    branches: [ "feature/seungmin-cicd" ]
+#    push:
+#      branches: [ "develop" ]
+    pull_request:
+      branches: [ "main" ]
 
 permissions:
   contents: read
