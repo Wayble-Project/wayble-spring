@@ -1,186 +1,186 @@
-name: Test Elasticsearch CI/CD
-
-on:
-  workflow_dispatch: # 수동 실행 전용
-  push:
-    branches: [ "feature/seungmin-cicd" ] # 본인 브랜치에서만 실행
-
-permissions:
-  contents: read
-
-jobs:
-  # 1. 도커 이미지 빌드 및 푸시
-  build-docker-image:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Create application.yml from secrets
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: clean bootJar
-
-      - name: Docker build with test tag
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest .
-
-      - name: Docker login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
-
-  # 2. EC2에서 테스트 컨테이너 실행
-  test-elasticsearch-on-ec2:
-    needs: build-docker-image
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Pull latest test image from Docker Hub
-        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
-
-      - name: Cleanup all existing test containers before starting
-        run: |
-          echo "🧹 Cleaning up all existing test containers (name starts with 'wayble-' or 'elasticsearch-')"
-          for container in $(sudo docker ps -a --format '{{.Names}}' | grep -E '^wayble-|^elasticsearch-'); do
-            echo "🛑 Stopping and removing $container"
-            sudo docker stop $container || true
-            sudo docker rm $container || true
-          done
-            
-          echo "🧯 Cleaning up unused Docker networks"
-          sudo docker network prune -f || true
-
-      - name: Create test Docker network if not exists
-        run: |
-          sudo docker network create wayble-test-network || true
-
-      - name: Check if Elasticsearch image exists locally
-        run: |
-          if sudo docker images | grep -q "es-with-nori.*9.0.2"; then
-            echo "✅ Elasticsearch with Nori image found locally"
-          else
-            echo "⬇️ Building Elasticsearch with Nori image..."
-            sudo docker build -f Dockerfile.elasticsearch -t es-with-nori:9.0.2 .
-          fi
-
-      - name: Run test Elasticsearch container
-        run: |
-          sudo docker run -d \
-            --name elasticsearch-test \
-            --network wayble-test-network \
-            -p 9200:9200 -p 9300:9300 \
-            -e "discovery.type=single-node" \
-            -e "xpack.security.enabled=false" \
-            -e "network.host=0.0.0.0" \
-            -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
-            es-with-nori:9.0.2
-
-      - name: Wait for test Elasticsearch to be ready
-        run: |
-          echo "Waiting for test Elasticsearch to start..."
-          for i in {1..30}; do
-            HEALTH_STATUS=$(curl -s http://localhost:9200/_cluster/health | jq -r '.status' 2>/dev/null || echo "down")
-            if [ "$HEALTH_STATUS" = "green" ] || [ "$HEALTH_STATUS" = "yellow" ]; then
-              echo "✅ Test Elasticsearch is ready and healthy! Status: $HEALTH_STATUS"
-              curl -s http://localhost:9200/_cluster/health | jq .
-              break
-            fi
-            echo "Waiting... ($i/30) - Current status: $HEALTH_STATUS"
-            sleep 5
-          done
-
-      - name: Verify network connectivity
-        run: |
-          echo "=== Network Information ==="
-          sudo docker network inspect wayble-test-network
-          
-          echo "=== Test DNS resolution from Spring Boot container ==="
-          sudo docker run --rm --network wayble-test-network alpine:latest nslookup elasticsearch-test || echo "DNS resolution failed"
-          
-          echo "=== Test ping from Spring Boot container ==="
-          sudo docker run --rm --network wayble-test-network alpine:latest ping -c 2 elasticsearch-test || echo "Ping failed"
-          
-          echo "=== Test direct HTTP connection from container ==="
-          sudo docker run --rm --network wayble-test-network alpine/curl:latest curl -v http://elasticsearch-test:9200/_cluster/health || echo "HTTP connection failed"
-          
-          echo "=== Test Elasticsearch from same network context ==="
-          sudo docker run --rm --network wayble-test-network alpine/curl:latest curl -s http://elasticsearch-test:9200/_cluster/health | jq . || echo "JSON parsing failed"
-
-      - name: Run test Spring Boot container
-        run: |
-          sudo docker run -d \
-            --name wayble-test-app \
-            --network wayble-test-network \
-            -p 8081:8080 \
-            -e "SPRING_PROFILES_ACTIVE=develop" \
-            ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
-
-      - name: Test application health
-        run: |
-          echo "Waiting for application to start..."
-          sleep 30
-          
-          # 애플리케이션 로그 확인
-          echo "=== Application Logs ==="
-          sudo docker logs wayble-test-app || echo "Failed to get app logs"
-          
-          # 컨테이너 상태 확인
-          echo "=== Container Status ==="
-          sudo docker ps -a --filter "name=wayble-test-app"
-          
-          # 포트 확인
-          echo "=== Port Check ==="
-          netstat -tlnp | grep 8081 || echo "Port 8081 not listening"
-          
-          # 애플리케이션 헬스체크 (상세 디버그)
-          echo "=== Health Check Details ==="
-          curl -v http://localhost:8081/ || echo "Health check failed with exit code $?"
-          
-          # 간단한 연결 테스트
-          echo "=== Simple Connection Test ==="
-          timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/8081' && echo "Port 8081 is open" || echo "Port 8081 is closed"
-          
-          echo "✅ Debug information collected"
-          
-          # Elasticsearch 연결 테스트
-          if curl -f http://localhost:9200/_cluster/health > /dev/null 2>&1; then
-            echo "✅ Elasticsearch is accessible!"
-          else
-            echo "❌ Elasticsearch connection failed"
-            exit 1
-          fi
-
-#      # ✅ 테스트 성공 알림
-#      - name: Send test success notification
-#        if: success()
-#        run: |
-#          curl -H "Content-Type: application/json" \
-#               -X POST \
-#               -d "{\"content\": \"✅ Elasticsearch CI/CD 테스트 성공! 이제 develop에 머지해도 안전합니다.\"}" \
-#               ${{ secrets.DISCORD_WEBHOOK_URL }}
+#name: Test Elasticsearch CI/CD
 #
-#      # ❌ 테스트 실패 알림
-#      - name: Send test failure notification
-#        if: failure()
+#on:
+#  workflow_dispatch: # 수동 실행 전용
+#  push:
+#    branches: [ "feature/seungmin-cicd" ] # 본인 브랜치에서만 실행
+#
+#permissions:
+#  contents: read
+#
+#jobs:
+#  # 1. 도커 이미지 빌드 및 푸시
+#  build-docker-image:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#
+#      - name: Create application.yml from secrets
 #        run: |
-#          curl -H "Content-Type: application/json" \
-#               -X POST \
-#               -d "{\"content\": \"❌ Elasticsearch CI/CD 테스트 실패! develop 머지 전에 수정이 필요합니다.\"}" \
-#               ${{ secrets.DISCORD_WEBHOOK_URL }}
+#          mkdir -p src/main/resources
+#          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+#
+#      - name: Build with Gradle
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          arguments: clean bootJar
+#
+#      - name: Docker build with test tag
+#        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest .
+#
+#      - name: Docker login
+#        uses: docker/login-action@v2
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+#
+#      - name: Push Docker image
+#        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
+#
+#  # 2. EC2에서 테스트 컨테이너 실행
+#  test-elasticsearch-on-ec2:
+#    needs: build-docker-image
+#    runs-on: self-hosted
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Pull latest test image from Docker Hub
+#        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
+#
+#      - name: Cleanup all existing test containers before starting
+#        run: |
+#          echo "🧹 Cleaning up all existing test containers (name starts with 'wayble-' or 'elasticsearch-')"
+#          for container in $(sudo docker ps -a --format '{{.Names}}' | grep -E '^wayble-|^elasticsearch-'); do
+#            echo "🛑 Stopping and removing $container"
+#            sudo docker stop $container || true
+#            sudo docker rm $container || true
+#          done
+#
+#          echo "🧯 Cleaning up unused Docker networks"
+#          sudo docker network prune -f || true
+#
+#      - name: Create test Docker network if not exists
+#        run: |
+#          sudo docker network create wayble-test-network || true
+#
+#      - name: Check if Elasticsearch image exists locally
+#        run: |
+#          if sudo docker images | grep -q "es-with-nori.*9.0.2"; then
+#            echo "✅ Elasticsearch with Nori image found locally"
+#          else
+#            echo "⬇️ Building Elasticsearch with Nori image..."
+#            sudo docker build -f Dockerfile.elasticsearch -t es-with-nori:9.0.2 .
+#          fi
+#
+#      - name: Run test Elasticsearch container
+#        run: |
+#          sudo docker run -d \
+#            --name elasticsearch-test \
+#            --network wayble-test-network \
+#            -p 9200:9200 -p 9300:9300 \
+#            -e "discovery.type=single-node" \
+#            -e "xpack.security.enabled=false" \
+#            -e "network.host=0.0.0.0" \
+#            -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
+#            es-with-nori:9.0.2
+#
+#      - name: Wait for test Elasticsearch to be ready
+#        run: |
+#          echo "Waiting for test Elasticsearch to start..."
+#          for i in {1..30}; do
+#            HEALTH_STATUS=$(curl -s http://localhost:9200/_cluster/health | jq -r '.status' 2>/dev/null || echo "down")
+#            if [ "$HEALTH_STATUS" = "green" ] || [ "$HEALTH_STATUS" = "yellow" ]; then
+#              echo "✅ Test Elasticsearch is ready and healthy! Status: $HEALTH_STATUS"
+#              curl -s http://localhost:9200/_cluster/health | jq .
+#              break
+#            fi
+#            echo "Waiting... ($i/30) - Current status: $HEALTH_STATUS"
+#            sleep 5
+#          done
+#
+#      - name: Verify network connectivity
+#        run: |
+#          echo "=== Network Information ==="
+#          sudo docker network inspect wayble-test-network
+#
+#          echo "=== Test DNS resolution from Spring Boot container ==="
+#          sudo docker run --rm --network wayble-test-network alpine:latest nslookup elasticsearch-test || echo "DNS resolution failed"
+#
+#          echo "=== Test ping from Spring Boot container ==="
+#          sudo docker run --rm --network wayble-test-network alpine:latest ping -c 2 elasticsearch-test || echo "Ping failed"
+#
+#          echo "=== Test direct HTTP connection from container ==="
+#          sudo docker run --rm --network wayble-test-network alpine/curl:latest curl -v http://elasticsearch-test:9200/_cluster/health || echo "HTTP connection failed"
+#
+#          echo "=== Test Elasticsearch from same network context ==="
+#          sudo docker run --rm --network wayble-test-network alpine/curl:latest curl -s http://elasticsearch-test:9200/_cluster/health | jq . || echo "JSON parsing failed"
+#
+#      - name: Run test Spring Boot container
+#        run: |
+#          sudo docker run -d \
+#            --name wayble-test-app \
+#            --network wayble-test-network \
+#            -p 8081:8080 \
+#            -e "SPRING_PROFILES_ACTIVE=develop" \
+#            ${{ secrets.DOCKERHUB_USERNAME }}/wayble-test:latest
+#
+#      - name: Test application health
+#        run: |
+#          echo "Waiting for application to start..."
+#          sleep 30
+#
+#          # 애플리케이션 로그 확인
+#          echo "=== Application Logs ==="
+#          sudo docker logs wayble-test-app || echo "Failed to get app logs"
+#
+#          # 컨테이너 상태 확인
+#          echo "=== Container Status ==="
+#          sudo docker ps -a --filter "name=wayble-test-app"
+#
+#          # 포트 확인
+#          echo "=== Port Check ==="
+#          netstat -tlnp | grep 8081 || echo "Port 8081 not listening"
+#
+#          # 애플리케이션 헬스체크 (상세 디버그)
+#          echo "=== Health Check Details ==="
+#          curl -v http://localhost:8081/ || echo "Health check failed with exit code $?"
+#
+#          # 간단한 연결 테스트
+#          echo "=== Simple Connection Test ==="
+#          timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/8081' && echo "Port 8081 is open" || echo "Port 8081 is closed"
+#
+#          echo "✅ Debug information collected"
+#
+#          # Elasticsearch 연결 테스트
+#          if curl -f http://localhost:9200/_cluster/health > /dev/null 2>&1; then
+#            echo "✅ Elasticsearch is accessible!"
+#          else
+#            echo "❌ Elasticsearch connection failed"
+#            exit 1
+#          fi
+#
+##      # ✅ 테스트 성공 알림
+##      - name: Send test success notification
+##        if: success()
+##        run: |
+##          curl -H "Content-Type: application/json" \
+##               -X POST \
+##               -d "{\"content\": \"✅ Elasticsearch CI/CD 테스트 성공! 이제 develop에 머지해도 안전합니다.\"}" \
+##               ${{ secrets.DISCORD_WEBHOOK_URL }}
+##
+##      # ❌ 테스트 실패 알림
+##      - name: Send test failure notification
+##        if: failure()
+##        run: |
+##          curl -H "Content-Type: application/json" \
+##               -X POST \
+##               -d "{\"content\": \"❌ Elasticsearch CI/CD 테스트 실패! develop 머지 전에 수정이 필요합니다.\"}" \
+##               ${{ secrets.DISCORD_WEBHOOK_URL }}
