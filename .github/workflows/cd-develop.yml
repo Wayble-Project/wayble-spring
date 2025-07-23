@@ -1,13 +1,14 @@
 name: CI/CD
 
 on:
-  push:
-    branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+#    push:
+#      branches: [ "develop" ]
+    pull_request:
+      branches: [ "main" ]
 
 permissions:
   contents: read
+
 
 jobs:
   # 1. 도커 이미지 빌드 및 푸시
@@ -22,6 +23,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Create application.yml from secrets
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
@@ -46,25 +52,126 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Pull latest image from Docker Hub
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
-      - name: Stop existing container if any
+      - name: Cleanup all existing containers before starting
         run: |
-          CONTAINER_ID=$(sudo docker ps -q --filter "name=github-actions-demo")
-          if [ ! -z "$CONTAINER_ID" ]; then
-            sudo docker stop $CONTAINER_ID
+          echo "🧹 Cleaning up all existing containers"
+
+          # Stop and remove specific containers
+          sudo docker stop github-actions-demo || true
+          sudo docker rm github-actions-demo || true
+
+          sudo docker stop elasticsearch || true
+          sudo docker rm elasticsearch || true
+
+
+          echo "🧯 Cleaning up unused Docker networks"
+          sudo docker system prune -f || true
+
+      - name: Create Docker network if not exists
+        run: |
+          sudo docker network create wayble-network || true
+
+      - name: Check if Elasticsearch image exists locally
+        run: |
+          if sudo docker images | grep -q "es-with-nori.*9.0.2"; then
+            echo "✅ Elasticsearch image found locally - skipping download"
+          else
+            echo "⬇️ Building Elasticsearch with Nori image..."
+            sudo docker build -f Dockerfile.elasticsearch -t es-with-nori:9.0.2 .
           fi
 
-      - name: Run new container
+      - name: Run Elasticsearch container
         run: |
-          sudo docker run -d --rm \
+          sudo docker run -d \
+            --name elasticsearch \
+            --network wayble-network \
+            -p 9200:9200 -p 9300:9300 \
+            -e "discovery.type=single-node" \
+            -e "xpack.security.enabled=false" \
+            -e "network.host=0.0.0.0" \
+            -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
+            es-with-nori:9.0.2
+
+      - name: Wait for test Elasticsearch to be ready
+        run: |
+          echo "Waiting for test Elasticsearch to start..."
+          for i in {1..30}; do
+            HEALTH_STATUS=$(curl -s http://localhost:9200/_cluster/health | jq -r '.status' 2>/dev/null || echo "down")
+            if [ "$HEALTH_STATUS" = "green" ] || [ "$HEALTH_STATUS" = "yellow" ]; then
+              echo "✅ Test Elasticsearch is ready and healthy! Status: $HEALTH_STATUS"
+              curl -s http://localhost:9200/_cluster/health | jq .
+              break
+            fi
+            echo "Waiting... ($i/30) - Current status: $HEALTH_STATUS"
+            sleep 5
+          done
+
+      - name: Verify network connectivity
+        run: |
+          echo "=== Network Information ==="
+          sudo docker network inspect wayble-network
+
+          echo "=== Test DNS resolution from Spring Boot container ==="
+          sudo docker run --rm --network wayble-network alpine:latest nslookup elasticsearch || echo "DNS resolution failed"
+
+          echo "=== Test ping from Spring Boot container ==="
+          sudo docker run --rm --network wayble-network alpine:latest ping -c 2 elasticsearch || echo "Ping failed"
+
+          echo "=== Test direct HTTP connection from container ==="
+          sudo docker run --rm --network wayble-network alpine/curl:latest curl -v http://elasticsearch:9200/_cluster/health || echo "HTTP connection failed"
+
+          echo "=== Test Elasticsearch from same network context ==="
+          sudo docker run --rm --network wayble-network alpine/curl:latest curl -s http://elasticsearch:9200/_cluster/health | jq . || echo "JSON parsing failed"
+
+
+      - name: Run new Spring Boot container
+        run: |
+          sudo docker run -d \
             --name github-actions-demo \
+            --network wayble-network \
             -p 8080:8080 \
+            -e "SPRING_PROFILES_ACTIVE=develop" \
             ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
-      - name: Prune unused docker resources
-        run: sudo docker system prune -f
+      - name: Test application health
+        run: |
+          echo "Waiting for application to start..."
+          sleep 30
+
+          # 애플리케이션 로그 확인
+          echo "=== Application Logs ==="
+          sudo docker logs github-actions-demo || echo "Failed to get app logs"
+
+          # 컨테이너 상태 확인
+          echo "=== Container Status ==="
+          sudo docker ps -a --filter "name=github-actions-demo"
+
+          # 포트 확인
+          echo "=== Port Check ==="
+          netstat -tlnp | grep 8080 || echo "Port 8080 not listening"
+
+          # 애플리케이션 헬스체크 (상세 디버그)
+          echo "=== Health Check Details ==="
+          curl -v http://localhost:8080/ || echo "Health check failed with exit code $?"
+
+          # 간단한 연결 테스트
+          echo "=== Simple Connection Test ==="
+          timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/8080' && echo "Port 8080 is open" || echo "Port 8080 is closed"
+
+          echo "✅ Debug information collected"
+
+          # Elasticsearch 연결 테스트
+          if curl -f http://localhost:9200/_cluster/health > /dev/null 2>&1; then
+            echo "✅ Elasticsearch is accessible!"
+          else
+            echo "❌ Elasticsearch connection failed"
+            exit 1
+          fi
 
       # ✅ 배포 성공 알림 (Discord)
       - name: Send success webhook to Discord
@@ -84,7 +191,7 @@ jobs:
                -d "{\"content\": \"❌ EC2 배포 실패! 확인이 필요합니다.\"}" \
                ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      
+
 
 
 # name: CD - DEVELOP
@@ -99,3 +206,4 @@ jobs:
 #     runs-on: ubuntu-latest #OS환경
 #     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
 #     #닫힌 Pull Request 중에서, 병합된 것이고, 병합 대상 브랜치가 develop 브랜치일 경우에만 이 작업을 실행
+
