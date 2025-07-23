@@ -72,7 +72,7 @@ jobs:
 
 
           echo "🧯 Cleaning up unused Docker networks"
-          sudo docker network prune -f || true
+          sudo docker system prune -f || true
 
       - name: Create Docker network if not exists
         run: |
