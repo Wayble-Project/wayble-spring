@@ -8,8 +8,12 @@ import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
+import com.wayble.server.explore.entity.AgeGroup;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
+import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
+import com.wayble.server.explore.repository.WaybleZoneVisitLogDocumentRepository;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
@@ -48,6 +52,9 @@ public class WaybleZoneSearchApiIntegrationTest {
     private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
     @Autowired
+    private WaybleZoneVisitLogDocumentRepository waybleZoneVisitLogDocumentRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -67,6 +74,8 @@ public class WaybleZoneSearchApiIntegrationTest {
     private Long userId;
 
     private String token;
+
+    private static final int SAMPLES = 100;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -100,7 +109,7 @@ public class WaybleZoneSearchApiIntegrationTest {
         userId = testUser.getId();
         token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
 
-        for (int i = 1; i <= 1000; i++) {
+        for (int i = 1; i <= SAMPLES; i++) {
             Map<String, Double> points = makeRandomPoint();
             Address address = Address.builder()
                     .state("state" + i)
@@ -125,6 +134,32 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .reviewCount((long)(Math.random() * 500))
                     .build();
 
+            User user = User.createUser(
+                    "user" + i,
+                    "username" + i,
+                    UUID.randomUUID() + "@email",
+                    "password" + i,
+                    generateRandomBirthDate(),
+                    Gender.values()[i % 2],
+                    LoginType.values()[i % LoginType.values().length],
+                    UserType.DISABLED
+            );
+            userRepository.save(user);
+
+            int count = (int) (Math.random() * 30) + 1;
+            for (int j = 0; j < count; j++) {
+                Long zoneId = (long) (Math.random() * SAMPLES) + 1;
+                WaybleZoneVisitLogDocument visitLogDocument = WaybleZoneVisitLogDocument
+                        .builder()
+                        .userId(user.getId())
+                        .zoneId(zoneId)
+                        .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))
+                        .gender(user.getGender())
+                        .build();
+
+                waybleZoneVisitLogDocumentRepository.save(visitLogDocument);
+            }
+
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
             waybleZoneDocumentRepository.save(waybleZoneDocument);
         }
@@ -132,8 +167,9 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @AfterAll
     public void teardown() {
-        waybleZoneDocumentRepository.deleteAll();
-        userRepository.deleteAll();
+//        waybleZoneVisitLogDocumentRepository.deleteAll();
+//        waybleZoneDocumentRepository.deleteAll();
+//        userRepository.deleteAll();
     }
 
     @Test
@@ -388,6 +424,68 @@ public class WaybleZoneSearchApiIntegrationTest {
 
         for (WaybleZoneSearchResponseDto dto : dtoList) {
             System.out.println(dto.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("특정 동 주변 Top3 웨이블존 검색순 기반 검색")
+    public void findMostSearchesWaybleZoneByDistrict() throws Exception{
+        final String district = districtList.get((int) (Math.random() * districtList.size()));
+        MvcResult result = mockMvc.perform(get(baseUrl + "/district/most-searches")
+                        .header("Authorization", "Bearer " + token)
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("district", district)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        List<WaybleZoneDistrictResponseDto> dtoList =
+                objectMapper.convertValue(
+                        dataNode,
+                        new TypeReference<>() {}
+                );
+
+        // 검증: 결과가 비어있지 않아야 함 (최대 3개)
+        assertThat(dtoList).isNotEmpty();
+        assertThat(dtoList.size()).isLessThanOrEqualTo(3);
+
+        // 검증: 각 결과의 필수 필드들이 존재하는지 확인
+        for (WaybleZoneDistrictResponseDto dto : dtoList) {
+            assertThat(dto.visitCount()).isNotNull();
+            assertThat(dto.visitCount()).isGreaterThan(0L);
+            
+            // 필수 필드들이 존재하는지 확인
+            assertThat(dto.waybleZoneInfo().zoneId()).isNotNull();
+            assertThat(dto.waybleZoneInfo().zoneName()).isNotNull();
+            assertThat(dto.waybleZoneInfo().zoneType()).isNotNull();
+            assertThat(dto.waybleZoneInfo().latitude()).isNotNull();
+            assertThat(dto.waybleZoneInfo().longitude()).isNotNull();
+        }
+
+        // 검증: 방문 수 내림차순으로 정렬되어야 함
+        for (int i = 1; i < dtoList.size(); i++) {
+            assertThat(dtoList.get(i).visitCount())
+                    .withFailMessage("방문 수 정렬 오류: 인덱스 %d의 방문 수(%d)가 인덱스 %d의 방문 수(%d)보다 크면 안됩니다",
+                            i, dtoList.get(i).visitCount(), i-1, dtoList.get(i-1).visitCount())
+                    .isLessThanOrEqualTo(dtoList.get(i-1).visitCount());
+        }
+
+        // 디버그 출력
+        System.out.println("=== District " + district + " Top3 Results ===");
+        for (int i = 0; i < dtoList.size(); i++) {
+            WaybleZoneDistrictResponseDto dto = dtoList.get(i);
+            System.out.println((i+1) + ". Zone " + dto.waybleZoneInfo().zoneId() + 
+                    " [" + dto.waybleZoneInfo().zoneName() + "] " +
+                    "visits: " + dto.visitCount() + 
+                    " type: " + dto.waybleZoneInfo().zoneType());
         }
     }
 
