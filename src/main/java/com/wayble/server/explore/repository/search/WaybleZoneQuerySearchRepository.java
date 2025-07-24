@@ -134,14 +134,10 @@ public class WaybleZoneQuerySearchRepository{
     }
 
     public List<WaybleZoneDistrictResponseDto> findTop3SearchesWaybleZonesByDistrict(String district) {
-        // DEBUG: 모든 zone의 district 확인
-        debugAllZoneDistricts();
-        
         // 1. 특정 district에 속한 wayble zone들 조회
         List<Long> zoneIdsInDistrict = getZoneIdsByDistrict(district);
         
         if (zoneIdsInDistrict.isEmpty()) {
-            System.out.println("DEBUG: No zones found for district: " + district);
             return Collections.emptyList();
         }
 
@@ -149,7 +145,6 @@ public class WaybleZoneQuerySearchRepository{
         Map<Long, Long> visitCounts = getVisitCountsByZoneIds(zoneIdsInDistrict);
         
         if (visitCounts.isEmpty()) {
-            System.out.println("DEBUG: No visit counts found");
             return Collections.emptyList();
         }
         
@@ -162,16 +157,12 @@ public class WaybleZoneQuerySearchRepository{
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
-        
-        System.out.println("DEBUG: Top3 visit counts: " + top3VisitCounts);
 
         // 3. top3 zone들의 상세 정보 조회 및 ResponseDto 생성
         return getWaybleZoneDetails(new ArrayList<>(top3VisitCounts.keySet()), top3VisitCounts);
     }
 
     private List<Long> getZoneIdsByDistrict(String district) {
-        System.out.println("=== DEBUG: Searching for district: " + district + " ===");
-        
         Query termQuery = TermQuery.of(t -> t
                 .field("address.district.keyword")
                 .value(district)
@@ -188,14 +179,6 @@ public class WaybleZoneQuerySearchRepository{
                 INDEX
         );
 
-        System.out.println("DEBUG: Found " + searchHits.getTotalHits() + " zones in district: " + district);
-        
-        // 첫 번째 결과 몇 개의 district 값 확인
-        searchHits.getSearchHits().stream().limit(3).forEach(hit -> {
-            WaybleZoneDocument doc = hit.getContent();
-            System.out.println("DEBUG: Zone " + doc.getZoneId() + " has district: [" + doc.getAddress().getDistrict() + "]");
-        });
-
         return searchHits.getSearchHits().stream()
                 .map(hit -> hit.getContent().getZoneId())
                 .collect(Collectors.toList());
@@ -205,16 +188,12 @@ public class WaybleZoneQuerySearchRepository{
     private Map<Long, Long> getVisitCountsByZoneIds(List<Long> zoneIds) {
         Map<Long, Long> visitCountMap = new HashMap<>();
         
-        System.out.println("DEBUG: Checking visit counts for " + zoneIds.size() + " zones");
-        
         // 각 zoneId별로 방문 로그 수를 직접 카운트
         for (Long zoneId : zoneIds) {
             long count = countVisitLogsByZoneId(zoneId);
             visitCountMap.put(zoneId, count);
-            System.out.println("DEBUG: Zone " + zoneId + " has " + count + " visits");
         }
 
-        System.out.println("DEBUG: Visit count map size: " + visitCountMap.size());
         return visitCountMap;
     }
 
@@ -240,35 +219,10 @@ public class WaybleZoneQuerySearchRepository{
 
     private List<WaybleZoneDistrictResponseDto> getWaybleZoneDetails(List<Long> zoneIds, Map<Long, Long> visitCountMap) {
         if (zoneIds.isEmpty()) {
-            System.out.println("DEBUG: getWaybleZoneDetails - zoneIds is empty");
             return Collections.emptyList();
         }
 
-        System.out.println("DEBUG: getWaybleZoneDetails - Looking for zoneIds: " + zoneIds);
-
-        // 단일 zoneId로 먼저 테스트해보기
-        Long firstZoneId = zoneIds.get(0);
-        System.out.println("DEBUG: Testing single zoneId: " + firstZoneId);
-        
-        Query singleTermQuery = TermQuery.of(t -> t
-                .field("id")
-                .value(firstZoneId)
-        )._toQuery();
-        
-        NativeQuery testQuery = NativeQuery.builder()
-                .withQuery(singleTermQuery)
-                .withMaxResults(1)
-                .build();
-                
-        SearchHits<WaybleZoneDocument> testHits = operations.search(
-                testQuery,
-                WaybleZoneDocument.class,
-                INDEX
-        );
-        
-        System.out.println("DEBUG: Single zoneId test found: " + testHits.getTotalHits() + " zones");
-
-        // Terms query로 변경 - 여러 값을 한번에 검색
+        // Terms query로 여러 값을 한번에 검색
         Query termsQuery = Query.of(q -> q
                 .terms(t -> t
                         .field("id")
@@ -290,41 +244,13 @@ public class WaybleZoneQuerySearchRepository{
                 INDEX
         );
 
-        System.out.println("DEBUG: getWaybleZoneDetails - Found " + searchHits.getTotalHits() + " zones");
-
-        List<WaybleZoneDistrictResponseDto> result = searchHits.getSearchHits().stream()
+        return searchHits.getSearchHits().stream()
                 .map(hit -> {
                     WaybleZoneDocument doc = hit.getContent();
                     Long visitCount = visitCountMap.get(doc.getZoneId());
-                    System.out.println("DEBUG: Creating DTO for zone " + doc.getZoneId() + " with " + visitCount + " visits");
                     return WaybleZoneDistrictResponseDto.from(doc, visitCount);
                 })
                 .sorted((a, b) -> Long.compare(b.visitCount(), a.visitCount())) // 방문 수 내림차순 정렬
                 .collect(Collectors.toList());
-
-        System.out.println("DEBUG: getWaybleZoneDetails - Returning " + result.size() + " results");
-        return result;
-    }
-    
-    private void debugAllZoneDistricts() {
-        System.out.println("=== DEBUG: All zones in index ===");
-        
-        NativeQuery searchQuery = NativeQuery.builder()
-                .withQuery(Query.of(q -> q.matchAll(m -> m)))
-                .withMaxResults(20)
-                .build();
-
-        SearchHits<WaybleZoneDocument> searchHits = operations.search(
-                searchQuery,
-                WaybleZoneDocument.class,
-                INDEX
-        );
-        
-        System.out.println("DEBUG: Total zones in index: " + searchHits.getTotalHits());
-        
-        searchHits.getSearchHits().forEach(hit -> {
-            WaybleZoneDocument doc = hit.getContent();
-            System.out.println("DEBUG: Zone " + doc.getZoneId() + " district: [" + doc.getAddress().getDistrict() + "]");
-        });
     }
 }
