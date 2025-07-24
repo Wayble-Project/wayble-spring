@@ -7,9 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EdgeService {
-    public Edge createEdge(Node startNode, Node endNode, DirectionType edgeType) {
+    public Edge createEdge(Long id, Node startNode, Node endNode, DirectionType edgeType) {
 
         Edge edge = Edge.builder()
+                .id(id)
                 .edgeType(edgeType)
                 .startNode(startNode)
                 .endNode(endNode)

@@ -26,8 +26,8 @@ public class TransportationService {
         TransportationRequestDto.Location origin = request.origin();
         TransportationRequestDto.Location destination = request.destination();
 
-        Node start = new Node(origin.name(), origin.latitude(), origin.longitude());
-        Node end = new Node(destination.name(), destination.latitude(), destination.longitude());
+        Node start = new Node(-1L, origin.name(), origin.latitude(), origin.longitude());
+        Node end = new Node(-2L, destination.name(), destination.latitude(), destination.longitude());
 
         List<TransportationResponseDto.Step> steps = returnDijstra(start, end);
 
@@ -91,10 +91,10 @@ public class TransportationService {
         weightMap.put(Pair.of(endTmp, nearestToEnd), weightEnd);
 
         // Edge 객체 생성: route는 null, edgeType 은 필요에 따라 설정
-        edges.add(edgeService.createEdge(startTmp, nearestToStart, DirectionType.FROM_WAYPOINT));
-        edges.add(edgeService.createEdge(nearestToStart, startTmp, DirectionType.TO_WAYPOINT));
-        edges.add(edgeService.createEdge(nearestToEnd, endTmp, DirectionType.FROM_WAYPOINT));
-        edges.add(edgeService.createEdge(endTmp, nearestToEnd, DirectionType.TO_WAYPOINT));
+        edges.add(edgeService.createEdge(-1L, startTmp, nearestToStart, DirectionType.FROM_WAYPOINT));
+        edges.add(edgeService.createEdge(-2L, nearestToStart, startTmp, DirectionType.TO_WAYPOINT));
+        edges.add(edgeService.createEdge(-3L, nearestToEnd, endTmp, DirectionType.FROM_WAYPOINT));
+        edges.add(edgeService.createEdge(-4L, endTmp, nearestToEnd, DirectionType.TO_WAYPOINT));
 
         // 그래프 빌드 및 Dijkstra 호출
         Map<Long, List<Edge>> graph = buildGraph(nodes, edges);
@@ -117,7 +117,14 @@ public class TransportationService {
         // 그래프 구성: 각 노드에서 출발 가능한 엣지 목록
         for (Edge edge : edges) {
             Long startId = edge.getStartNode() != null ? edge.getStartNode().getId() : null;
-
+            if (startId == null) {
+                System.out.println("❗ edge의 startNode 또는 startNode.id가 null입니다. edgeId=" + edge.getId());
+                continue;
+            }
+            if (!graph.containsKey(startId)) {
+                System.out.println("❗ graph에 해당 startId가 없습니다: " + startId);
+                continue;
+            }
             graph.get(startId).add(edge);
         }
 
@@ -167,14 +174,26 @@ public class TransportationService {
     private Map<Long, List<Edge>> buildGraph(List<Node> nodes, List<Edge> edges) {
         Map<Long, List<Edge>> graph = new HashMap<>();
         for (Node node : nodes) {
-            if (node.getId() == null) {
-                System.out.println("❗ ID가 null인 node 발견");
+            Long nodeId = node.getId();
+            if (nodeId != null) {
+                graph.put(nodeId, new ArrayList<>());
             } else {
-                graph.put(node.getId(), new ArrayList<>());
+                System.out.println("❗ ID가 null인 node 발견: " + node.getStationName());
             }
         }
         for (Edge edge : edges) {
-            graph.get(edge.getStartNode()).add(edge);
+            Node start = edge.getStartNode();
+            Long startId = start != null ? start.getId() : null;
+            if (startId == null) {
+                System.out.println("❗ edge의 startNode 또는 startId가 null. edge=" + edge);
+                continue;
+            }
+
+            if (!graph.containsKey(startId)) {
+                System.out.println("❗ graph에 없는 startId: " + startId);
+                continue;
+            }
+            graph.get(edge.getStartNode().getId()).add(edge);
         }
         return graph;
     }

@@ -44,7 +44,8 @@ public class Node {
     @OneToMany(mappedBy = "endNode")
     private List<Route> endRoutes;
 
-    public Node(String stationName, double latitude, double longitude) {
+    public Node(Long id, String stationName, double latitude, double longitude) {
+        this.id = id;
         this.stationName = stationName;
         this.latitude = latitude;
         this.longitude = longitude;
