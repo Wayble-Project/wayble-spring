@@ -9,9 +9,6 @@ import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseD
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.service.WaybleZoneSearchService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -42,12 +39,12 @@ public class WaybleZoneSearchController {
         ));
     }
 
-    @GetMapping("/district")
-    public CommonResponse<List<WaybleZoneDistrictResponseDto>> findByDistrict(
+    @GetMapping("/district/most-searches")
+    public CommonResponse<List<WaybleZoneDistrictResponseDto>> findMostSearchesWaybleZoneByDistrict(
             @Valid @ModelAttribute WaybleZoneDistrictSearchDto conditionDto)
     {
-        return CommonResponse.success(waybleZoneSearchService.searchWaybleZonesByDistrict(
-                conditionDto.district(), conditionDto.districtSearchType()
+        return CommonResponse.success(waybleZoneSearchService.searchMostSearchesWaybleZoneByDistrict(
+                conditionDto.district()
         ));
     }
 

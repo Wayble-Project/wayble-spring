@@ -1,7 +1,5 @@
 package com.wayble.server.explore.dto.search.request;
 
-import com.wayble.server.explore.entity.DistrictSearchType;
-import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -21,8 +19,6 @@ public record WaybleZoneDistrictSearchDto(
         Double longitude,
 
         @Size(min = 2, message = "동 이름은 최소 2글자 이상이어야 합니다.")
-        String district,
-
-        DistrictSearchType districtSearchType
+        String district
 ) {
 }

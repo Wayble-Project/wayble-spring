@@ -1,7 +1,6 @@
 package com.wayble.server.explore.service;
 
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
-import com.wayble.server.explore.entity.DistrictSearchType;
 import com.wayble.server.explore.repository.search.WaybleZoneQuerySearchRepository;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
@@ -46,15 +45,11 @@ public class WaybleZoneSearchService {
         return waybleZoneQuerySearchRepository.searchWaybleZonesByCondition(condition, pageable);
     }
 
-    public List<WaybleZoneDistrictResponseDto> searchWaybleZonesByDistrict(String district, DistrictSearchType searchType) {
+    public List<WaybleZoneDistrictResponseDto> searchMostSearchesWaybleZoneByDistrict(String district, String searchType) {
         if (district == null) {
             return null;
         }
 
-        if (searchType == DistrictSearchType.SEARCHES) {
-            return null;
-        } else {
-            return waybleZoneQuerySearchRepository.findTop3SearchesWaybleZonesByDistrict(district);
-        }
+        return waybleZoneQuerySearchRepository.findTop3SearchesWaybleZonesByDistrict(district);
     }
 }
