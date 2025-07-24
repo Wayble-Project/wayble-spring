@@ -5,7 +5,7 @@ import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.Builder;
 
 @Builder
-public record WaybleZoneBaseResponseDto(
+public record WaybleZoneInfoResponseDto(
         Long zoneId,
         String zoneName,
         WaybleZoneType zoneType,
@@ -16,8 +16,8 @@ public record WaybleZoneBaseResponseDto(
         Long reviewCount,
         FacilityResponseDto facility
 ) {
-    public static WaybleZoneBaseResponseDto from(WaybleZoneDocument document) {
-        return WaybleZoneBaseResponseDto.builder()
+    public static WaybleZoneInfoResponseDto from(WaybleZoneDocument document) {
+        return WaybleZoneInfoResponseDto.builder()
                 .zoneId(document.getZoneId())
                 .zoneName(document.getZoneName())
                 .zoneType(document.getZoneType())

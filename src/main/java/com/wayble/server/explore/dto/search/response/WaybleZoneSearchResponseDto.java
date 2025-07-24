@@ -1,6 +1,6 @@
 package com.wayble.server.explore.dto.search.response;
 
-import com.wayble.server.explore.dto.common.WaybleZoneBaseResponseDto;
+import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,14 +8,14 @@ import lombok.Builder;
 @Builder(access = AccessLevel.PRIVATE)
 public record WaybleZoneSearchResponseDto(
 
-        WaybleZoneBaseResponseDto waybleZoneInfo,
+        WaybleZoneInfoResponseDto waybleZoneInfo,
 
         Double distance
 ) {
     public static WaybleZoneSearchResponseDto from(WaybleZoneDocument waybleZoneDocument, Double distance) {
 
         return WaybleZoneSearchResponseDto.builder()
-                .waybleZoneInfo(WaybleZoneBaseResponseDto.from(waybleZoneDocument))
+                .waybleZoneInfo(WaybleZoneInfoResponseDto.from(waybleZoneDocument))
                 .distance(distance)
                 .build();
     }

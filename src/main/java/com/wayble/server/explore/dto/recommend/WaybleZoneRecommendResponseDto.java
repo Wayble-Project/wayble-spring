@@ -1,13 +1,13 @@
 package com.wayble.server.explore.dto.recommend;
 
-import com.wayble.server.explore.dto.common.WaybleZoneBaseResponseDto;
+import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import lombok.Builder;
 
 @Builder
 public record WaybleZoneRecommendResponseDto(
 
-        WaybleZoneBaseResponseDto waybleZoneInfo,
+        WaybleZoneInfoResponseDto waybleZoneInfo,
 
         Double distanceScore,
 
@@ -20,7 +20,7 @@ public record WaybleZoneRecommendResponseDto(
 ) {
     public static WaybleZoneRecommendResponseDto from(WaybleZoneDocument waybleZoneDocument) {
         return WaybleZoneRecommendResponseDto.builder()
-                .waybleZoneInfo(WaybleZoneBaseResponseDto.from(waybleZoneDocument))
+                .waybleZoneInfo(WaybleZoneInfoResponseDto.from(waybleZoneDocument))
                 .distanceScore(0.0)
                 .similarityScore(0.0)
                 .recencyScore(0.0)

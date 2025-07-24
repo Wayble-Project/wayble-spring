@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.wayble.server.explore.dto.common.FacilityResponseDto;
+import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
@@ -131,7 +132,7 @@ public class WaybleZoneQueryRecommendRepository {
 
                     double totalScore = distanceScore + similarityScore + recencyScore;
 
-                    return WaybleZoneRecommendResponseDto.builder()
+                    WaybleZoneInfoResponseDto waybleZoneInfo = WaybleZoneInfoResponseDto.builder()
                             .zoneId(zone.getZoneId())
                             .zoneName(zone.getZoneName())
                             .zoneType(zone.getZoneType())
@@ -141,6 +142,10 @@ public class WaybleZoneQueryRecommendRepository {
                             .averageRating(zone.getAverageRating())
                             .reviewCount(zone.getReviewCount())
                             .facility(FacilityResponseDto.from(zone.getFacility()))
+                            .build();
+
+                    return WaybleZoneRecommendResponseDto.builder()
+                            .waybleZoneInfo(waybleZoneInfo)
                             .distanceScore(distanceScore)
                             .similarityScore(similarityScore)
                             .recencyScore(recencyScore)
