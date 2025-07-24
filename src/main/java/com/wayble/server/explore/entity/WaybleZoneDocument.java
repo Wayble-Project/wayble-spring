@@ -1,6 +1,6 @@
 package com.wayble.server.explore.entity;
 
-import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.springframework.data.annotation.Id;

@@ -2,9 +2,9 @@ package com.wayble.server.explore.service;
 
 import com.wayble.server.explore.repository.search.WaybleZoneQuerySearchRepository;
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchConditionDto;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
+import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.exception.SearchErrorCase;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;

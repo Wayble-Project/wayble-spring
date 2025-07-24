@@ -3,6 +3,7 @@ package com.wayble.server.explore.repository.recommend;
 import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import com.wayble.server.explore.dto.common.FacilityResponseDto;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
@@ -139,7 +140,7 @@ public class WaybleZoneQueryRecommendRepository {
                             .longitude(zone.getAddress().getLocation().getLon())
                             .averageRating(zone.getAverageRating())
                             .reviewCount(zone.getReviewCount())
-                            .facility(com.wayble.server.explore.dto.FacilityResponseDto.from(zone.getFacility()))
+                            .facility(FacilityResponseDto.from(zone.getFacility()))
                             .distanceScore(distanceScore)
                             .similarityScore(similarityScore)
                             .recencyScore(recencyScore)

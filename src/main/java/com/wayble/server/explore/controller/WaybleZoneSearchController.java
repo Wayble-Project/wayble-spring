@@ -1,10 +1,10 @@
 package com.wayble.server.explore.controller;
 
 import com.wayble.server.common.response.CommonResponse;
-import com.wayble.server.explore.dto.search.SearchSliceDto;
-import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchConditionDto;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.dto.search.request.SearchSliceDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
+import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.service.WaybleZoneSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

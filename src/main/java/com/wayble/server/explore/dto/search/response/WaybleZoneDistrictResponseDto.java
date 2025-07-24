@@ -1,6 +1,6 @@
-package com.wayble.server.explore.dto.search;
+package com.wayble.server.explore.dto.search.response;
 
-import com.wayble.server.explore.dto.FacilityResponseDto;
+import com.wayble.server.explore.dto.common.FacilityResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.Builder;
