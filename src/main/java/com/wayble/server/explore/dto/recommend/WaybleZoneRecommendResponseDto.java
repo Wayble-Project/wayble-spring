@@ -1,30 +1,13 @@
 package com.wayble.server.explore.dto.recommend;
 
-import com.wayble.server.explore.dto.common.FacilityResponseDto;
+import com.wayble.server.explore.dto.common.WaybleZoneBaseResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
-import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import lombok.Builder;
 
 @Builder
 public record WaybleZoneRecommendResponseDto(
 
-        Long zoneId,
-
-        String zoneName,
-
-        WaybleZoneType zoneType,
-
-        String thumbnailImageUrl,
-
-        Double latitude,
-
-        Double longitude,
-
-        Double averageRating,
-
-        Long reviewCount,
-
-        FacilityResponseDto facility,
+        WaybleZoneBaseResponseDto waybleZoneInfo,
 
         Double distanceScore,
 
@@ -37,15 +20,7 @@ public record WaybleZoneRecommendResponseDto(
 ) {
     public static WaybleZoneRecommendResponseDto from(WaybleZoneDocument waybleZoneDocument) {
         return WaybleZoneRecommendResponseDto.builder()
-                .zoneId(waybleZoneDocument.getZoneId())
-                .zoneName(waybleZoneDocument.getZoneName())
-                .zoneType(waybleZoneDocument.getZoneType())
-                .thumbnailImageUrl(waybleZoneDocument.getThumbnailImageUrl())
-                .averageRating(waybleZoneDocument.getAverageRating())
-                .reviewCount(waybleZoneDocument.getReviewCount())
-                .latitude(waybleZoneDocument.getAddress().getLocation().getLat())
-                .longitude(waybleZoneDocument.getAddress().getLocation().getLon())
-                .facility(FacilityResponseDto.from(waybleZoneDocument.getFacility()))
+                .waybleZoneInfo(WaybleZoneBaseResponseDto.from(waybleZoneDocument))
                 .distanceScore(0.0)
                 .similarityScore(0.0)
                 .recencyScore(0.0)
