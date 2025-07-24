@@ -1,0 +1,30 @@
+package com.wayble.server.direction.dto.response;
+
+import com.wayble.server.direction.entity.type.Type;
+import lombok.Builder;
+
+import java.util.List;
+
+@Builder
+public record WayblePathResponse(
+        double distance,
+        List<WayblePoint> points
+) {
+    public record WayblePoint(
+            long id,
+            double lat,
+            double lon,
+            Type type
+    ) {}
+
+    public static WayblePathResponse of(double distance, List<WayblePoint> points) {
+        List<WayblePoint> wayblePoints = points.stream()
+                .map(n -> new WayblePoint(n.id, n.lat, n.lon, n.type))
+                .toList();
+
+        return WayblePathResponse.builder()
+                .distance(distance)
+                .points(wayblePoints)
+                .build();
+    }
+}

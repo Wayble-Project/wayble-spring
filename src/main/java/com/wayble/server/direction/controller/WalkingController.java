@@ -2,9 +2,11 @@ package com.wayble.server.direction.controller;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.direction.controller.swagger.WalkingSwagger;
+import com.wayble.server.direction.dto.response.WayblePathResponse;
 import com.wayble.server.direction.external.tmap.dto.request.TMapRequest;
 import com.wayble.server.direction.external.tmap.dto.response.TMapParsingResponse;
 import com.wayble.server.direction.service.WalkingService;
+import com.wayble.server.direction.service.WaybleDijkstraService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WalkingController implements WalkingSwagger {
 
     private final WalkingService walkingService;
+    private final WaybleDijkstraService waybleDijkstraService;
 
     @Override
     @GetMapping()
@@ -30,5 +33,13 @@ public class WalkingController implements WalkingSwagger {
     ) {
         TMapRequest request = new TMapRequest(startX, startY, endX, endY, startName, endName);
         return CommonResponse.success(walkingService.callTMapApi(request));
+    }
+
+    @GetMapping("/wayble")
+    public CommonResponse<WayblePathResponse> getWayblePath(
+            @RequestParam long start,
+            @RequestParam long end
+    ) {
+        return CommonResponse.success(waybleDijkstraService.findWayblePath(start, end));
     }
 }

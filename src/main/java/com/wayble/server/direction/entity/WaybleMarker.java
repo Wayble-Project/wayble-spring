@@ -6,5 +6,5 @@ public class WaybleMarker {
     public Long id;
     public double lat;
     public double lon;
-    public Type Type;
+    public Type type;
 }

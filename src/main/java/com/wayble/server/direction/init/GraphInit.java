@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.direction.entity.Edge;
 import com.wayble.server.direction.entity.Node;
 import com.wayble.server.direction.entity.WaybleMarker;
+import com.wayble.server.direction.entity.type.Type;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class GraphInit {
     private List<Edge> edges;
     private List<WaybleMarker> markers;
     private Map<Long, Node> nodeMap;
+    private Map<Long, Type> markerMap;
     private Map<Long, List<Edge>> adjacencyList;
 
     @PostConstruct
@@ -38,19 +40,19 @@ public class GraphInit {
                 node -> node.id, node -> node
         ));
 
-        // 웨이블 마커
+        // 웨이블 마커 (임시)
         InputStream markerStream = getClass().getResourceAsStream("/wayble_markers.json");
         if (markerStream != null) {
-            markers = objectMapper.readValue(markerStream, new TypeReference<List<WaybleMarker>>() {});
+            markers = objectMapper.readValue(markerStream, new TypeReference<>(){});
         } else {
             markers = new ArrayList<>();
         }
 
-        Set<Long> nodeSet = findWaybleMarkers();
-
+        markerMap = findWaybleMarkers();
         adjacencyList = new HashMap<>();
+
         for (Edge edge : edges) {
-            boolean isWaybleMarker = nodeSet.contains(edge.from) || nodeSet.contains(edge.to);
+            boolean isWaybleMarker = markerMap.containsKey(edge.from) || markerMap.containsKey(edge.to);
             double distance = isWaybleMarker ? edge.length * 0.5 : edge.length;
 
             adjacencyList.computeIfAbsent(edge.from, k -> new ArrayList<>()).add(
@@ -70,8 +72,8 @@ public class GraphInit {
         }
     }
 
-    private Set<Long> findWaybleMarkers() {
-        Set<Long> waybleMarkers = new HashSet<>();
+    private Map<Long, Type> findWaybleMarkers() {
+        Map<Long, Type> waybleMarkers = new HashMap<>();
 
         for (WaybleMarker marker : markers) {
             long nearNode = nodes.stream()
@@ -82,7 +84,8 @@ public class GraphInit {
                     .orElse(marker.id);
 
             if (nearNode != marker.id) {
-                waybleMarkers.add(nearNode);
+                Type type = marker.type;
+                waybleMarkers.put(nearNode, type);
             }
         }
         return waybleMarkers;
@@ -105,5 +108,9 @@ public class GraphInit {
 
     public Map<Long, Node> getNodeMap() {
         return nodeMap;
+    }
+
+    public Map<Long, Type> getMarkerMap() {
+        return markerMap;
     }
 }
