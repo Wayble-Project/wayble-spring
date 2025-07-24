@@ -45,7 +45,7 @@ public class WaybleZoneSearchService {
         return waybleZoneQuerySearchRepository.searchWaybleZonesByCondition(condition, pageable);
     }
 
-    public List<WaybleZoneDistrictResponseDto> searchMostSearchesWaybleZoneByDistrict(String district, String searchType) {
+    public List<WaybleZoneDistrictResponseDto> searchMostSearchesWaybleZoneByDistrict(String district) {
         if (district == null) {
             return null;
         }
