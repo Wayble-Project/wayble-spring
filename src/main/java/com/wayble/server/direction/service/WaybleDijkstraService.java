@@ -20,6 +20,8 @@ public class WaybleDijkstraService {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
+        double totalDistance = calculateDistance(path);
+
         List<WayblePathResponse.WayblePoint> wayblePoints = path.stream()
                 .map(id -> {
                     Node node = graphInit.getNodeMap().get(id);
@@ -27,8 +29,29 @@ public class WaybleDijkstraService {
                     return new WayblePathResponse.WayblePoint(id, node.lat, node.lon, type);
                 }).toList();
 
-        double totalDistance = calculateDistance(path);
-        return WayblePathResponse.of(totalDistance, wayblePoints);
+        List<double[]> polyline = new ArrayList<>();
+        Map<Long, List<Edge>> adjacencyList = graphInit.getGraph();
+
+        for (int i = 0; i < path.size() - 1; i++) {
+            long from = path.get(i);
+            long to = path.get(i + 1);
+
+            Edge edge = adjacencyList.getOrDefault(from, List.of()).stream()
+                    .filter(e -> e.to == to)
+                    .findFirst()
+                    .orElse(null);
+
+            if (edge != null && edge.geometry != null) {
+                polyline.addAll(edge.geometry);
+            } else {
+                Node fromNode = graphInit.getNodeMap().get(from);
+                Node toNode = graphInit.getNodeMap().get(to);
+
+                polyline.add(new double[]{fromNode.lon, fromNode.lat});
+                polyline.add(new double[]{toNode.lon, toNode.lat});
+            }
+        }
+        return WayblePathResponse.of(totalDistance, wayblePoints, polyline);
     }
 
     private List<Long> dijkstra(long start, long end) {

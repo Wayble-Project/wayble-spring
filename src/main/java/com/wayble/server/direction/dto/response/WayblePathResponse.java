@@ -8,7 +8,8 @@ import java.util.List;
 @Builder
 public record WayblePathResponse(
         double distance,
-        List<WayblePoint> points
+        List<WayblePoint> points,
+        List<double[]> polyline
 ) {
     public record WayblePoint(
             long id,
@@ -17,7 +18,11 @@ public record WayblePathResponse(
             Type type
     ) {}
 
-    public static WayblePathResponse of(double distance, List<WayblePoint> points) {
+    public static WayblePathResponse of(
+            double distance,
+            List<WayblePoint> points,
+            List<double[]> polyline
+    ) {
         List<WayblePoint> wayblePoints = points.stream()
                 .map(n -> new WayblePoint(n.id, n.lat, n.lon, n.type))
                 .toList();
@@ -25,6 +30,7 @@ public record WayblePathResponse(
         return WayblePathResponse.builder()
                 .distance(distance)
                 .points(wayblePoints)
+                .polyline(polyline)
                 .build();
     }
 }

@@ -32,7 +32,7 @@ public class GraphInit {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // 그래프
-        InputStream graphStream = getClass().getResourceAsStream("/seocho_graph.json");
+        InputStream graphStream = getClass().getResourceAsStream("/seocho_pedestrian.json");
         JsonNode root = objectMapper.readTree(graphStream);
         nodes = Arrays.asList(objectMapper.convertValue(root.get("nodes"), Node[].class));
         edges = Arrays.asList(objectMapper.convertValue(root.get("edges"), Edge[].class));
@@ -55,11 +55,13 @@ public class GraphInit {
             boolean isWaybleMarker = markerMap.containsKey(edge.from) || markerMap.containsKey(edge.to);
             double distance = isWaybleMarker ? edge.length * 0.5 : edge.length;
 
+            // 양방향
             adjacencyList.computeIfAbsent(edge.from, k -> new ArrayList<>()).add(
                     new Edge() {{
                         from = edge.from;
                         to = edge.to;
                         length = distance;
+                        geometry = edge.geometry;
                     }}
             );
             adjacencyList.computeIfAbsent(edge.to, k -> new ArrayList<>()).add(
@@ -67,9 +69,20 @@ public class GraphInit {
                         from = edge.to;
                         to = edge.from;
                         length = distance;
+                        geometry = reverseGeometry(edge.geometry);
                     }}
             );
         }
+    }
+
+    private List<double[]> reverseGeometry(List<double[]> geometry) {
+        if (geometry == null) {
+            return null;
+        }
+        List<double[]> reversed = new ArrayList<>(geometry);
+        Collections.reverse(reversed);
+
+        return reversed;
     }
 
     private Map<Long, Type> findWaybleMarkers() {
