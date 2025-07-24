@@ -92,9 +92,11 @@ public class TransportationService {
 
         // Edge 객체 생성: route는 null, edgeType 은 필요에 따라 설정
         edges.add(edgeService.createEdge(-1L, startTmp, nearestToStart, DirectionType.FROM_WAYPOINT));
-        edges.add(edgeService.createEdge(-2L, nearestToStart, startTmp, DirectionType.TO_WAYPOINT));
-        edges.add(edgeService.createEdge(-3L, nearestToEnd, endTmp, DirectionType.FROM_WAYPOINT));
-        edges.add(edgeService.createEdge(-4L, endTmp, nearestToEnd, DirectionType.TO_WAYPOINT));
+        edges.add(edgeService.createEdge(-2L, nearestToEnd, endTmp, DirectionType.TO_WAYPOINT));
+//        edges.add(edgeService.createEdge(-1L, startTmp, nearestToStart, DirectionType.FROM_WAYPOINT));
+//        edges.add(edgeService.createEdge(-2L, nearestToStart, startTmp, DirectionType.TO_WAYPOINT));
+//        edges.add(edgeService.createEdge(-3L, nearestToEnd, endTmp, DirectionType.FROM_WAYPOINT));
+//        edges.add(edgeService.createEdge(-4L, endTmp, nearestToEnd, DirectionType.TO_WAYPOINT));
 
         // 그래프 빌드 및 Dijkstra 호출
         Map<Long, List<Edge>> graph = buildGraph(nodes, edges);
@@ -111,8 +113,11 @@ public class TransportationService {
         Map<Long, Integer> distance = new HashMap<>();
         Map<Long, Edge> prevEdge = new HashMap<>();
         Map<Long, Node> prevNode = new HashMap<>();
+
+        // 초기화
         for (Node node : nodes) distance.put(node.getId(), Integer.MAX_VALUE);
         distance.put(start.getId(), 0);
+        distance.putIfAbsent(end.getId(), Integer.MAX_VALUE);
 
         // 그래프 구성: 각 노드에서 출발 가능한 엣지 목록
         for (Edge edge : edges) {
@@ -128,21 +133,21 @@ public class TransportationService {
             graph.get(startId).add(edge);
         }
 
-        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(distance::get));
+        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> distance.getOrDefault(n.getId(), Integer.MAX_VALUE)));
         pq.add(start);
 
         while (!pq.isEmpty()) {
             Node curr = pq.poll();
             if (curr.equals(end)) break;
-            for (Edge edge : graph.getOrDefault(curr, List.of())) {
+            for (Edge edge : graph.getOrDefault(curr.getId(), List.of())) {
                 Node neighbor = edge.getEndNode();
                 // 가중치 계산: 노드간 거리 기반
                 double weight = haversine(
                         edge.getStartNode().getLatitude(), edge.getStartNode().getLongitude(),
                         edge.getEndNode().getLatitude(),   edge.getEndNode().getLongitude()
                 );
-                int alt = distance.get(curr) + (int)(weight * 1000);  // 미터 단위 정수화
-                if (alt < distance.get(neighbor)) {
+                int alt = distance.get(curr.getId()) + (int)(weight * 1000);  // 미터 단위 정수화
+                if (alt < distance.get(neighbor.getId())) {
                     distance.put(neighbor.getId(), alt);
                     prevNode.put(neighbor.getId(), curr);
                     prevEdge.put(neighbor.getId(), edge);
@@ -155,7 +160,7 @@ public class TransportationService {
         List<TransportationResponseDto.Step> steps = new LinkedList<>();
         Node current = end;
         while (!current.equals(start)) {
-            Edge edge = prevEdge.get(current);
+            Edge edge = prevEdge.get(current.getId());
             if (edge == null) break; // 경로 없음
             String routeName = (edge.getRoute() != null) ? edge.getRoute().getRouteName() : null;
             steps.add(0, new TransportationResponseDto.Step(
@@ -164,8 +169,10 @@ public class TransportationService {
                     edge.getStartNode().getStationName(),
                     edge.getEndNode().getStationName()
             ));
-            current = prevNode.get(current);
+            current = prevNode.get(current.getId());
         }
+
+
 
         return steps;
 
