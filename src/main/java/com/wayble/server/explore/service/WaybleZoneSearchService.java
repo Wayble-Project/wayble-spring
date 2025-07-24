@@ -1,5 +1,7 @@
 package com.wayble.server.explore.service;
 
+import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
+import com.wayble.server.explore.entity.DistrictSearchType;
 import com.wayble.server.explore.repository.search.WaybleZoneQuerySearchRepository;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
@@ -13,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +44,17 @@ public class WaybleZoneSearchService {
             Pageable pageable)
     {
         return waybleZoneQuerySearchRepository.searchWaybleZonesByCondition(condition, pageable);
+    }
+
+    public List<WaybleZoneDistrictResponseDto> searchWaybleZonesByDistrict(String district, DistrictSearchType searchType) {
+        if (district == null) {
+            return null;
+        }
+
+        if (searchType == DistrictSearchType.SEARCHES) {
+            return null;
+        } else {
+            return waybleZoneQuerySearchRepository.findTop3SearchesWaybleZonesByDistrict(district);
+        }
     }
 }

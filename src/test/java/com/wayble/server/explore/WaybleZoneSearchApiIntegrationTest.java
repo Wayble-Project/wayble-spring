@@ -81,6 +81,14 @@ public class WaybleZoneSearchApiIntegrationTest {
             "노브랜드버거"
     ));
 
+    List<String> districtList = new ArrayList<>(Arrays.asList(
+            "반포동",
+            "잠원동",
+            "서초동",
+            "양재동",
+            "내곡동"
+    ));
+
     @BeforeAll
     public void setup() {
         User testUser = User.createUser(
@@ -97,7 +105,7 @@ public class WaybleZoneSearchApiIntegrationTest {
             Address address = Address.builder()
                     .state("state" + i)
                     .city("city" + i)
-                    .district("district" + i)
+                    .district(districtList.get((int) (Math.random() * districtList.size())))
                     .streetAddress("street address" + i)
                     .detailAddress("detail address" + i)
                     .latitude(points.get("latitude"))

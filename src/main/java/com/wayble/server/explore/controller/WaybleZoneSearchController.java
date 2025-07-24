@@ -2,16 +2,23 @@ package com.wayble.server.explore.controller;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.explore.dto.search.request.SearchSliceDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneDistrictSearchDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
+import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.service.WaybleZoneSearchService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +39,15 @@ public class WaybleZoneSearchController {
         return CommonResponse.success(new SearchSliceDto<>(
                 slice.getContent(),
                 slice.hasNext()
+        ));
+    }
+
+    @GetMapping("/district")
+    public CommonResponse<List<WaybleZoneDistrictResponseDto>> findByDistrict(
+            @Valid @ModelAttribute WaybleZoneDistrictSearchDto conditionDto)
+    {
+        return CommonResponse.success(waybleZoneSearchService.searchWaybleZonesByDistrict(
+                conditionDto.district(), conditionDto.districtSearchType()
         ));
     }
 

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 @Repository
@@ -131,7 +133,7 @@ public class WaybleZoneQuerySearchRepository{
         return new SliceImpl<>(dtos, pageable, hasNext);
     }
 
-    public List<WaybleZoneDistrictResponseDto> findTop3WaybleZonesByDistrict(String district) {
+    public List<WaybleZoneDistrictResponseDto> findTop3SearchesWaybleZonesByDistrict(String district) {
         // 1. 특정 district에 속한 wayble zone들 조회
         List<Long> zoneIdsInDistrict = getZoneIdsByDistrict(district);
         
@@ -139,18 +141,24 @@ public class WaybleZoneQuerySearchRepository{
             return Collections.emptyList();
         }
 
-        // 2. 해당 zone들의 방문 로그 수 집계
-        Map<Long, Long> visitCountMap = getVisitCountsByZoneIds(zoneIdsInDistrict);
-
-        // 3. 방문 수 기준으로 top3 선택
-        List<Long> top3ZoneIds = visitCountMap.entrySet().stream()
+        // 2. 해당 zone들의 방문 로그 수 집계 및 top3 선택
+        Map<Long, Long> top3VisitCounts = getVisitCountsByZoneIds(zoneIdsInDistrict)
+                .entrySet().stream()
                 .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
                 .limit(DISTRICT_SEARCH_SIZE)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+        
+        if (top3VisitCounts.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        // 4. top3 zone들의 상세 정보 조회 및 ResponseDto 생성
-        return getWaybleZoneDetails(top3ZoneIds, visitCountMap);
+        // 3. top3 zone들의 상세 정보 조회 및 ResponseDto 생성
+        return getWaybleZoneDetails(new ArrayList<>(top3VisitCounts.keySet()), top3VisitCounts);
     }
 
     private List<Long> getZoneIdsByDistrict(String district) {
@@ -174,6 +182,7 @@ public class WaybleZoneQuerySearchRepository{
                 .map(hit -> hit.getContent().getZoneId())
                 .collect(Collectors.toList());
     }
+
 
     private Map<Long, Long> getVisitCountsByZoneIds(List<Long> zoneIds) {
         Map<Long, Long> visitCountMap = new HashMap<>();
