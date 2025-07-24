@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
+import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
@@ -168,12 +169,13 @@ public class WaybleZoneSearchApiIntegrationTest {
         assertThat(dtoList).isNotEmpty();
         for (int i = 0; i < dtoList.size(); i++) {
             WaybleZoneSearchResponseDto dto = dtoList.get(i);
+            WaybleZoneInfoResponseDto infoResponseDto = dto.waybleZoneInfo();
             double expected = haversine(LATITUDE, LONGITUDE,
-                    dto.latitude(), dto.longitude());
+                    infoResponseDto.latitude(), infoResponseDto.longitude());
             // 허용 오차: 0.05 km (≈50m)
             assertThat(dto.distance())
                     .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
-                            dto.zoneId(), expected, dto.distance())
+                            infoResponseDto.zoneId(), expected, dto.distance())
                     .isCloseTo(expected, offset(0.05));
 
             if (i > 0) {
@@ -184,28 +186,29 @@ public class WaybleZoneSearchApiIntegrationTest {
             }
             
             // facility 검증 추가
-            assertThat(dto.facility()).isNotNull();
-            assertThat(dto.facility().hasSlope()).isNotNull();
-            assertThat(dto.facility().hasNoDoorStep()).isNotNull();
-            assertThat(dto.facility().hasElevator()).isNotNull();
-            assertThat(dto.facility().hasTableSeat()).isNotNull();
-            assertThat(dto.facility().hasDisabledToilet()).isNotNull();
-            assertThat(dto.facility().floorInfo()).isNotNull();
+            assertThat(infoResponseDto.facility()).isNotNull();
+            assertThat(infoResponseDto.facility().hasSlope()).isNotNull();
+            assertThat(infoResponseDto.facility().hasNoDoorStep()).isNotNull();
+            assertThat(infoResponseDto.facility().hasElevator()).isNotNull();
+            assertThat(infoResponseDto.facility().hasTableSeat()).isNotNull();
+            assertThat(infoResponseDto.facility().hasDisabledToilet()).isNotNull();
+            assertThat(infoResponseDto.facility().floorInfo()).isNotNull();
         }
 
 
         if (!dtoList.isEmpty()) {
             WaybleZoneSearchResponseDto firstDto = dtoList.get(0);
+            WaybleZoneInfoResponseDto firstInfoResponseDto = firstDto.waybleZoneInfo();
             System.out.println("=== Search Result - Facility Info ===");
-            System.out.println("zoneId = " + firstDto.zoneId());
-            System.out.println("zoneName = " + firstDto.zoneName());
-            if (firstDto.facility() != null) {
-                System.out.println("hasSlope = " + firstDto.facility().hasSlope());
-                System.out.println("hasNoDoorStep = " + firstDto.facility().hasNoDoorStep());
-                System.out.println("hasElevator = " + firstDto.facility().hasElevator());
-                System.out.println("hasTableSeat = " + firstDto.facility().hasTableSeat());
-                System.out.println("hasDisabledToilet = " + firstDto.facility().hasDisabledToilet());
-                System.out.println("floorInfo = " + firstDto.facility().floorInfo());
+            System.out.println("zoneId = " + firstInfoResponseDto.zoneId());
+            System.out.println("zoneName = " + firstInfoResponseDto.zoneName());
+            if (firstInfoResponseDto.facility() != null) {
+                System.out.println("hasSlope = " + firstInfoResponseDto.facility().hasSlope());
+                System.out.println("hasNoDoorStep = " + firstInfoResponseDto.facility().hasNoDoorStep());
+                System.out.println("hasElevator = " + firstInfoResponseDto.facility().hasElevator());
+                System.out.println("hasTableSeat = " + firstInfoResponseDto.facility().hasTableSeat());
+                System.out.println("hasDisabledToilet = " + firstInfoResponseDto.facility().hasDisabledToilet());
+                System.out.println("floorInfo = " + firstInfoResponseDto.facility().floorInfo());
             } else {
                 System.out.println("facility info is null");
             }
@@ -243,14 +246,15 @@ public class WaybleZoneSearchApiIntegrationTest {
         assertThat(dtoList).isNotEmpty();
         for (int i = 0; i < dtoList.size(); i++) {
             WaybleZoneSearchResponseDto dto = dtoList.get(i);
+            WaybleZoneInfoResponseDto infoResponseDto = dto.waybleZoneInfo();
 
-            assertThat(dto.zoneName().contains(word)).isTrue();
+            assertThat(infoResponseDto.zoneName().contains(word)).isTrue();
             double expected = haversine(LATITUDE, LONGITUDE,
-                    dto.latitude(), dto.longitude());
+                    infoResponseDto.latitude(), infoResponseDto.longitude());
             // 허용 오차: 0.05 km (≈50m)
             assertThat(dto.distance())
                     .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
-                            dto.zoneId(), expected, dto.distance())
+                            infoResponseDto.zoneId(), expected, dto.distance())
                     .isCloseTo(expected, offset(0.05));
 
             if (i > 0) {
@@ -297,14 +301,15 @@ public class WaybleZoneSearchApiIntegrationTest {
         assertThat(dtoList).isNotEmpty();
         for (int i = 0; i < dtoList.size(); i++) {
             WaybleZoneSearchResponseDto dto = dtoList.get(i);
+            WaybleZoneInfoResponseDto infoResponseDto = dto.waybleZoneInfo();
 
-            assertThat(dto.zoneType()).isEqualTo(zoneType);
+            assertThat(infoResponseDto.zoneType()).isEqualTo(zoneType);
             double expected = haversine(LATITUDE, LONGITUDE,
-                    dto.latitude(), dto.longitude());
+                    infoResponseDto.latitude(), infoResponseDto.longitude());
             // 허용 오차: 0.05 km (≈50m)
             assertThat(dto.distance())
                     .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
-                            dto.zoneId(), expected, dto.distance())
+                            infoResponseDto.zoneId(), expected, dto.distance())
                     .isCloseTo(expected, offset(0.05));
 
             if (i > 0) {
@@ -353,15 +358,16 @@ public class WaybleZoneSearchApiIntegrationTest {
         assertThat(dtoList).isNotEmpty();
         for (int i = 0; i < dtoList.size(); i++) {
             WaybleZoneSearchResponseDto dto = dtoList.get(i);
+            WaybleZoneInfoResponseDto infoResponseDto = dto.waybleZoneInfo();
 
-            assertThat(dto.zoneName().contains(word)).isTrue();
-            assertThat(dto.zoneType()).isEqualTo(zoneType);
+            assertThat(infoResponseDto.zoneName().contains(word)).isTrue();
+            assertThat(infoResponseDto.zoneType()).isEqualTo(zoneType);
             double expected = haversine(LATITUDE, LONGITUDE,
-                    dto.latitude(), dto.longitude());
+                    infoResponseDto.latitude(), infoResponseDto.longitude());
             // 허용 오차: 0.05 km (≈50m)
             assertThat(dto.distance())
                     .withFailMessage("zoneId=%d: expected=%.5f, actual=%.5f",
-                            dto.zoneId(), expected, dto.distance())
+                            infoResponseDto.zoneId(), expected, dto.distance())
                     .isCloseTo(expected, offset(0.05));
 
             if (i > 0) {

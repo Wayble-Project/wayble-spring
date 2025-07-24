@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
+import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.entity.AgeGroup;
@@ -230,7 +231,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(waybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
 
         WaybleZoneRecommendResponseDto dto = waybleZoneRecommendResponseDtoList.get(0);
-        Long zoneId = dto.zoneId();
+        Long zoneId = dto.waybleZoneInfo().zoneId();
 
         Optional<RecommendLogDocument> recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndZoneId(userId, zoneId);
         assertThat(recommendLogDocument.isPresent()).isTrue();
@@ -263,40 +264,40 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
         assertThat(WaybleZoneRecommendResponseDtoList.size()).isEqualTo(1);
         WaybleZoneRecommendResponseDto dto = WaybleZoneRecommendResponseDtoList.get(0);
-        assertThat(dto.zoneId()).isNotNull();
-        assertThat(dto.zoneName()).isNotNull();
-        assertThat(dto.zoneType()).isNotNull();
-        assertThat(dto.latitude()).isNotNull();
-        assertThat(dto.longitude()).isNotNull();
-        assertThat(dto.facility()).isNotNull();
-        assertThat(dto.facility().hasSlope()).isNotNull();
-        assertThat(dto.facility().hasNoDoorStep()).isNotNull();
-        assertThat(dto.facility().hasElevator()).isNotNull();
-        assertThat(dto.facility().hasTableSeat()).isNotNull();
-        assertThat(dto.facility().hasDisabledToilet()).isNotNull();
-        assertThat(dto.facility().floorInfo()).isNotNull();
+        assertThat(dto.waybleZoneInfo().zoneId()).isNotNull();
+        assertThat(dto.waybleZoneInfo().zoneName()).isNotNull();
+        assertThat(dto.waybleZoneInfo().zoneType()).isNotNull();
+        assertThat(dto.waybleZoneInfo().latitude()).isNotNull();
+        assertThat(dto.waybleZoneInfo().longitude()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility().hasSlope()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility().hasNoDoorStep()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility().hasElevator()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility().hasTableSeat()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility().hasDisabledToilet()).isNotNull();
+        assertThat(dto.waybleZoneInfo().facility().floorInfo()).isNotNull();
 
-        System.out.println("zoneId = " + dto.zoneId());
-        System.out.println("zoneName = " + dto.zoneName());
-        System.out.println("zoneType = " + dto.zoneType());
-        System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
-        System.out.println("latitude = " + dto.latitude());
-        System.out.println("longitude = " + dto.longitude());
-        System.out.println("rating = " + dto.averageRating());
-        System.out.println("reviewCount = " + dto.reviewCount());
-        System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+        System.out.println("zoneId = " + dto.waybleZoneInfo().zoneId());
+        System.out.println("zoneName = " + dto.waybleZoneInfo().zoneName());
+        System.out.println("zoneType = " + dto.waybleZoneInfo().zoneType());
+        System.out.println("thumbnailImageUrl = " + dto.waybleZoneInfo().thumbnailImageUrl());
+        System.out.println("latitude = " + dto.waybleZoneInfo().latitude());
+        System.out.println("longitude = " + dto.waybleZoneInfo().longitude());
+        System.out.println("rating = " + dto.waybleZoneInfo().averageRating());
+        System.out.println("reviewCount = " + dto.waybleZoneInfo().reviewCount());
+        System.out.println("distance = " + haversine(dto.waybleZoneInfo().latitude(), dto.waybleZoneInfo().longitude(), LATITUDE, LONGITUDE));
         System.out.println("distanceScore = " + dto.distanceScore());
         System.out.println("similarityScore = " + dto.similarityScore());
         System.out.println("recencyScore = " + dto.recencyScore());
         System.out.println("totalScore = " + dto.totalScore());
         System.out.println("=== Facility Info ===");
-        if (dto.facility() != null) {
-            System.out.println("hasSlope = " + dto.facility().hasSlope());
-            System.out.println("hasNoDoorStep = " + dto.facility().hasNoDoorStep());
-            System.out.println("hasElevator = " + dto.facility().hasElevator());
-            System.out.println("hasTableSeat = " + dto.facility().hasTableSeat());
-            System.out.println("hasDisabledToilet = " + dto.facility().hasDisabledToilet());
-            System.out.println("floorInfo = " + dto.facility().floorInfo());
+        if (dto.waybleZoneInfo().facility() != null) {
+            System.out.println("hasSlope = " + dto.waybleZoneInfo().facility().hasSlope());
+            System.out.println("hasNoDoorStep = " + dto.waybleZoneInfo().facility().hasNoDoorStep());
+            System.out.println("hasElevator = " + dto.waybleZoneInfo().facility().hasElevator());
+            System.out.println("hasTableSeat = " + dto.waybleZoneInfo().facility().hasTableSeat());
+            System.out.println("hasDisabledToilet = " + dto.waybleZoneInfo().facility().hasDisabledToilet());
+            System.out.println("floorInfo = " + dto.waybleZoneInfo().facility().floorInfo());
         } else {
             System.out.println("facility info is null");
         }
@@ -328,24 +329,25 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(waybleZoneRecommendResponseDtoList.size()).isGreaterThan(0);
         for (int i = 0; i < waybleZoneRecommendResponseDtoList.size(); i++) {
             WaybleZoneRecommendResponseDto dto = waybleZoneRecommendResponseDtoList.get(i);
-            assertThat(dto.zoneId()).isNotNull();
-            assertThat(dto.zoneName()).isNotNull();
-            assertThat(dto.zoneType()).isNotNull();
-            assertThat(dto.latitude()).isNotNull();
-            assertThat(dto.longitude()).isNotNull();
+            WaybleZoneInfoResponseDto zoneInfoResponseDto = dto.waybleZoneInfo();
+            assertThat(zoneInfoResponseDto.zoneId()).isNotNull();
+            assertThat(zoneInfoResponseDto.zoneName()).isNotNull();
+            assertThat(zoneInfoResponseDto.zoneType()).isNotNull();
+            assertThat(zoneInfoResponseDto.latitude()).isNotNull();
+            assertThat(zoneInfoResponseDto.longitude()).isNotNull();
             if (i > 0) {
                 assertThat(waybleZoneRecommendResponseDtoList.get(i - 1).totalScore()).isGreaterThanOrEqualTo(dto.totalScore());
             }
 
-            System.out.println("zoneId = " + dto.zoneId());
-            System.out.println("zoneName = " + dto.zoneName());
-            System.out.println("zoneType = " + dto.zoneType());
-            System.out.println("thumbnailImageUrl = " + dto.thumbnailImageUrl());
-            System.out.println("latitude = " + dto.latitude());
-            System.out.println("longitude = " + dto.longitude());
-            System.out.println("rating = " + dto.averageRating());
-            System.out.println("reviewCount = " + dto.reviewCount());
-            System.out.println("distance = " + haversine(dto.latitude(), dto.longitude(), LATITUDE, LONGITUDE));
+            System.out.println("zoneId = " + zoneInfoResponseDto.zoneId());
+            System.out.println("zoneName = " + zoneInfoResponseDto.zoneName());
+            System.out.println("zoneType = " + zoneInfoResponseDto.zoneType());
+            System.out.println("thumbnailImageUrl = " + zoneInfoResponseDto.thumbnailImageUrl());
+            System.out.println("latitude = " + zoneInfoResponseDto.latitude());
+            System.out.println("longitude = " + zoneInfoResponseDto.longitude());
+            System.out.println("rating = " + zoneInfoResponseDto.averageRating());
+            System.out.println("reviewCount = " + zoneInfoResponseDto.reviewCount());
+            System.out.println("distance = " + haversine(zoneInfoResponseDto.latitude(), zoneInfoResponseDto.longitude(), LATITUDE, LONGITUDE));
             System.out.println("distanceScore = " + dto.distanceScore());
             System.out.println("similarityScore = " + dto.similarityScore());
             System.out.println("recencyScore = " + dto.recencyScore());
