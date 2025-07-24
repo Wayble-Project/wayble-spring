@@ -35,6 +35,8 @@ public class WaybleZoneQuerySearchRepository{
 
     private static final IndexCoordinates INDEX = IndexCoordinates.of("wayble_zone");
 
+    private static final int DISTRICT_SEARCH_SIZE = 3;
+
     public Slice<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto cond, Pageable pageable) {
 
         int fetchSize = pageable.getPageSize() + 1;
@@ -143,7 +145,7 @@ public class WaybleZoneQuerySearchRepository{
         // 3. 방문 수 기준으로 top3 선택
         List<Long> top3ZoneIds = visitCountMap.entrySet().stream()
                 .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
-                .limit(3)
+                .limit(DISTRICT_SEARCH_SIZE)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
