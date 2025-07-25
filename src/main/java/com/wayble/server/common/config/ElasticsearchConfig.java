@@ -8,13 +8,15 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 @Configuration
 public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
-    @Value("${spring.elasticsearch.uris}")
+    @Value("${spring.data.elasticsearch.rest.uris}")
     private String host;
 
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
                 .connectedTo(host)
+                .withConnectTimeout(10000)
+                .withSocketTimeout(30000)
                 .build();
     }
 }
