@@ -1,5 +1,6 @@
 package com.wayble.server.user.service.auth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
@@ -13,6 +14,7 @@ import com.wayble.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ public class KakaoLoginService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final WebClient webClient = WebClient.create();
 
     private static final String KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -30,10 +33,10 @@ public class KakaoLoginService {
         // 카카오에서 사용자 정보 조회
         KakaoUserInfoDto kakaoUserInfo = fetchKakaoUserInfo(request.accessToken());
 
-        String email = kakaoUserInfo.getKakao_account().getEmail();
-        String nickname = kakaoUserInfo.getKakao_account().getProfile().getNickname();
-        String profileImage = kakaoUserInfo.getKakao_account().getProfile().getProfile_image_url();
-        Long kakaoId = kakaoUserInfo.getId();
+        String email = kakaoUserInfo.getKakaoAccount().getEmail();
+        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickname();
+        String profileImage = kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl();
+        // Long kakaoId = kakaoUserInfo.getId();
 
         // 유저 검색 (카카오ID + KAKAO 타입)
         Optional<User> userOpt = userRepository.findByEmailAndLoginType(email, LoginType.KAKAO);
@@ -48,7 +51,7 @@ public class KakaoLoginService {
                     LoginType.KAKAO
             );
             user.setNickname(nickname);
-            user.setProfileImageUrl(profileImage);
+            user.updateProfileImageUrl(profileImage);
 
             user = userRepository.save(user);
             isNewUser = true;
@@ -76,7 +79,7 @@ public class KakaoLoginService {
     // 카카오 사용자 정보 요청
     private KakaoUserInfoDto fetchKakaoUserInfo(String kakaoAccessToken) {
         try {
-            String response = WebClient.create()
+            String response = webClient
                     .get()
                     .uri(KAKAO_USERINFO_URL)
                     .header("Authorization", "Bearer " + kakaoAccessToken)
@@ -87,8 +90,9 @@ public class KakaoLoginService {
             System.out.println("카카오 응답: " + response);
 
             return objectMapper.readValue(response, KakaoUserInfoDto.class);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+                  throw new ApplicationException(UserErrorCase.KAKAO_AUTH_FAILED);
+        } catch (WebClientException e) {
             throw new ApplicationException(UserErrorCase.KAKAO_AUTH_FAILED);
         }
     }
