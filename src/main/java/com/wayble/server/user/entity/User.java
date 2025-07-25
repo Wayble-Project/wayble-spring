@@ -69,24 +69,15 @@ public class User extends BaseEntity {
     private List<UserPlace> userPlaces = new ArrayList<>();
 
     public static User createUser(
-            String nickname,
-            String username,
             String email,
             String password,
-            LocalDate birthDate,
-            Gender gender,
-            LoginType loginType,
-            UserType userType
+            LoginType loginType
     ) {
         return User.builder()
-                .nickname(nickname)
-                .username(username)
                 .email(email)
                 .password(password)
-                .birthDate(birthDate)
-                .gender(gender)
                 .loginType(loginType)
-                .userType(userType)
+                .userType(UserType.GENERAL) // 기본값
                 .build();
     }
 
