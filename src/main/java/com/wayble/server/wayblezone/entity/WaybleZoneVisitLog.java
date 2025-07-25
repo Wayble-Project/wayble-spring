@@ -16,17 +16,17 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user_place")
+@Table(name = "wayble_zone_visit_log")
 public class WaybleZoneVisitLog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(name = "zone_id", nullable = false)
     private Long zoneId;
 
     private Gender gender;
