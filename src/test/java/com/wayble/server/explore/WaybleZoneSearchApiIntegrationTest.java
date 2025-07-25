@@ -11,9 +11,7 @@ import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.common.entity.AgeGroup;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
-import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
-import com.wayble.server.explore.repository.WaybleZoneVisitLogDocumentRepository;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
@@ -21,6 +19,8 @@ import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
+import com.wayble.server.wayblezone.entity.WaybleZoneVisitLog;
+import com.wayble.server.wayblezone.repository.WaybleZoneVisitLogRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,7 +52,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
     @Autowired
-    private WaybleZoneVisitLogDocumentRepository waybleZoneVisitLogDocumentRepository;
+    private WaybleZoneVisitLogRepository waybleZoneVisitLogRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -149,7 +149,7 @@ public class WaybleZoneSearchApiIntegrationTest {
             int count = (int) (Math.random() * 30) + 1;
             for (int j = 0; j < count; j++) {
                 Long zoneId = (long) (Math.random() * SAMPLES) + 1;
-                WaybleZoneVisitLogDocument visitLogDocument = WaybleZoneVisitLogDocument
+                WaybleZoneVisitLog visitLogDocument = WaybleZoneVisitLog
                         .builder()
                         .userId(user.getId())
                         .zoneId(zoneId)
@@ -157,7 +157,7 @@ public class WaybleZoneSearchApiIntegrationTest {
                         .gender(user.getGender())
                         .build();
 
-                waybleZoneVisitLogDocumentRepository.save(visitLogDocument);
+                waybleZoneVisitLogRepository.save(visitLogDocument);
             }
 
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
@@ -167,9 +167,9 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @AfterAll
     public void teardown() {
-//        waybleZoneVisitLogDocumentRepository.deleteAll();
-//        waybleZoneDocumentRepository.deleteAll();
-//        userRepository.deleteAll();
+        waybleZoneVisitLogRepository.deleteAll();
+        waybleZoneDocumentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

@@ -11,10 +11,8 @@ import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDt
 import com.wayble.server.common.entity.AgeGroup;
 import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
-import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.explore.repository.RecommendLogDocumentRepository;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
-import com.wayble.server.explore.repository.WaybleZoneVisitLogDocumentRepository;
 import com.wayble.server.explore.repository.recommend.WaybleZoneQueryRecommendRepository;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
@@ -23,6 +21,8 @@ import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
+import com.wayble.server.wayblezone.entity.WaybleZoneVisitLog;
+import com.wayble.server.wayblezone.repository.WaybleZoneVisitLogRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -62,7 +62,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
     private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
 
     @Autowired
-    private WaybleZoneVisitLogDocumentRepository waybleZoneVisitLogDocumentRepository;
+    private WaybleZoneVisitLogRepository waybleZoneVisitLogRepository;
 
     @Autowired
     private RecommendLogDocumentRepository recommendLogDocumentRepository;
@@ -168,15 +168,16 @@ public class WaybleZoneRecommendApiIntegrationTest {
             int count = (int) (Math.random() * 30) + 1;
             for (int j = 0; j < count; j++) {
                 Long zoneId = (long) (Math.random() * SAMPLES) + 1;
-                WaybleZoneVisitLogDocument visitLogDocument = WaybleZoneVisitLogDocument
+                WaybleZoneVisitLog visitLogDocument = WaybleZoneVisitLog
                         .builder()
                         .userId(user.getId())
                         .zoneId(zoneId)
                         .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))
                         .gender(user.getGender())
+                        .visitedAt(LocalDate.now())
                         .build();
 
-                waybleZoneVisitLogDocumentRepository.save(visitLogDocument);
+                waybleZoneVisitLogRepository.save(visitLogDocument);
             }
         }
     }
@@ -184,7 +185,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @AfterAll
     public void teardown() {
         waybleZoneDocumentRepository.deleteAll();
-        waybleZoneVisitLogDocumentRepository.deleteAll();
+        waybleZoneVisitLogRepository.deleteAll();
         recommendLogDocumentRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -201,7 +202,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
             assertThat(doc.getAddress().getLocation()).isNotNull();
         }
 
-        List<WaybleZoneVisitLogDocument> waybleZoneVisitLogList = waybleZoneVisitLogDocumentRepository.findAll();
+        List<WaybleZoneVisitLog> waybleZoneVisitLogList = waybleZoneVisitLogRepository.findAll();
         assertThat(waybleZoneVisitLogList.size()).isGreaterThan(0);
         System.out.println("visit log size: " + waybleZoneVisitLogList.size());
     }
