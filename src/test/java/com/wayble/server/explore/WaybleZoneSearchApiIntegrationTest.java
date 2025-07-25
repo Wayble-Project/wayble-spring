@@ -9,7 +9,7 @@ import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
-import com.wayble.server.explore.entity.AgeGroup;
+import com.wayble.server.common.entity.AgeGroup;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
