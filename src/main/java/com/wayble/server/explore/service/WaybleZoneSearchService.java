@@ -32,7 +32,7 @@ public class WaybleZoneSearchService {
             return null;
         }
 
-        return waybleZoneQuerySearchRepository.findTop3SearchesWaybleZonesByDistrict(district);
+        return waybleZoneRepository.findTop3SearchesWaybleZonesByDistrict(district);
     }
 
     public List<WaybleZoneDistrictResponseDto> searchMostLikesWaybleZoneByDistrict(String district) {
