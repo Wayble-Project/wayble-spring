@@ -14,7 +14,7 @@ public record WaybleZoneInfoResponseDto(
         Double latitude,
         Double longitude,
         Double averageRating,
-        int reviewCount,
+        long reviewCount,
         FacilityResponseDto facility
 ) {
     public static WaybleZoneInfoResponseDto from(WaybleZoneDocument document) {

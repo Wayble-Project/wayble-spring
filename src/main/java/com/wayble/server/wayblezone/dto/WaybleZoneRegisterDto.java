@@ -15,7 +15,7 @@ public record WaybleZoneRegisterDto(
         Address address,
         WaybleZoneFacility facility,
         Double averageRating,
-        int reviewCount,
-        int likes
+        long reviewCount,
+        long likes
 ) {
 }

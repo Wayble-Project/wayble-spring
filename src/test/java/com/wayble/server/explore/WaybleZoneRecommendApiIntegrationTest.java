@@ -147,7 +147,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
                     .facility(facility)
                     .averageRating(Math.random() * 5)
-                    .reviewCount((int)(Math.random() * 500))
+                    .reviewCount((long)(Math.random() * 500))
                     .build();
 
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);

@@ -10,11 +10,12 @@ public record WaybleZoneDistrictResponseDto(
         Long visitCount,
         Long likes
 ) {
-    public static WaybleZoneDistrictResponseDto from(WaybleZoneDocument waybleZoneDocument, Long visitCount) {
+    public static WaybleZoneDistrictResponseDto from(WaybleZoneDocument waybleZoneDocument, Long visitCount, Long likes) {
         
         return WaybleZoneDistrictResponseDto.builder()
                 .waybleZoneInfo(WaybleZoneInfoResponseDto.from(waybleZoneDocument))
                 .visitCount(visitCount != null ? visitCount : 0L)
+                .likes(likes != null ? likes : 0L)
                 .build();
     }
 }

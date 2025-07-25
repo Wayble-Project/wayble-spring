@@ -38,7 +38,7 @@ public class WaybleZoneDocument {
 
     private double averageRating;
 
-    private int reviewCount;
+    private long reviewCount;
 
     public static WaybleZoneDocument fromEntity(WaybleZone waybleZone) {
         return WaybleZoneDocument.builder()

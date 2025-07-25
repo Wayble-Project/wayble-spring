@@ -44,11 +44,11 @@ public class WaybleZone extends BaseEntity {
 
     @Column(nullable = false, name = "review_count")
     @Builder.Default
-    private int reviewCount = 0; // 리뷰 수
+    private long reviewCount = 0; // 리뷰 수
 
     @Column(nullable = false)
     @Builder.Default
-    private int likes = 0; // 즐겨찾기 수
+    private long likes = 0; // 즐겨찾기 수
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -78,11 +78,11 @@ public class WaybleZone extends BaseEntity {
         this.mainImageUrl = mainImageUrl;
     }
 
-    public void addReviewCount(int count) {
+    public void addReviewCount(long count) {
         this.reviewCount += count;
     }
 
-    public void addLikes(int count) {
+    public void addLikes(long count) {
         this.likes += count;
     }
 

@@ -137,8 +137,8 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
                     .facility(facility)
                     .averageRating(Math.random() * 5)
-                    .reviewCount((int) (Math.random() * 100))
-                    .likes((int) (Math.random() * 100))
+                    .reviewCount((long) (Math.random() * 100))
+                    .likes((long) (Math.random() * 100))
                     .build();
 
             User user = User.createUserWithDetails(
@@ -467,7 +467,7 @@ public class WaybleZoneSearchApiIntegrationTest {
         // 검증: 방문 수 내림차순으로 정렬되어야 함
         for (int i = 1; i < dtoList.size(); i++) {
             assertThat(dtoList.get(i).visitCount())
-                    .withFailMessage("방문 수 정렬 오류: 인덱스 %d의 방문 수(%d)가 인덱스 %d의 방문 수(%d)보다 크면 안됩니다",
+                    .withFailMessage("검색 수 정렬 오류: 인덱스 %d의 검색 수(%d)가 인덱스 %d의 방문 수(%d)보다 크면 안됩니다",
                             i, dtoList.get(i).visitCount(), i-1, dtoList.get(i-1).visitCount())
                     .isLessThanOrEqualTo(dtoList.get(i-1).visitCount());
         }
