@@ -44,7 +44,7 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
                             .latitude(zone.getAddress().getLatitude())
                             .longitude(zone.getAddress().getLongitude())
                             .averageRating(zone.getRating())
-                            .reviewCount((long) zone.getReviewCount())
+                            .reviewCount(zone.getReviewCount())
                             .facility(zone.getFacility() != null ? FacilityResponseDto.from(EsWaybleZoneFacility.from(zone.getFacility())) : null)
                             .build();
                     
@@ -90,7 +90,7 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
                             .latitude(zone.getAddress().getLatitude())
                             .longitude(zone.getAddress().getLongitude())
                             .averageRating(zone.getRating())
-                            .reviewCount((long) zone.getReviewCount())
+                            .reviewCount(zone.getReviewCount())
                             .facility(zone.getFacility() != null ? FacilityResponseDto.from(EsWaybleZoneFacility.from(zone.getFacility())) : null)
                             .build();
                     
@@ -104,9 +104,9 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
     }
 
     // 내부 클래스로 visit count 담을 DTO
-    private static class VisitCount {
-        private final Long zoneId;
-        private final Long count;
+    public static class VisitCount {
+        public final Long zoneId;
+        public final Long count;
 
         public VisitCount(Long zoneId, Long count) {
             this.zoneId = zoneId;

@@ -38,7 +38,7 @@ public class WaybleZoneDocument {
 
     private double averageRating;
 
-    private long reviewCount;
+    private int reviewCount;
 
     public static WaybleZoneDocument fromEntity(WaybleZone waybleZone) {
         return WaybleZoneDocument.builder()
@@ -49,7 +49,7 @@ public class WaybleZoneDocument {
                 .address(EsAddress.from(waybleZone.getAddress()))
                 .facility(EsWaybleZoneFacility.from(waybleZone.getFacility()))
                 .averageRating(0.0)
-                .reviewCount(0L)
+                .reviewCount(0)
                 .build();
     }
 
