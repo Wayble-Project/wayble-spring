@@ -99,7 +99,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        User testUser = User.createUser(
+        User testUser = User.createUserWithDetails(
                 "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
                 generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
         );

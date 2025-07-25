@@ -105,7 +105,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
-        User testUser = User.createUser(
+        User testUser = User.createUserWithDetails(
                 "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
                 generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
         );
@@ -141,7 +141,7 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .likes((int) (Math.random() * 100))
                     .build();
 
-            User user = User.createUser(
+            User user = User.createUserWithDetails(
                     "user" + i,
                     "username" + i,
                     UUID.randomUUID() + "@email",
