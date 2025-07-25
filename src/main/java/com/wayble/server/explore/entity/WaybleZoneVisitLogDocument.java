@@ -1,5 +1,6 @@
 package com.wayble.server.explore.entity;
 
+import com.wayble.server.common.entity.AgeGroup;
 import org.springframework.data.annotation.Id;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.User;

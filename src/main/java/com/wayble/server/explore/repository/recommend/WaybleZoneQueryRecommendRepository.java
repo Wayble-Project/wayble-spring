@@ -11,7 +11,7 @@ import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.Gender;
-import com.wayble.server.explore.entity.AgeGroup;
+import com.wayble.server.common.entity.AgeGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;

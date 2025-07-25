@@ -1,10 +1,10 @@
 package com.wayble.server.wayblezone.controller;
 
 import com.wayble.server.common.response.CommonResponse;
-import com.wayble.server.explore.service.WaybleZoneVisitLogService;
 import com.wayble.server.wayblezone.dto.WaybleZoneDetailResponseDto;
 import com.wayble.server.wayblezone.dto.WaybleZoneListResponseDto;
 import com.wayble.server.wayblezone.service.WaybleZoneService;
+import com.wayble.server.wayblezone.service.WaybleZoneVisitLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
