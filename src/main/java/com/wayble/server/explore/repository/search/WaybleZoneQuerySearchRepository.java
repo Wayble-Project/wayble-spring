@@ -4,10 +4,8 @@ import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
-import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -21,12 +19,6 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -130,126 +122,5 @@ public class WaybleZoneQuerySearchRepository{
         }
 
         return new SliceImpl<>(dtos, pageable, hasNext);
-    }
-
-    public List<WaybleZoneDistrictResponseDto> findTop3SearchesWaybleZonesByDistrict(String district) {
-        // 1. 특정 district에 속한 wayble zone들 조회
-        List<Long> zoneIdsInDistrict = getZoneIdsByDistrict(district);
-        
-        if (zoneIdsInDistrict.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // 2. 해당 zone들의 방문 로그 수 집계 및 top3 선택
-        Map<Long, Long> visitCounts = getVisitCountsByZoneIds(zoneIdsInDistrict);
-        
-        if (visitCounts.isEmpty()) {
-            return Collections.emptyList();
-        }
-        
-        Map<Long, Long> top3VisitCounts = visitCounts.entrySet().stream()
-                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
-                .limit(DISTRICT_SEARCH_SIZE)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-
-        // 3. top3 zone들의 상세 정보 조회 및 ResponseDto 생성
-        return getWaybleZoneDetails(new ArrayList<>(top3VisitCounts.keySet()), top3VisitCounts);
-    }
-
-    private List<Long> getZoneIdsByDistrict(String district) {
-        Query termQuery = TermQuery.of(t -> t
-                .field("address.district.keyword")
-                .value(district)
-        )._toQuery();
-
-        NativeQuery searchQuery = NativeQuery.builder()
-                .withQuery(termQuery)
-                .withMaxResults(1000) // district 내 모든 zone 조회
-                .build();
-
-        SearchHits<WaybleZoneDocument> searchHits = operations.search(
-                searchQuery,
-                WaybleZoneDocument.class,
-                INDEX
-        );
-
-        return searchHits.getSearchHits().stream()
-                .map(hit -> hit.getContent().getZoneId())
-                .collect(Collectors.toList());
-    }
-
-
-    private Map<Long, Long> getVisitCountsByZoneIds(List<Long> zoneIds) {
-        Map<Long, Long> visitCountMap = new HashMap<>();
-        
-        // 각 zoneId별로 방문 로그 수를 직접 카운트
-        for (Long zoneId : zoneIds) {
-            long count = countVisitLogsByZoneId(zoneId);
-            visitCountMap.put(zoneId, count);
-        }
-
-        return visitCountMap;
-    }
-
-    private long countVisitLogsByZoneId(Long zoneId) {
-        Query termQuery = TermQuery.of(t -> t
-                .field("zoneId")
-                .value(zoneId)
-        )._toQuery();
-
-        NativeQuery searchQuery = NativeQuery.builder()
-                .withQuery(termQuery)
-                .withMaxResults(0) // 카운트만 필요하므로 결과는 0개
-                .build();
-
-        SearchHits<?> searchHits = operations.search(
-                searchQuery,
-                Object.class,
-                IndexCoordinates.of("wayble_zone_visit_log")
-        );
-
-        return searchHits.getTotalHits();
-    }
-
-    private List<WaybleZoneDistrictResponseDto> getWaybleZoneDetails(List<Long> zoneIds, Map<Long, Long> visitCountMap) {
-        if (zoneIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // Terms query로 여러 값을 한번에 검색
-        Query termsQuery = Query.of(q -> q
-                .terms(t -> t
-                        .field("id")
-                        .terms(tv -> tv.value(zoneIds.stream()
-                                .map(id -> co.elastic.clients.elasticsearch._types.FieldValue.of(id))
-                                .collect(Collectors.toList())
-                        ))
-                )
-        );
-
-        NativeQuery searchQuery = NativeQuery.builder()
-                .withQuery(termsQuery)
-                .withMaxResults(zoneIds.size())
-                .build();
-
-        SearchHits<WaybleZoneDocument> searchHits = operations.search(
-                searchQuery,
-                WaybleZoneDocument.class,
-                INDEX
-        );
-
-        return searchHits.getSearchHits().stream()
-                .map(hit -> {
-                    WaybleZoneDocument doc = hit.getContent();
-                    Long visitCount = visitCountMap.get(doc.getZoneId());
-                    return WaybleZoneDistrictResponseDto.from(doc, visitCount);
-                })
-                .sorted((a, b) -> Long.compare(b.visitCount(), a.visitCount())) // 방문 수 내림차순 정렬
-                .collect(Collectors.toList());
     }
 }
