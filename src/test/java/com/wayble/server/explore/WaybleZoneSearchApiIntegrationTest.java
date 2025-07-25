@@ -149,15 +149,16 @@ public class WaybleZoneSearchApiIntegrationTest {
             int count = (int) (Math.random() * 30) + 1;
             for (int j = 0; j < count; j++) {
                 Long zoneId = (long) (Math.random() * SAMPLES) + 1;
-                WaybleZoneVisitLog visitLogDocument = WaybleZoneVisitLog
+                WaybleZoneVisitLog waybleZoneVisitLog = WaybleZoneVisitLog
                         .builder()
                         .userId(user.getId())
                         .zoneId(zoneId)
                         .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))
                         .gender(user.getGender())
+                        .visitedAt(makeRandomDate())
                         .build();
 
-                waybleZoneVisitLogRepository.save(visitLogDocument);
+                waybleZoneVisitLogRepository.save(waybleZoneVisitLog);
             }
 
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
@@ -204,6 +205,9 @@ public class WaybleZoneSearchApiIntegrationTest {
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
 
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
                         dataNode,
@@ -238,25 +242,6 @@ public class WaybleZoneSearchApiIntegrationTest {
             assertThat(infoResponseDto.facility().hasDisabledToilet()).isNotNull();
             assertThat(infoResponseDto.facility().floorInfo()).isNotNull();
         }
-
-
-        if (!dtoList.isEmpty()) {
-            WaybleZoneSearchResponseDto firstDto = dtoList.get(0);
-            WaybleZoneInfoResponseDto firstInfoResponseDto = firstDto.waybleZoneInfo();
-            System.out.println("=== Search Result - Facility Info ===");
-            System.out.println("zoneId = " + firstInfoResponseDto.zoneId());
-            System.out.println("zoneName = " + firstInfoResponseDto.zoneName());
-            if (firstInfoResponseDto.facility() != null) {
-                System.out.println("hasSlope = " + firstInfoResponseDto.facility().hasSlope());
-                System.out.println("hasNoDoorStep = " + firstInfoResponseDto.facility().hasNoDoorStep());
-                System.out.println("hasElevator = " + firstInfoResponseDto.facility().hasElevator());
-                System.out.println("hasTableSeat = " + firstInfoResponseDto.facility().hasTableSeat());
-                System.out.println("hasDisabledToilet = " + firstInfoResponseDto.facility().hasDisabledToilet());
-                System.out.println("floorInfo = " + firstInfoResponseDto.facility().floorInfo());
-            } else {
-                System.out.println("facility info is null");
-            }
-        }
     }
 
     @Test
@@ -281,6 +266,9 @@ public class WaybleZoneSearchApiIntegrationTest {
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
 
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
                         dataNode,
@@ -308,10 +296,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                         .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
             }
         }
-
-        for (WaybleZoneSearchResponseDto dto : dtoList) {
-            System.out.println(dto.toString());
-        }
     }
 
     @Test
@@ -329,12 +313,13 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
-
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
@@ -362,10 +347,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                                 dto.distance(), dtoList.get(i-1).distance())
                         .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
             }
-        }
-
-        for (WaybleZoneSearchResponseDto dto : dtoList) {
-            System.out.println(dto.toString());
         }
     }
 
@@ -386,12 +367,13 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
-
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
         List<WaybleZoneSearchResponseDto> dtoList =
                 objectMapper.convertValue(
@@ -421,10 +403,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                         .isGreaterThanOrEqualTo(dtoList.get(i - 1).distance());
             }
         }
-
-        for (WaybleZoneSearchResponseDto dto : dtoList) {
-            System.out.println(dto.toString());
-        }
     }
 
     @Test
@@ -441,11 +419,12 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
-        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
-
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
         List<WaybleZoneDistrictResponseDto> dtoList =
                 objectMapper.convertValue(
@@ -477,16 +456,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                             i, dtoList.get(i).visitCount(), i-1, dtoList.get(i-1).visitCount())
                     .isLessThanOrEqualTo(dtoList.get(i-1).visitCount());
         }
-
-        // 디버그 출력
-        System.out.println("=== District " + district + " Top3 Results ===");
-        for (int i = 0; i < dtoList.size(); i++) {
-            WaybleZoneDistrictResponseDto dto = dtoList.get(i);
-            System.out.println((i+1) + ". Zone " + dto.waybleZoneInfo().zoneId() + 
-                    " [" + dto.waybleZoneInfo().zoneName() + "] " +
-                    "visits: " + dto.visitCount() + 
-                    " type: " + dto.waybleZoneInfo().zoneType());
-        }
     }
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
@@ -498,6 +467,12 @@ public class WaybleZoneSearchApiIntegrationTest {
                 * Math.sin(dLon/2) * Math.sin(dLon/2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return R * c;
+    }
+
+    private LocalDate makeRandomDate() {
+        Random random = new Random();
+        int daysAgo = random.nextInt(40) + 1;
+        return LocalDate.now().minusDays(daysAgo);
     }
 
     private Map<String, Double> makeRandomPoint() {

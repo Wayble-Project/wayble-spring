@@ -174,7 +174,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                         .zoneId(zoneId)
                         .ageGroup(AgeGroup.fromBirthDate(user.getBirthDate()))
                         .gender(user.getGender())
-                        .visitedAt(LocalDate.now())
+                        .visitedAt(makeRandomDate())
                         .build();
 
                 waybleZoneVisitLogRepository.save(visitLogDocument);
@@ -224,6 +224,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
         List<WaybleZoneRecommendResponseDto> waybleZoneRecommendResponseDtoList = objectMapper.convertValue(
                 dataNode,
                 new TypeReference<>() {}
@@ -258,6 +261,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
         List<WaybleZoneRecommendResponseDto> WaybleZoneRecommendResponseDtoList = objectMapper.convertValue(
                 dataNode,
                 new TypeReference<>() {}
@@ -277,31 +283,6 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(dto.waybleZoneInfo().facility().hasTableSeat()).isNotNull();
         assertThat(dto.waybleZoneInfo().facility().hasDisabledToilet()).isNotNull();
         assertThat(dto.waybleZoneInfo().facility().floorInfo()).isNotNull();
-
-        System.out.println("zoneId = " + dto.waybleZoneInfo().zoneId());
-        System.out.println("zoneName = " + dto.waybleZoneInfo().zoneName());
-        System.out.println("zoneType = " + dto.waybleZoneInfo().zoneType());
-        System.out.println("thumbnailImageUrl = " + dto.waybleZoneInfo().thumbnailImageUrl());
-        System.out.println("latitude = " + dto.waybleZoneInfo().latitude());
-        System.out.println("longitude = " + dto.waybleZoneInfo().longitude());
-        System.out.println("rating = " + dto.waybleZoneInfo().averageRating());
-        System.out.println("reviewCount = " + dto.waybleZoneInfo().reviewCount());
-        System.out.println("distance = " + haversine(dto.waybleZoneInfo().latitude(), dto.waybleZoneInfo().longitude(), LATITUDE, LONGITUDE));
-        System.out.println("distanceScore = " + dto.distanceScore());
-        System.out.println("similarityScore = " + dto.similarityScore());
-        System.out.println("recencyScore = " + dto.recencyScore());
-        System.out.println("totalScore = " + dto.totalScore());
-        System.out.println("=== Facility Info ===");
-        if (dto.waybleZoneInfo().facility() != null) {
-            System.out.println("hasSlope = " + dto.waybleZoneInfo().facility().hasSlope());
-            System.out.println("hasNoDoorStep = " + dto.waybleZoneInfo().facility().hasNoDoorStep());
-            System.out.println("hasElevator = " + dto.waybleZoneInfo().facility().hasElevator());
-            System.out.println("hasTableSeat = " + dto.waybleZoneInfo().facility().hasTableSeat());
-            System.out.println("hasDisabledToilet = " + dto.waybleZoneInfo().facility().hasDisabledToilet());
-            System.out.println("floorInfo = " + dto.waybleZoneInfo().facility().floorInfo());
-        } else {
-            System.out.println("facility info is null");
-        }
     }
 
     @Test
@@ -322,6 +303,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
         List<WaybleZoneRecommendResponseDto> waybleZoneRecommendResponseDtoList = objectMapper.convertValue(
                 dataNode,
                 new TypeReference<>() {}
@@ -339,20 +323,6 @@ public class WaybleZoneRecommendApiIntegrationTest {
             if (i > 0) {
                 assertThat(waybleZoneRecommendResponseDtoList.get(i - 1).totalScore()).isGreaterThanOrEqualTo(dto.totalScore());
             }
-
-            System.out.println("zoneId = " + zoneInfoResponseDto.zoneId());
-            System.out.println("zoneName = " + zoneInfoResponseDto.zoneName());
-            System.out.println("zoneType = " + zoneInfoResponseDto.zoneType());
-            System.out.println("thumbnailImageUrl = " + zoneInfoResponseDto.thumbnailImageUrl());
-            System.out.println("latitude = " + zoneInfoResponseDto.latitude());
-            System.out.println("longitude = " + zoneInfoResponseDto.longitude());
-            System.out.println("rating = " + zoneInfoResponseDto.averageRating());
-            System.out.println("reviewCount = " + zoneInfoResponseDto.reviewCount());
-            System.out.println("distance = " + haversine(zoneInfoResponseDto.latitude(), zoneInfoResponseDto.longitude(), LATITUDE, LONGITUDE));
-            System.out.println("distanceScore = " + dto.distanceScore());
-            System.out.println("similarityScore = " + dto.similarityScore());
-            System.out.println("recencyScore = " + dto.recencyScore());
-            System.out.println("totalScore = " + dto.totalScore());
         }
     }
 
