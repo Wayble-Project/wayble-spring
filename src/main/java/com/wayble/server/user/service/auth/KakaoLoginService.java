@@ -8,7 +8,6 @@ import com.wayble.server.user.dto.KakaoLoginResponseDto;
 import com.wayble.server.user.dto.KakaoUserInfoDto;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
-import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,16 +43,11 @@ public class KakaoLoginService {
         if (userOpt.isEmpty()) {
             // 신규 가입자라면 회원가입 처리
             user = User.createUser(
-                    nickname,
-                    email,       // username
                     email,
-                    "",          // password
-                    null,        // birthDate
-                    null,        // gender
-                    LoginType.KAKAO,
-                    UserType.GENERAL
+                    "",  // 소셜로그인은 패스워드 X
+                    LoginType.KAKAO
             );
-            // 프로필 이미지 추가
+            user.setNickname(nickname);
             user.setProfileImageUrl(profileImage);
 
             user = userRepository.save(user);
@@ -98,4 +92,5 @@ public class KakaoLoginService {
             throw new ApplicationException(UserErrorCase.KAKAO_AUTH_FAILED);
         }
     }
+
 }
