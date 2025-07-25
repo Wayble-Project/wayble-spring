@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Builder
@@ -30,4 +32,10 @@ public class WaybleZoneVisitLog extends BaseEntity {
     private Gender gender;
 
     private AgeGroup ageGroup;
+
+    private LocalDate visitedAt;
+
+    public void updateVisitedAtToNow() {
+        this.visitedAt = LocalDate.now();
+    }
 }

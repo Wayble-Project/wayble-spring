@@ -31,6 +31,14 @@ public class WaybleZoneVisitLogService {
             return;
         }
 
+        if(waybleZoneVisitLogRepository.existsByUserIdAndZoneId(userId, zoneId)) {
+            WaybleZoneVisitLog waybleZoneVisitLog = waybleZoneVisitLogRepository
+                    .findByUserIdAndZoneId(userId, zoneId).get();
+
+            waybleZoneVisitLog.updateVisitedAtToNow();
+            return;
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
