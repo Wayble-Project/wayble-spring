@@ -7,7 +7,7 @@ import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
-import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.common.entity.AgeGroup;
 import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
@@ -138,7 +138,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
             WaybleZoneFacility facility = createRandomFacility(i);
             
-            WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
+            WaybleZoneRegisterDto dto = WaybleZoneRegisterDto
                     .builder()
                     .zoneId((long) i)
                     .zoneName(nameList.get((int) (Math.random() * nameList.size())))

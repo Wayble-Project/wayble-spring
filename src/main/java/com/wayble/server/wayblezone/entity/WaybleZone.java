@@ -4,6 +4,7 @@ import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
 import com.wayble.server.user.entity.UserPlaceWaybleZoneMapping;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -76,5 +77,17 @@ public class WaybleZone extends BaseEntity {
 
     public void addLikes(int count) {
         this.likes += count;
+    }
+
+    public static WaybleZone from(WaybleZoneRegisterDto dto) {
+        return WaybleZone.builder()
+                .zoneName(dto.zoneName())
+                .contactNumber(dto.contactNumber())
+                .zoneType(dto.waybleZoneType())
+                .address(dto.address())
+                .rating(dto.averageRating())
+                .reviewCount(dto.reviewCount())
+                .likes(dto.likes())
+                .build();
     }
 }

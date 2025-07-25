@@ -1,7 +1,7 @@
 package com.wayble.server.explore.service;
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.exception.SearchErrorCase;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
@@ -26,7 +26,7 @@ public class WaybleZoneDocumentService {
         waybleZoneDocumentRepository.save(WaybleZoneDocument.fromEntity(waybleZone));
     }
 
-    public void saveDocumentFromDto(WaybleZoneDocumentRegisterDto dto) {
+    public void saveDocumentFromDto(WaybleZoneRegisterDto dto) {
         waybleZoneDocumentRepository.save(WaybleZoneDocument.fromDto(dto));
     }
 }

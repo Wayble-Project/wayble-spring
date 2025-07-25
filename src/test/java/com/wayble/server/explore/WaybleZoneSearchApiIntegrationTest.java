@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
-import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.common.entity.AgeGroup;
@@ -17,9 +17,11 @@ import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
+import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import com.wayble.server.wayblezone.entity.WaybleZoneVisitLog;
+import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
 import com.wayble.server.wayblezone.repository.WaybleZoneVisitLogRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WaybleZoneRepository waybleZoneRepository;
 
     @Autowired
     private WaybleZoneDocumentRepository waybleZoneDocumentRepository;
@@ -123,7 +128,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
             WaybleZoneFacility facility = createRandomFacility(i);
             
-            WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
+            WaybleZoneRegisterDto dto = WaybleZoneRegisterDto
                     .builder()
                     .zoneId((long) i)
                     .zoneName(nameList.get((int) (Math.random() * nameList.size())))
@@ -131,7 +136,7 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
                     .facility(facility)
                     .averageRating(Math.random() * 5)
-                    .reviewCount((long)(Math.random() * 500))
+                    .reviewCount((int) (Math.random() * 500))
                     .build();
 
             User user = User.createUser(
@@ -162,6 +167,9 @@ public class WaybleZoneSearchApiIntegrationTest {
             }
 
             WaybleZoneDocument waybleZoneDocument = WaybleZoneDocument.fromDto(dto);
+            WaybleZone waybleZone = WaybleZone.from(dto);
+
+            waybleZoneRepository.save(waybleZone);
             waybleZoneDocumentRepository.save(waybleZoneDocument);
         }
     }

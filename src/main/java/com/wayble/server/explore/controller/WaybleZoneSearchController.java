@@ -3,7 +3,7 @@ package com.wayble.server.explore.controller;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.explore.dto.search.request.SearchSliceDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneDistrictSearchDto;
-import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
@@ -61,7 +61,7 @@ public class WaybleZoneSearchController {
     }
 
     @PostMapping("")
-    public CommonResponse<String> registerDocumentFromDto(@RequestBody WaybleZoneDocumentRegisterDto registerDto) {
+    public CommonResponse<String> registerDocumentFromDto(@RequestBody WaybleZoneRegisterDto registerDto) {
         waybleZoneDocumentService.saveDocumentFromDto(registerDto);
         return CommonResponse.success("Wayble Zone Document 등록 완료!");
     }
