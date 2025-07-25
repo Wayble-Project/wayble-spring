@@ -24,8 +24,8 @@ public class KakaoLoginService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtProvider;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final WebClient webClient = WebClient.create();
+    private final ObjectMapper objectMapper;
+    private final WebClient webClient;
 
     private static final String KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -90,9 +90,7 @@ public class KakaoLoginService {
             System.out.println("카카오 응답: " + response);
 
             return objectMapper.readValue(response, KakaoUserInfoDto.class);
-        } catch (JsonProcessingException e) {
-                  throw new ApplicationException(UserErrorCase.KAKAO_AUTH_FAILED);
-        } catch (WebClientException e) {
+        } catch (JsonProcessingException | WebClientException e) {
             throw new ApplicationException(UserErrorCase.KAKAO_AUTH_FAILED);
         }
     }
