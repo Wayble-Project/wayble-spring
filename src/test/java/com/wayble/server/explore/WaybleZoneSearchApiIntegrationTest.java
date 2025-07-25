@@ -422,8 +422,6 @@ public class WaybleZoneSearchApiIntegrationTest {
         final String district = districtList.get((int) (Math.random() * districtList.size()));
         MvcResult result = mockMvc.perform(get(baseUrl + "/district/most-searches")
                         .header("Authorization", "Bearer " + token)
-                        .param("latitude",  String.valueOf(LATITUDE))
-                        .param("longitude", String.valueOf(LONGITUDE))
                         .param("district", district)
                         .accept(MediaType.APPLICATION_JSON)
                 )
@@ -481,8 +479,6 @@ public class WaybleZoneSearchApiIntegrationTest {
         final String district = districtList.get((int) (Math.random() * districtList.size()));
         MvcResult result = mockMvc.perform(get(baseUrl + "/district/most-likes")
                         .header("Authorization", "Bearer " + token)
-                        .param("latitude",  String.valueOf(LATITUDE))
-                        .param("longitude", String.valueOf(LONGITUDE))
                         .param("district", district)
                         .accept(MediaType.APPLICATION_JSON)
                 )

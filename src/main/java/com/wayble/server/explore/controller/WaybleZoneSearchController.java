@@ -2,7 +2,6 @@ package com.wayble.server.explore.controller;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.explore.dto.search.request.SearchSliceDto;
-import com.wayble.server.explore.dto.search.request.WaybleZoneDistrictSearchDto;
 import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
@@ -10,6 +9,7 @@ import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto
 import com.wayble.server.explore.service.WaybleZoneDocumentService;
 import com.wayble.server.explore.service.WaybleZoneSearchService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -44,19 +44,26 @@ public class WaybleZoneSearchController {
 
     @GetMapping("/district/most-searches")
     public CommonResponse<List<WaybleZoneDistrictResponseDto>> findMostSearchesWaybleZoneByDistrict(
-            @Valid @ModelAttribute WaybleZoneDistrictSearchDto conditionDto)
+            @Valid
+            @RequestParam("district")
+            @Size(min = 2, message = "동 이름은 최소 2글자 이상이어야 합니다.")
+            String district)
     {
         return CommonResponse.success(waybleZoneSearchService.searchMostSearchesWaybleZoneByDistrict(
-                conditionDto.district()
+                district
         ));
     }
 
     @GetMapping("/district/most-likes")
     public CommonResponse<List<WaybleZoneDistrictResponseDto>> findMostLikesWaybleZoneByDistrict(
-            @Valid @ModelAttribute WaybleZoneDistrictSearchDto conditionDto)
+            @Valid
+            @RequestParam("district")
+            @Size(min = 2, message = "동 이름은 최소 2글자 이상이어야 합니다.")
+            String district
+        )
     {
         return CommonResponse.success(waybleZoneSearchService.searchMostLikesWaybleZoneByDistrict(
-                conditionDto.district()
+                district
         ));
     }
 

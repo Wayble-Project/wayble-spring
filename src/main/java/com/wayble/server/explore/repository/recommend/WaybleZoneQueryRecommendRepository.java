@@ -140,6 +140,7 @@ public class WaybleZoneQueryRecommendRepository {
                             .zoneName(zone.getZoneName())
                             .zoneType(zone.getZoneType())
                             .thumbnailImageUrl(zone.getThumbnailImageUrl())
+                            .address(zone.getAddress().toFullAddress())
                             .latitude(zone.getAddress().getLocation().getLat())
                             .longitude(zone.getAddress().getLocation().getLon())
                             .averageRating(zone.getAverageRating())
