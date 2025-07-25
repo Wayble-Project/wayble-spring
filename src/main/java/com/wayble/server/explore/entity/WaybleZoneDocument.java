@@ -40,8 +40,6 @@ public class WaybleZoneDocument {
 
     private long reviewCount;
 
-    private long likes;
-
     public static WaybleZoneDocument fromEntity(WaybleZone waybleZone) {
         return WaybleZoneDocument.builder()
                 .zoneId(waybleZone.getId())
@@ -52,7 +50,6 @@ public class WaybleZoneDocument {
                 .facility(EsWaybleZoneFacility.from(waybleZone.getFacility()))
                 .averageRating(0.0)
                 .reviewCount(0L)
-                .likes(0L)
                 .build();
     }
 
@@ -66,7 +63,6 @@ public class WaybleZoneDocument {
                 .facility(EsWaybleZoneFacility.from(dto.facility()))
                 .averageRating(dto.averageRating() != null ? dto.averageRating() : 0.0)
                 .reviewCount(dto.reviewCount() != null ? dto.reviewCount() : 0L)
-                .likes(dto.likes() != null ? dto.likes() : 0L)
                 .build();
     }
 }
