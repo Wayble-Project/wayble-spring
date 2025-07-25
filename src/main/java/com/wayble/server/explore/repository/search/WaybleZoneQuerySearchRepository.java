@@ -4,8 +4,11 @@ import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import com.wayble.server.explore.dto.search.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.dto.search.WaybleZoneDistrictResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,10 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -120,5 +127,114 @@ public class WaybleZoneQuerySearchRepository{
         }
 
         return new SliceImpl<>(dtos, pageable, hasNext);
+    }
+
+    public List<WaybleZoneDistrictResponseDto> findTop3WaybleZonesByDistrict(String district) {
+        // 1. 특정 district에 속한 wayble zone들 조회
+        List<Long> zoneIdsInDistrict = getZoneIdsByDistrict(district);
+        
+        if (zoneIdsInDistrict.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. 해당 zone들의 방문 로그 수 집계
+        Map<Long, Long> visitCountMap = getVisitCountsByZoneIds(zoneIdsInDistrict);
+
+        // 3. 방문 수 기준으로 top3 선택
+        List<Long> top3ZoneIds = visitCountMap.entrySet().stream()
+                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        // 4. top3 zone들의 상세 정보 조회 및 ResponseDto 생성
+        return getWaybleZoneDetails(top3ZoneIds, visitCountMap);
+    }
+
+    private List<Long> getZoneIdsByDistrict(String district) {
+        Query termQuery = TermQuery.of(t -> t
+                .field("address.district")
+                .value(district)
+        )._toQuery();
+
+        NativeQuery searchQuery = NativeQuery.builder()
+                .withQuery(termQuery)
+                .withMaxResults(1000) // district 내 모든 zone 조회
+                .build();
+
+        SearchHits<WaybleZoneDocument> searchHits = operations.search(
+                searchQuery,
+                WaybleZoneDocument.class,
+                INDEX
+        );
+
+        return searchHits.getSearchHits().stream()
+                .map(hit -> hit.getContent().getZoneId())
+                .collect(Collectors.toList());
+    }
+
+    private Map<Long, Long> getVisitCountsByZoneIds(List<Long> zoneIds) {
+        Map<Long, Long> visitCountMap = new HashMap<>();
+        
+        // 각 zoneId별로 방문 로그 수를 직접 카운트
+        for (Long zoneId : zoneIds) {
+            long count = countVisitLogsByZoneId(zoneId);
+            visitCountMap.put(zoneId, count);
+        }
+
+        return visitCountMap;
+    }
+
+    private long countVisitLogsByZoneId(Long zoneId) {
+        Query termQuery = TermQuery.of(t -> t
+                .field("zoneId")
+                .value(zoneId)
+        )._toQuery();
+
+        NativeQuery searchQuery = NativeQuery.builder()
+                .withQuery(termQuery)
+                .withMaxResults(0) // 카운트만 필요하므로 결과는 0개
+                .build();
+
+        SearchHits<?> searchHits = operations.search(
+                searchQuery,
+                Object.class,
+                IndexCoordinates.of("wayble_zone_visit_log")
+        );
+
+        return searchHits.getTotalHits();
+    }
+
+    private List<WaybleZoneDistrictResponseDto> getWaybleZoneDetails(List<Long> zoneIds, Map<Long, Long> visitCountMap) {
+        if (zoneIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        for (Long zoneId : zoneIds) {
+            boolQueryBuilder.should(TermQuery.of(t -> t
+                    .field("zoneId")
+                    .value(zoneId)
+            )._toQuery());
+        }
+
+        NativeQuery searchQuery = NativeQuery.builder()
+                .withQuery(boolQueryBuilder.build()._toQuery())
+                .withMaxResults(zoneIds.size())
+                .build();
+
+        SearchHits<WaybleZoneDocument> searchHits = operations.search(
+                searchQuery,
+                WaybleZoneDocument.class,
+                INDEX
+        );
+
+        return searchHits.getSearchHits().stream()
+                .map(hit -> {
+                    WaybleZoneDocument doc = hit.getContent();
+                    return WaybleZoneDistrictResponseDto.from(doc, visitCountMap.get(doc.getZoneId()));
+                })
+                .sorted((a, b) -> Long.compare(b.visitCount(), a.visitCount())) // 방문 수 내림차순 정렬
+                .collect(Collectors.toList());
     }
 }

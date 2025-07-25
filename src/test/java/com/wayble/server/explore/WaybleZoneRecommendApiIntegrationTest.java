@@ -3,6 +3,7 @@ package com.wayble.server.explore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
@@ -19,6 +20,7 @@ import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
+import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -70,11 +75,13 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     private static final double RADIUS = 50.0;
 
-    private static final Long SAMPLES = 1000L;
+    private static final Long SAMPLES = 100L;
 
     private static final String baseUrl = "/api/v1/wayble-zones/recommend";
 
-    private final Long userId = 1L;
+    private Long userId;
+
+    private String token;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -91,6 +98,15 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     @BeforeAll
     public void setup() {
+        User testUser = User.createUser(
+                "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
+                generateRandomBirthDate(), Gender.MALE, LoginType.KAKAO, UserType.DISABLED
+        );
+
+        userRepository.save(testUser);
+        userId = testUser.getId();
+        token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
+
         for (int i = 1; i <= SAMPLES / 2; i++) {
             Long zoneId = (long) (Math.random() * SAMPLES) + 1;
             if(!recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId)) {
@@ -119,6 +135,8 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .longitude(points.get("longitude"))
                     .build();
 
+            WaybleZoneFacility facility = createRandomFacility(i);
+            
             WaybleZoneDocumentRegisterDto dto = WaybleZoneDocumentRegisterDto
                     .builder()
                     .zoneId((long) i)
@@ -126,6 +144,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
                     .address(address)
                     .thumbnailImageUrl("thumbnail url" + i)
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
+                    .facility(facility)
                     .averageRating(Math.random() * 5)
                     .reviewCount((long)(Math.random() * 500))
                     .build();
@@ -170,30 +189,24 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @DisplayName("데이터 저장 테스트")
     public void checkDataExists() {
         List<WaybleZoneDocument> waybleZoneDocumentList = waybleZoneDocumentRepository.findAll();
-        System.out.println("=== 웨이블존 목록 ===");
-
         assertThat(waybleZoneDocumentList.size()).isGreaterThan(0);
+        System.out.println("Total documents: " + waybleZoneDocumentList.size());
         for (WaybleZoneDocument doc : waybleZoneDocumentList) {
             assertThat(doc.getZoneId()).isNotNull();
             assertThat(doc.getZoneName()).isNotNull();
             assertThat(doc.getAddress().getLocation()).isNotNull();
-            System.out.println("존 정보: " + doc.toString());
-            System.out.println("주소: " + doc.getAddress().toString());
         }
 
         List<WaybleZoneVisitLogDocument> waybleZoneVisitLogList = waybleZoneVisitLogDocumentRepository.findAll();
-        System.out.println("=== 웨이블존 방문 목록 ===");
-
         assertThat(waybleZoneVisitLogList.size()).isGreaterThan(0);
-        for (WaybleZoneVisitLogDocument doc : waybleZoneVisitLogList) {
-            System.out.println("방문 정보" + doc.toString());
-        }
+        System.out.println("visit log size: " + waybleZoneVisitLogList.size());
     }
 
     @Test
     @DisplayName("추천 기록 저장 테스트")
     public void saveRecommendLogTest() throws Exception {
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -221,19 +234,13 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(recommendLogDocument.get().getUserId()).isEqualTo(userId);
         assertThat(recommendLogDocument.get().getZoneId()).isEqualTo(zoneId);
         assertThat(recommendLogDocument.get().getRecommendationDate()).isEqualTo(LocalDate.now());
-        System.out.println("===recommend log===");
-        System.out.println("id = " + recommendLogDocument.get().getId());
-        System.out.println("userId = " +recommendLogDocument.get().getUserId());
-        System.out.println("zoneId = " +recommendLogDocument.get().getZoneId());
-        System.out.println("recommendationDate = " +recommendLogDocument.get().getRecommendationDate());
-        System.out.println("recommendCount " +recommendLogDocument.get().getRecommendCount());
     }
 
     @Test
     @DisplayName("추천 기능 테스트")
     public void recommendWaybleZone() throws Exception {
-
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
@@ -258,6 +265,13 @@ public class WaybleZoneRecommendApiIntegrationTest {
         assertThat(dto.zoneType()).isNotNull();
         assertThat(dto.latitude()).isNotNull();
         assertThat(dto.longitude()).isNotNull();
+        assertThat(dto.facility()).isNotNull();
+        assertThat(dto.facility().hasSlope()).isNotNull();
+        assertThat(dto.facility().hasNoDoorStep()).isNotNull();
+        assertThat(dto.facility().hasElevator()).isNotNull();
+        assertThat(dto.facility().hasTableSeat()).isNotNull();
+        assertThat(dto.facility().hasDisabledToilet()).isNotNull();
+        assertThat(dto.facility().floorInfo()).isNotNull();
 
         System.out.println("zoneId = " + dto.zoneId());
         System.out.println("zoneName = " + dto.zoneName());
@@ -272,16 +286,28 @@ public class WaybleZoneRecommendApiIntegrationTest {
         System.out.println("similarityScore = " + dto.similarityScore());
         System.out.println("recencyScore = " + dto.recencyScore());
         System.out.println("totalScore = " + dto.totalScore());
+        System.out.println("=== Facility Info ===");
+        if (dto.facility() != null) {
+            System.out.println("hasSlope = " + dto.facility().hasSlope());
+            System.out.println("hasNoDoorStep = " + dto.facility().hasNoDoorStep());
+            System.out.println("hasElevator = " + dto.facility().hasElevator());
+            System.out.println("hasTableSeat = " + dto.facility().hasTableSeat());
+            System.out.println("hasDisabledToilet = " + dto.facility().hasDisabledToilet());
+            System.out.println("floorInfo = " + dto.facility().floorInfo());
+        } else {
+            System.out.println("facility info is null");
+        }
     }
 
     @Test
     @DisplayName("추천 결과 상위 N개 값 테스트")
     public void recommendWaybleZoneTop20() throws Exception {
         MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
                         .param("latitude", String.valueOf(LATITUDE))
                         .param("longitude", String.valueOf(LONGITUDE))
-                        .param("count", String.valueOf(20))
+                        .param("size", String.valueOf(20))
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is2xxSuccessful())
@@ -369,5 +395,20 @@ public class WaybleZoneRecommendApiIntegrationTest {
         long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
 
         return start.plusDays(randomDays);
+    }
+    
+    private WaybleZoneFacility createRandomFacility(int i) {
+        Random random = new Random(i); // 시드 고정으로 재현 가능한 랜덤
+        
+        String[] floors = {"B1", "1층", "2층", "3층"};
+        
+        return WaybleZoneFacility.builder()
+                .hasSlope(random.nextBoolean())
+                .hasNoDoorStep(random.nextBoolean())
+                .hasElevator(random.nextBoolean())
+                .hasTableSeat(random.nextBoolean())
+                .hasDisabledToilet(random.nextBoolean())
+                .floorInfo(floors[random.nextInt(floors.length)])
+                .build();
     }
 }
