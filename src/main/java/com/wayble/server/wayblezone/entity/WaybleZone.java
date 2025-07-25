@@ -43,6 +43,9 @@ public class WaybleZone extends BaseEntity {
     @Column(nullable = false)
     private int reviewCount = 0; // 리뷰 수
 
+    @Column(nullable = false)
+    private int likes = 0; // 즐겨찾기 수
+
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WaybleZoneImage> waybleZoneImageList = new ArrayList<>();
 
@@ -65,5 +68,13 @@ public class WaybleZone extends BaseEntity {
     // 혹시 필요할수도 있어서 추가해놓음
     public void setMainImageUrl(String mainImageUrl) {
         this.mainImageUrl = mainImageUrl;
+    }
+
+    public void addReviewCount(int count) {
+        this.reviewCount += count;
+    }
+
+    public void addLikes(int count) {
+        this.likes += count;
     }
 }

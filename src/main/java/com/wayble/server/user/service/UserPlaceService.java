@@ -44,6 +44,8 @@ public class UserPlaceService {
             throw new ApplicationException(UserErrorCase.PLACE_ALREADY_SAVED);
         }
 
+        waybleZone.addLikes(1);
+
         // 저장
         UserPlace userPlace = userPlaceRepository.save(
                 UserPlace.builder()
