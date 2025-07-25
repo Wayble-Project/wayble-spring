@@ -81,6 +81,28 @@ public class User extends BaseEntity {
                 .build();
     }
 
+    public static User createUserWithDetails(
+            String name,
+            String username,
+            String email,
+            String password,
+            LocalDate birthDate,
+            Gender gender,
+            LoginType loginType,
+            UserType userType
+    ) {
+        return User.builder()
+                .nickname(name)
+                .username(username)
+                .email(email)
+                .password(password)
+                .birthDate(birthDate)
+                .gender(gender)
+                .loginType(loginType)
+                .userType(userType) // 기본값
+                .build();
+    }
+
     public void updateProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }

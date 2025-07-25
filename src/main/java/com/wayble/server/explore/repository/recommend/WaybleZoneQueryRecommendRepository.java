@@ -3,13 +3,16 @@ package com.wayble.server.explore.repository.recommend;
 import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.wayble.server.explore.dto.common.FacilityResponseDto;
+import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
-import com.wayble.server.explore.entity.WaybleZoneVisitLogDocument;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.Gender;
-import com.wayble.server.explore.entity.AgeGroup;
+import com.wayble.server.common.entity.AgeGroup;
+import com.wayble.server.wayblezone.entity.WaybleZoneVisitLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -22,14 +25,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.wayble.server.wayblezone.entity.QWaybleZoneVisitLog.waybleZoneVisitLog;
+
 @Repository
 @RequiredArgsConstructor
 public class WaybleZoneQueryRecommendRepository {
 
     private final ElasticsearchOperations operations;
+    private final JPAQueryFactory queryFactory;
 
     private static final IndexCoordinates ZONE_INDEX = IndexCoordinates.of("wayble_zone");
-    private static final IndexCoordinates LOG_INDEX = IndexCoordinates.of("wayble_zone_visit_log");
     private static final IndexCoordinates RECOMMEND_LOG_INDEX = IndexCoordinates.of("recommend_log");
 
 
@@ -67,19 +72,19 @@ public class WaybleZoneQueryRecommendRepository {
 
         SearchHits<WaybleZoneDocument> zoneHits = operations.search(nativeQuery, WaybleZoneDocument.class, ZONE_INDEX);
 
-        // 전체 방문 로그를 최대 10,000건까지 조회
-        NativeQuery logQuery = NativeQuery.builder()
-                .withMaxResults(10000)
-                .build();
-
-        SearchHits<WaybleZoneVisitLogDocument> logHits = operations.search(logQuery, WaybleZoneVisitLogDocument.class, LOG_INDEX);
+        // 최근 30일 이내 방문 로그 조회
+        LocalDate thirtyDaysAgo = LocalDate.now().minusDays(30);
+        
+        List<WaybleZoneVisitLog> visitLogs = queryFactory
+                .selectFrom(waybleZoneVisitLog)
+                .where(waybleZoneVisitLog.visitedAt.goe(thirtyDaysAgo))
+                .limit(10000)
+                .fetch();
 
         // zoneId 별로 유사 사용자 방문 횟수 가중치 계산
         Map<Long, Double> zoneVisitScoreMap = new HashMap<>();
 
-        for (var hit : logHits) {
-            WaybleZoneVisitLogDocument log = hit.getContent();
-
+        for (WaybleZoneVisitLog log : visitLogs) {
             double weight = 0.0;
             boolean ageMatch = log.getAgeGroup() == userAgeGroup;
             boolean genderMatch = log.getGender() == userGender;
@@ -130,16 +135,21 @@ public class WaybleZoneQueryRecommendRepository {
 
                     double totalScore = distanceScore + similarityScore + recencyScore;
 
-                    return WaybleZoneRecommendResponseDto.builder()
+                    WaybleZoneInfoResponseDto waybleZoneInfo = WaybleZoneInfoResponseDto.builder()
                             .zoneId(zone.getZoneId())
                             .zoneName(zone.getZoneName())
                             .zoneType(zone.getZoneType())
                             .thumbnailImageUrl(zone.getThumbnailImageUrl())
+                            .address(zone.getAddress().toFullAddress())
                             .latitude(zone.getAddress().getLocation().getLat())
                             .longitude(zone.getAddress().getLocation().getLon())
                             .averageRating(zone.getAverageRating())
                             .reviewCount(zone.getReviewCount())
-                            .facility(com.wayble.server.explore.dto.FacilityResponseDto.from(zone.getFacility()))
+                            .facility(FacilityResponseDto.from(zone.getFacility()))
+                            .build();
+
+                    return WaybleZoneRecommendResponseDto.builder()
+                            .waybleZoneInfo(waybleZoneInfo)
                             .distanceScore(distanceScore)
                             .similarityScore(similarityScore)
                             .recencyScore(recencyScore)

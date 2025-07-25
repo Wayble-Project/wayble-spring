@@ -44,7 +44,7 @@ public class WaybleZoneRecommendService {
         List<WaybleZoneRecommendResponseDto> recommendResponseDtoList = waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, size);
 
         if (size == 1 && !recommendResponseDtoList.isEmpty()) {
-            Long zoneId = recommendResponseDtoList.get(0).zoneId();
+            Long zoneId = recommendResponseDtoList.get(0).waybleZoneInfo().zoneId();
 
             boolean logExist = recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId);
             if (logExist) {

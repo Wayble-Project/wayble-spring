@@ -1,6 +1,6 @@
 package com.wayble.server.explore.entity;
 
-import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.springframework.data.annotation.Id;
@@ -49,11 +49,11 @@ public class WaybleZoneDocument {
                 .address(EsAddress.from(waybleZone.getAddress()))
                 .facility(EsWaybleZoneFacility.from(waybleZone.getFacility()))
                 .averageRating(0.0)
-                .reviewCount(0L)
+                .reviewCount(0)
                 .build();
     }
 
-    public static WaybleZoneDocument fromDto(WaybleZoneDocumentRegisterDto dto) {
+    public static WaybleZoneDocument fromDto(WaybleZoneRegisterDto dto) {
         return WaybleZoneDocument.builder()
                 .zoneId(dto.zoneId())
                 .zoneName(dto.zoneName())
@@ -61,8 +61,8 @@ public class WaybleZoneDocument {
                 .thumbnailImageUrl(dto.thumbnailImageUrl())
                 .address(EsAddress.from(dto.address()))
                 .facility(EsWaybleZoneFacility.from(dto.facility()))
-                .averageRating(dto.averageRating() != null ? dto.averageRating() : 0.0)
-                .reviewCount(dto.reviewCount() != null ? dto.reviewCount() : 0L)
+                .averageRating(dto.averageRating())
+                .reviewCount(dto.reviewCount())
                 .build();
     }
 }
