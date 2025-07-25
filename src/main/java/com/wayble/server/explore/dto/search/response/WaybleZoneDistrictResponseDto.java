@@ -7,7 +7,8 @@ import lombok.Builder;
 @Builder
 public record WaybleZoneDistrictResponseDto(
         WaybleZoneInfoResponseDto waybleZoneInfo,
-        Long visitCount
+        Long visitCount,
+        Long likes
 ) {
     public static WaybleZoneDistrictResponseDto from(WaybleZoneDocument waybleZoneDocument, Long visitCount) {
         
