@@ -7,6 +7,7 @@ import com.wayble.server.explore.dto.search.request.WaybleZoneDocumentRegisterDt
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.service.WaybleZoneDocumentService;
 import com.wayble.server.explore.service.WaybleZoneSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/v1/wayble-zones/search")
 public class WaybleZoneSearchController {
+
+    private final WaybleZoneDocumentService waybleZoneDocumentService;
 
     private final WaybleZoneSearchService waybleZoneSearchService;
 
@@ -50,7 +53,7 @@ public class WaybleZoneSearchController {
 
     @PostMapping("")
     public CommonResponse<String> registerDocumentFromDto(@RequestBody WaybleZoneDocumentRegisterDto registerDto) {
-        waybleZoneSearchService.saveDocumentFromDto(registerDto);
+        waybleZoneDocumentService.saveDocumentFromDto(registerDto);
         return CommonResponse.success("Wayble Zone Document 등록 완료!");
     }
 }
