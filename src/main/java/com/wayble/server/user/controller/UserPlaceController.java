@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,11 @@ public class UserPlaceController {
             @PathVariable Long userId,
             @RequestBody @Valid UserPlaceRequestDto request
     ) {
-        Long tokenUserId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof Long)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
+        Long tokenUserId = (Long) authentication.getPrincipal();
         if (!userId.equals(tokenUserId)) {
             throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
@@ -58,11 +63,14 @@ public class UserPlaceController {
     public CommonResponse<List<UserPlaceListResponseDto>> getUserPlaces(
             @PathVariable Long userId
     ) {
-        Long tokenUserId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof Long)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
+        Long tokenUserId = (Long) authentication.getPrincipal();
         if (!userId.equals(tokenUserId)) {
             throw new ApplicationException(UserErrorCase.FORBIDDEN);
         }
-
         List<UserPlaceListResponseDto> places = userPlaceService.getUserPlaces(userId);
         return CommonResponse.success(places);
     }

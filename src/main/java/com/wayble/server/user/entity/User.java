@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nickname", length = 8, nullable = false)
+    @Column(name = "nickname", length = 8)
     private String nickname;
 
     private String username;
@@ -69,28 +69,23 @@ public class User extends BaseEntity {
     private List<UserPlace> userPlaces = new ArrayList<>();
 
     public static User createUser(
-            String nickname,
-            String username,
             String email,
             String password,
-            LocalDate birthDate,
-            Gender gender,
-            LoginType loginType,
-            UserType userType
+            LoginType loginType
     ) {
         return User.builder()
-                .nickname(nickname)
-                .username(username)
                 .email(email)
                 .password(password)
-                .birthDate(birthDate)
-                .gender(gender)
                 .loginType(loginType)
-                .userType(userType)
+                .userType(UserType.GENERAL) // 기본값
                 .build();
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
+    public void updateProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

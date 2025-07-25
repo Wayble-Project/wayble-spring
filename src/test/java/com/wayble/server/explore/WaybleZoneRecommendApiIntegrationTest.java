@@ -153,15 +153,12 @@ public class WaybleZoneRecommendApiIntegrationTest {
             waybleZoneDocumentRepository.save(waybleZoneDocument);
 
             User user = User.createUser(
-                    "user" + i,
-                    "username" + i,
-                    UUID.randomUUID() + "@email",
-                    "password" + i,
-                    generateRandomBirthDate(),
-                    Gender.values()[i % 2],
-                    LoginType.values()[i % LoginType.values().length],
-                    UserType.DISABLED
+                    "user" + i + "@test.com",   // email
+                    "user password" + i,        // password
+                    LoginType.BASIC             // loginType
             );
+
+            user.setNickname("user" + i);
             userRepository.save(user);
 
             int count = (int) (Math.random() * 30) + 1;
