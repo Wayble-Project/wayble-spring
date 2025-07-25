@@ -10,10 +10,11 @@ public record WaybleZoneInfoResponseDto(
         String zoneName,
         WaybleZoneType zoneType,
         String thumbnailImageUrl,
+        String address,
         Double latitude,
         Double longitude,
         Double averageRating,
-        Long reviewCount,
+        int reviewCount,
         FacilityResponseDto facility
 ) {
     public static WaybleZoneInfoResponseDto from(WaybleZoneDocument document) {
@@ -22,6 +23,7 @@ public record WaybleZoneInfoResponseDto(
                 .zoneName(document.getZoneName())
                 .zoneType(document.getZoneType())
                 .thumbnailImageUrl(document.getThumbnailImageUrl())
+                .address(document.getAddress().toFullAddress())
                 .latitude(document.getAddress().getLocation().getLat())
                 .longitude(document.getAddress().getLocation().getLon())
                 .averageRating(document.getAverageRating())
