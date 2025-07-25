@@ -51,6 +51,15 @@ public class WaybleZoneSearchController {
         ));
     }
 
+    @GetMapping("/district/most-likes")
+    public CommonResponse<List<WaybleZoneDistrictResponseDto>> findMostLikesWaybleZoneByDistrict(
+            @Valid @ModelAttribute WaybleZoneDistrictSearchDto conditionDto)
+    {
+        return CommonResponse.success(waybleZoneSearchService.searchMostLikesWaybleZoneByDistrict(
+                conditionDto.district()
+        ));
+    }
+
     @PostMapping("")
     public CommonResponse<String> registerDocumentFromDto(@RequestBody WaybleZoneDocumentRegisterDto registerDto) {
         waybleZoneDocumentService.saveDocumentFromDto(registerDto);

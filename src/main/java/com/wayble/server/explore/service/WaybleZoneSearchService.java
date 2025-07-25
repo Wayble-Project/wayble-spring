@@ -4,6 +4,7 @@ import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseD
 import com.wayble.server.explore.repository.search.WaybleZoneQuerySearchRepository;
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
+import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -16,6 +17,8 @@ import java.util.List;
 public class WaybleZoneSearchService {
 
     private final WaybleZoneQuerySearchRepository waybleZoneQuerySearchRepository;
+
+    private final WaybleZoneRepository waybleZoneRepository;
 
     public Slice<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(
             WaybleZoneSearchConditionDto condition,
@@ -30,5 +33,13 @@ public class WaybleZoneSearchService {
         }
 
         return waybleZoneQuerySearchRepository.findTop3SearchesWaybleZonesByDistrict(district);
+    }
+
+    public List<WaybleZoneDistrictResponseDto> searchMostLikesWaybleZoneByDistrict(String district) {
+        if (district == null) {
+            return null;
+        }
+
+        return waybleZoneRepository.findTop3likesWaybleZonesByDistrict(district);
     }
 }
