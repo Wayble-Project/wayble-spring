@@ -132,11 +132,13 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .builder()
                     .zoneId((long) i)
                     .zoneName(nameList.get((int) (Math.random() * nameList.size())))
+                    .contactNumber("contact number" + i)
                     .address(address)
                     .waybleZoneType(WaybleZoneType.values()[i % WaybleZoneType.values().length])
                     .facility(facility)
                     .averageRating(Math.random() * 5)
-                    .reviewCount((int) (Math.random() * 500))
+                    .reviewCount((int) (Math.random() * 100))
+                    .likes((int) (Math.random() * 100))
                     .build();
 
             User user = User.createUser(
@@ -178,6 +180,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void teardown() {
         waybleZoneVisitLogRepository.deleteAll();
         waybleZoneDocumentRepository.deleteAll();
+        waybleZoneRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -455,6 +458,12 @@ public class WaybleZoneSearchApiIntegrationTest {
             assertThat(dto.waybleZoneInfo().zoneType()).isNotNull();
             assertThat(dto.waybleZoneInfo().latitude()).isNotNull();
             assertThat(dto.waybleZoneInfo().longitude()).isNotNull();
+            
+            // 해당 district가 주소에 포함되어 있는지 검증
+            assertThat(dto.waybleZoneInfo().address())
+                    .withFailMessage("응답의 주소(%s)에 요청한 district(%s)가 포함되어 있지 않습니다", 
+                            dto.waybleZoneInfo().address(), district)
+                    .contains(district);
         }
 
         // 검증: 방문 수 내림차순으로 정렬되어야 함
@@ -463,6 +472,65 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .withFailMessage("방문 수 정렬 오류: 인덱스 %d의 방문 수(%d)가 인덱스 %d의 방문 수(%d)보다 크면 안됩니다",
                             i, dtoList.get(i).visitCount(), i-1, dtoList.get(i-1).visitCount())
                     .isLessThanOrEqualTo(dtoList.get(i-1).visitCount());
+        }
+    }
+
+    @Test
+    @DisplayName("특정 동 주변 Top3 웨이블존 즐겨찾기순 기반 검색")
+    public void findMostLikesWaybleZoneByDistrict() throws Exception{
+        final String district = districtList.get((int) (Math.random() * districtList.size()));
+        MvcResult result = mockMvc.perform(get(baseUrl + "/district/most-likes")
+                        .header("Authorization", "Bearer " + token)
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("district", district)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
+        List<WaybleZoneDistrictResponseDto> dtoList =
+                objectMapper.convertValue(
+                        dataNode,
+                        new TypeReference<>() {}
+                );
+
+        // 검증: 결과가 비어있지 않아야 함 (최대 3개)
+        assertThat(dtoList).isNotEmpty();
+        assertThat(dtoList.size()).isLessThanOrEqualTo(3);
+
+        // 검증: 각 결과의 필수 필드들이 존재하는지 확인
+        for (WaybleZoneDistrictResponseDto dto : dtoList) {
+            assertThat(dto.likes()).isNotNull();
+            assertThat(dto.likes()).isGreaterThan(0L);
+
+            // 필수 필드들이 존재하는지 확인
+            assertThat(dto.waybleZoneInfo().zoneId()).isNotNull();
+            assertThat(dto.waybleZoneInfo().zoneName()).isNotNull();
+            assertThat(dto.waybleZoneInfo().zoneType()).isNotNull();
+            assertThat(dto.waybleZoneInfo().latitude()).isNotNull();
+            assertThat(dto.waybleZoneInfo().longitude()).isNotNull();
+            
+            // 해당 district가 주소에 포함되어 있는지 검증
+            assertThat(dto.waybleZoneInfo().address())
+                    .withFailMessage("응답의 주소(%s)에 요청한 district(%s)가 포함되어 있지 않습니다", 
+                            dto.waybleZoneInfo().address(), district)
+                    .contains(district);
+        }
+
+        // 검증: 방문 수 내림차순으로 정렬되어야 함
+        for (int i = 1; i < dtoList.size(); i++) {
+            assertThat(dtoList.get(i).likes())
+                    .withFailMessage("방문 수 정렬 오류: 인덱스 %d의 방문 수(%d)가 인덱스 %d의 좋아요 수(%d)보다 크면 안됩니다",
+                            i, dtoList.get(i).likes(), i-1, dtoList.get(i-1).likes())
+                    .isLessThanOrEqualTo(dtoList.get(i-1).likes());
         }
     }
 
