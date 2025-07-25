@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -31,11 +33,11 @@ public class WaybleZoneVisitLogService {
             return;
         }
 
-        if(waybleZoneVisitLogRepository.existsByUserIdAndZoneId(userId, zoneId)) {
-            WaybleZoneVisitLog waybleZoneVisitLog = waybleZoneVisitLogRepository
-                    .findByUserIdAndZoneId(userId, zoneId).get();
+        Optional<WaybleZoneVisitLog> existingLog = waybleZoneVisitLogRepository
+                               .findByUserIdAndZoneId(userId, zoneId);
 
-            waybleZoneVisitLog.updateVisitedAtToNow();
+        if(existingLog.isPresent()) {
+            existingLog.get().updateVisitedAtToNow();
             return;
         }
 
