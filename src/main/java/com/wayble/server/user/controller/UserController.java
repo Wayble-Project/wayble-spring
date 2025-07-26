@@ -3,10 +3,12 @@ package com.wayble.server.user.controller;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
+import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
 import com.wayble.server.user.dto.UserLoginRequestDto;
 import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.dto.token.TokenResponseDto;
 import com.wayble.server.user.exception.UserErrorCase;
+import com.wayble.server.user.service.UserInfoService;
 import com.wayble.server.user.service.UserService;
 import com.wayble.server.user.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +19,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -112,4 +116,25 @@ public class UserController {
         return CommonResponse.success("로그아웃에 성공하였습니다.");
     }
 
+    @PostMapping("/info")
+    @Operation(summary = "내 정보 등록", description = "유저의 상세 정보를 최초 1회 등록합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 정보 등록 완료"),
+            @ApiResponse(responseCode = "400", description = "이미 등록된 정보가 있습니다."),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
+    public CommonResponse<String> registerUserInfo(
+            @RequestBody @Valid UserInfoRegisterRequestDto req
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof Long userId)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
+
+        userInfoService.registerUserInfo(userId, req);
+        return CommonResponse.success("내 정보 등록 완료");
+    }
+
+    private final UserInfoService userInfoService;
 }
