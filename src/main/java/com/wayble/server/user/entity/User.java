@@ -53,10 +53,16 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
-    private UserType userType;
+    private UserType userType; // DISABLED,COMPANION,GENERAL
 
     @Column(name = "profile_image_url")
     private String profileImageUrl;
+
+    @Column(name = "disability_type")
+    private String disabilityType; // 장애 유형 (발달장애,시각장애,지체장애,청각장애)
+
+    @Column(name = "mobility_aid")
+    private String mobilityAid; // 이동 보조 수단 (안내견,지팡이,동행인,휠체어)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
@@ -109,5 +115,21 @@ public class User extends BaseEntity {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void setDisabilityType(String disabilityType) {
+        this.disabilityType = disabilityType;
+    }
+    public void setMobilityAid(String mobilityAid) {
+        this.mobilityAid = mobilityAid;
+    }
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }
