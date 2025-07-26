@@ -5,11 +5,13 @@ import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
 public class UserInfoRegisterRequestDto {
     @NotBlank(message = "닉네임은 필수입니다.")
+    @Size(max = 8, message = "닉네임은 8자 이하여야 합니다.")
     private String nickname;
 
     @NotBlank(message = "생년월일은 필수입니다.")

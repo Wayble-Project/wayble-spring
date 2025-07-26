@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,11 @@ public class UserInfoService {
         }
 
         user.setNickname(dto.getNickname());
-        user.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+        try {
+            user.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+        } catch (DateTimeParseException e) {
+            throw new ApplicationException(UserErrorCase.INVALID_BIRTH_DATE);
+        }
         user.setGender(dto.getGender());
         user.setUserType(dto.getUserType());
 

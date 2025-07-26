@@ -33,6 +33,7 @@ public class UserController {
     private final UserService userService;
     private final AuthService authService;
     private final JwtTokenProvider jwtProvider;
+    private final UserInfoService userInfoService;
 
     @PostMapping("/signup")
     @Operation(
@@ -135,6 +136,4 @@ public class UserController {
         userInfoService.registerUserInfo(userId, req);
         return CommonResponse.success("내 정보 등록 완료");
     }
-
-    private final UserInfoService userInfoService;
 }
