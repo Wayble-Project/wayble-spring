@@ -3,6 +3,7 @@ package com.wayble.server.user.service;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
+import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.exception.UserErrorCase;
@@ -43,6 +44,51 @@ public class UserInfoService {
             user.setDisabilityType(dto.getDisabilityType());
             user.setMobilityAid(dto.getMobilityAid());
         } else {
+            user.setDisabilityType(null);
+            user.setMobilityAid(null);
+        }
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUserInfo(Long userId, UserInfoUpdateRequestDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
+
+        if (dto.getNickname() != null) {
+            user.setNickname(dto.getNickname());
+        }
+
+        // 생년월일 수정
+        if (dto.getBirthDate() != null) {
+            try {
+                user.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+            } catch (DateTimeParseException e) {
+                throw new ApplicationException(UserErrorCase.INVALID_BIRTH_DATE);
+            }
+        }
+
+        // 성별 수정
+        if (dto.getGender() != null) {
+            user.setGender(dto.getGender());
+        }
+
+        // 유저 타입 수정
+        if (dto.getUserType() != null) {
+            user.setUserType(dto.getUserType());
+        }
+
+        UserType finalUserType = dto.getUserType() != null ? dto.getUserType() : user.getUserType();
+        if (finalUserType == UserType.DISABLED) {
+            if (dto.getDisabilityType() != null) {
+                user.setDisabilityType(dto.getDisabilityType());
+            }
+            if (dto.getMobilityAid() != null) {
+                user.setMobilityAid(dto.getMobilityAid());
+            }
+        } else if (dto.getUserType() != null) {
+            // userType이 DISABLED가 아닌 값으로 변경된 경우에만 null로 설정
             user.setDisabilityType(null);
             user.setMobilityAid(null);
         }
