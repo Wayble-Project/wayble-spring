@@ -95,19 +95,13 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void setDisabilityType(String disabilityType) {
-        this.disabilityType = disabilityType;
-    }
-    public void setMobilityAid(String mobilityAid) {
-        this.mobilityAid = mobilityAid;
-    }
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
+    public void setDisabilityType(String disabilityType) { this.disabilityType = disabilityType; }
+
+    public void setMobilityAid(String mobilityAid) { this.mobilityAid = mobilityAid; }
+
+    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
+
+    public void setGender(Gender gender) { this.gender = gender; }
+
+    public void setUserType(UserType userType) { this.userType = userType;}
 }
