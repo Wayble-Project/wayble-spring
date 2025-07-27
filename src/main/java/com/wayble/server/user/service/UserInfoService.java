@@ -62,7 +62,11 @@ public class UserInfoService {
 
         // 생년월일 수정
         if (dto.getBirthDate() != null) {
-            user.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+            try {
+                user.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+            } catch (DateTimeParseException e) {
+                throw new ApplicationException(UserErrorCase.INVALID_BIRTH_DATE);
+            }
         }
 
         // 성별 수정
@@ -73,13 +77,20 @@ public class UserInfoService {
         // 유저 타입 수정
         if (dto.getUserType() != null) {
             user.setUserType(dto.getUserType());
-            if (dto.getUserType() == UserType.DISABLED) {
+        }
+
+        UserType finalUserType = dto.getUserType() != null ? dto.getUserType() : user.getUserType();
+        if (finalUserType == UserType.DISABLED) {
+            if (dto.getDisabilityType() != null) {
                 user.setDisabilityType(dto.getDisabilityType());
-                user.setMobilityAid(dto.getMobilityAid());
-            } else {
-                user.setDisabilityType(null);
-                user.setMobilityAid(null);
             }
+            if (dto.getMobilityAid() != null) {
+                user.setMobilityAid(dto.getMobilityAid());
+            }
+        } else if (dto.getUserType() != null) {
+            // userType이 DISABLED가 아닌 값으로 변경된 경우에만 null로 설정
+            user.setDisabilityType(null);
+            user.setMobilityAid(null);
         }
 
         userRepository.save(user);
