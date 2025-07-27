@@ -4,6 +4,7 @@ import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
+import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
 import com.wayble.server.user.dto.UserLoginRequestDto;
 import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.dto.token.TokenResponseDto;
@@ -135,5 +136,29 @@ public class UserController {
 
         userInfoService.registerUserInfo(userId, req);
         return CommonResponse.success("내 정보 등록 완료");
+    }
+
+    @PatchMapping("/info")
+    @Operation(
+            summary = "내 정보 수정",
+            description = "유저가 자신의 정보를 수정합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 정보 수정 완료"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음")
+    })
+    public CommonResponse<String> updateUserInfo(
+            @RequestBody @Valid UserInfoUpdateRequestDto dto
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof Long)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
+        Long userId = (Long) authentication.getPrincipal();
+
+        userInfoService.updateUserInfo(userId, dto);
+        return CommonResponse.success("내 정보 수정 완료");
     }
 }
