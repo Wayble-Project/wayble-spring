@@ -5,14 +5,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.List;
 
 public class JwtAuthentication extends AbstractAuthenticationToken {
-    private final String email;
+    private final Long userId;
 
-    public JwtAuthentication(String email) {
+
+    public JwtAuthentication(Long userId) {
         super(List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        this.email = email;
+        this.userId = userId;
         setAuthenticated(true);
     }
 
     @Override public Object getCredentials() { return ""; }
-    @Override public Object getPrincipal() { return email; }
+    @Override public Object getPrincipal() {  return userId; }
 }

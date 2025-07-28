@@ -30,4 +30,14 @@ public class EsAddress {
                 .location(new GeoPoint(address.getLatitude(), address.getLongitude()))
                 .build();
     }
+
+    public String toFullAddress() {
+        StringBuilder sb = new StringBuilder();
+        if (state != null) sb.append(state).append(" ");
+        if (city != null) sb.append(city).append(" ");
+        if (district != null) sb.append(district).append(" ");
+        if (streetAddress != null) sb.append(streetAddress).append(" ");
+        if (detailAddress != null) sb.append(detailAddress);
+        return sb.toString().trim();
+    }
 }
