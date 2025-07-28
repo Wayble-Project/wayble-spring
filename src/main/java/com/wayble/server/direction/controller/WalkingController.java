@@ -37,9 +37,11 @@ public class WalkingController implements WalkingSwagger {
 
     @GetMapping("/wayble")
     public CommonResponse<WayblePathResponse> getWayblePath(
-            @RequestParam long start,
-            @RequestParam long end
+            @RequestParam double startLat,
+            @RequestParam double startLon,
+            @RequestParam double endLat,
+            @RequestParam double endLon
     ) {
-        return CommonResponse.success(waybleDijkstraService.findWayblePath(start, end));
+        return CommonResponse.success(waybleDijkstraService.findWayblePath(startLat, startLon, endLat, endLon));
     }
 }

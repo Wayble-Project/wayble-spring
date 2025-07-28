@@ -16,7 +16,18 @@ public class WaybleDijkstraService {
 
     private final GraphInit graphInit;
 
-    public WayblePathResponse findWayblePath(long start, long end) {
+    public WayblePathResponse findWayblePath(
+            double startLat,
+            double startLon,
+            double endLat,
+            double endLon
+    ) {
+        long startNode = findNearestNode(startLat, startLon);
+        long endNode = findNearestNode(endLat, endLon);
+        return findNodePath(startNode, endNode);
+    }
+
+    public WayblePathResponse findNodePath(long start, long end) {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
@@ -52,6 +63,15 @@ public class WaybleDijkstraService {
             }
         }
         return WayblePathResponse.of(totalDistance, wayblePoints, polyline);
+    }
+
+    private long findNearestNode(double lat, double lon) {
+        return graphInit.getNodeMap().values().stream()
+                .min(Comparator.comparingDouble(
+                        node -> haversine(lat, lon, node.lat, node.lon)
+                ))
+                .map(node -> node.id)
+                .orElseThrow(() -> new RuntimeException("Node not found"));
     }
 
     private List<Long> dijkstra(long start, long end) {
@@ -101,5 +121,16 @@ public class WaybleDijkstraService {
                     .orElse(0.0);
         }
         return totalDistance;
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371e3;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 }
