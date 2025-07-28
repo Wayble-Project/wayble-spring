@@ -39,7 +39,10 @@ public class SecurityConfig {
                                 "/api/v1/users/reissue",
                                 "/api/v1/users/logout",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/",
+                                "/index",
+                                "/index.html"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
