@@ -1,10 +1,10 @@
 name: CI/CD
 
 on:
-#    push:
-#      branches: [ "develop" ]
-    pull_request:
-      branches: [ "main" ]
+  #    push:
+  #      branches: [ "develop" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -28,6 +28,12 @@ jobs:
         run: |
           mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+
+      - name: Copy keystore.p12
+        run: |
+          cd ./src/main/resources
+          touch ./keystore.p12
+          echo "${{secrets.KEYSTORE}}" | base64 --decode > ./keystore.p12
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
@@ -194,8 +200,6 @@ jobs:
 
 
 
-# name: CD - DEVELOP
-
 # on:  #이 워크플로우가 언제 실행될지 트리거를 정의함.
 #   pull_request:
 #     types : [closed] #누군가가 Pull request를 닫았을 때 실행됨.
@@ -206,4 +210,6 @@ jobs:
 #     runs-on: ubuntu-latest #OS환경
 #     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
 #     #닫힌 Pull Request 중에서, 병합된 것이고, 병합 대상 브랜치가 develop 브랜치일 경우에만 이 작업을 실행
+
+
 
