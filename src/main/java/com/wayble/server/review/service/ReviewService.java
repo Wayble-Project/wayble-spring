@@ -38,6 +38,8 @@ public class ReviewService {
         Review review = Review.of(user, zone, dto.content(), dto.rating());
         reviewRepository.save(review);
 
+        zone.addReviewCount(1);
+
         if (dto.images() != null) {
             for (String imageUrl : dto.images()) {
                 reviewImageRepository.save(ReviewImage.of(review, imageUrl));

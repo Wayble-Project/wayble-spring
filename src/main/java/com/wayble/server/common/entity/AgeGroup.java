@@ -1,4 +1,4 @@
-package com.wayble.server.explore.entity;
+package com.wayble.server.common.entity;
 
 import java.time.LocalDate;
 import java.time.Period;

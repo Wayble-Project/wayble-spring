@@ -1,6 +1,6 @@
 package com.wayble.server.explore.entity;
 
-import com.wayble.server.explore.dto.search.WaybleZoneDocumentRegisterDto;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import org.springframework.data.annotation.Id;
@@ -33,6 +33,9 @@ public class WaybleZoneDocument {
     @Field(type = FieldType.Object)
     private EsAddress address;
 
+    @Field(type = FieldType.Object)
+    private EsWaybleZoneFacility facility;
+
     private double averageRating;
 
     private long reviewCount;
@@ -42,22 +45,24 @@ public class WaybleZoneDocument {
                 .zoneId(waybleZone.getId())
                 .zoneName(waybleZone.getZoneName())
                 .zoneType(waybleZone.getZoneType())
-                .thumbnailImageUrl("thumbnail image url")   // TODO: 이미지 경로 추가
+                .thumbnailImageUrl(waybleZone.getMainImageUrl() != null ? waybleZone.getMainImageUrl() : null)   // TODO: 이미지 경로 추가
                 .address(EsAddress.from(waybleZone.getAddress()))
+                .facility(EsWaybleZoneFacility.from(waybleZone.getFacility()))
                 .averageRating(0.0)
-                .reviewCount(0L)
+                .reviewCount(0)
                 .build();
     }
 
-    public static WaybleZoneDocument fromDto(WaybleZoneDocumentRegisterDto dto) {
+    public static WaybleZoneDocument fromDto(WaybleZoneRegisterDto dto) {
         return WaybleZoneDocument.builder()
                 .zoneId(dto.zoneId())
                 .zoneName(dto.zoneName())
                 .zoneType(dto.waybleZoneType())
                 .thumbnailImageUrl(dto.thumbnailImageUrl())
                 .address(EsAddress.from(dto.address()))
-                .averageRating(dto.averageRating() != null ? dto.averageRating() : 0.0)
-                .reviewCount(dto.reviewCount() != null ? dto.reviewCount() : 0L)
+                .facility(EsWaybleZoneFacility.from(dto.facility()))
+                .averageRating(dto.averageRating())
+                .reviewCount(dto.reviewCount())
                 .build();
     }
 }

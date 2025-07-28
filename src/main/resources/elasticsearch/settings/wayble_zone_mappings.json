@@ -7,6 +7,29 @@
     },
     "address.location": {
       "type": "geo_point"
+    },
+    "facility": {
+      "type": "object",
+      "properties": {
+        "hasSlope": {
+          "type": "boolean"
+        },
+        "hasNoDoorStep": {
+          "type": "boolean"
+        },
+        "hasElevator": {
+          "type": "boolean"
+        },
+        "hasTableSeat": {
+          "type": "boolean"
+        },
+        "hasDisabledToilet": {
+          "type": "boolean"
+        },
+        "floorInfo": {
+          "type": "keyword"
+        }
+      }
     }
   }
 }

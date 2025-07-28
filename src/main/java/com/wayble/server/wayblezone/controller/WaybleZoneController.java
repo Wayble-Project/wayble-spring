@@ -4,6 +4,7 @@ import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.wayblezone.dto.WaybleZoneDetailResponseDto;
 import com.wayble.server.wayblezone.dto.WaybleZoneListResponseDto;
 import com.wayble.server.wayblezone.service.WaybleZoneService;
+import com.wayble.server.wayblezone.service.WaybleZoneVisitLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +24,8 @@ import java.util.List;
 public class WaybleZoneController {
 
     private final WaybleZoneService waybleZoneService;
+
+    private final WaybleZoneVisitLogService waybleZoneVisitLogService;
 
     @GetMapping
     @Operation(
@@ -52,6 +56,10 @@ public class WaybleZoneController {
     public CommonResponse<WaybleZoneDetailResponseDto> getWaybleZoneDetail(
             @PathVariable @NotNull Long waybleZoneId
     ) {
+
+        // TODO: JWT에서 userId 추출해서 상세 조회 기록 남기기
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        waybleZoneVisitLogService.saveVisitLog(userId, waybleZoneId);
         return CommonResponse.success(waybleZoneService.getWaybleZoneDetail(waybleZoneId));
     }
 }

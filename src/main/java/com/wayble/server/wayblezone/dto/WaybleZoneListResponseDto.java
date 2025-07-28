@@ -10,7 +10,7 @@ public record WaybleZoneListResponseDto(
         String category,
         String address,
         double rating,
-        int reviewCount,
+        long reviewCount,
         String imageUrl,
         String contactNumber,
         FacilityDto facilities
