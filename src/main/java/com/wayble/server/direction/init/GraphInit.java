@@ -25,6 +25,7 @@ public class GraphInit {
     private List<Node> nodes;
     private List<Edge> edges;
     private List<WaybleMarker> markers;
+    private Map<Long, List<Edge>> adjacencyList;
 
     @Getter
     private Map<Long, Node> nodeMap;
@@ -80,16 +81,6 @@ public class GraphInit {
         }
     }
 
-    private List<double[]> reverseGeometry(List<double[]> geometry) {
-        if (geometry == null) {
-            return null;
-        }
-        List<double[]> reversed = new ArrayList<>(geometry);
-        Collections.reverse(reversed);
-
-        return reversed;
-    }
-
     private Map<Long, Type> findWaybleMarkers() {
         Map<Long, Type> waybleMarkers = new HashMap<>();
 
@@ -107,6 +98,16 @@ public class GraphInit {
             }
         }
         return waybleMarkers;
+    }
+
+    private List<double[]> reverseGeometry(List<double[]> geometry) {
+        if (geometry == null) {
+            return null;
+        }
+        List<double[]> reversed = new ArrayList<>(geometry);
+        Collections.reverse(reversed);
+
+        return reversed;
     }
 
     public Map<Long, List<Edge>> getGraph() {
