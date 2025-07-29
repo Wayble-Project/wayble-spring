@@ -8,6 +8,7 @@ import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseD
 import com.wayble.server.explore.entity.EsWaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,6 +104,25 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WaybleZone> findUnsyncedZones(int limit) {
+        return queryFactory
+                .selectFrom(waybleZone)
+                .where(waybleZone.syncedAt.isNull()
+                       .or(waybleZone.lastModifiedAt.gt(waybleZone.syncedAt)))
+                .limit(limit)
+                .fetch();
+    }
+
+    @Override
+    public List<WaybleZone> findZonesModifiedAfter(LocalDateTime since, int limit) {
+        return queryFactory
+                .selectFrom(waybleZone)
+                .where(waybleZone.lastModifiedAt.gt(since))
+                .limit(limit)
+                .fetch();
     }
 
     // 내부 클래스로 visit count 담을 DTO

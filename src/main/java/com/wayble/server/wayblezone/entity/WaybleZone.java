@@ -10,6 +10,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,17 +74,46 @@ public class WaybleZone extends BaseEntity {
     @Column(name = "main_image_url")
     private String mainImageUrl;
 
+    // ES 동기화 추적 필드들
+    @Column(name = "last_modified_at")
+    private LocalDateTime lastModifiedAt; // 마지막 수정 시간
+    
+    @Column(name = "synced_at")
+    private LocalDateTime syncedAt; // ES와 마지막 동기화 시간
+
     // 혹시 필요할수도 있어서 추가해놓음
     public void setMainImageUrl(String mainImageUrl) {
         this.mainImageUrl = mainImageUrl;
+        this.markAsModified();
+    }
+
+    public void updateRating(double averageRating) {
+        this.rating = averageRating;
+        this.markAsModified();
     }
 
     public void addReviewCount(long count) {
         this.reviewCount += count;
+        this.markAsModified();
     }
 
     public void addLikes(long count) {
         this.likes += count;
+        this.markAsModified(); // 변경 시 자동으로 수정 시간 갱신
+    }
+    
+    // ES 동기화 관련 메서드들
+    public void markAsModified() {
+        this.lastModifiedAt = LocalDateTime.now();
+    }
+    
+    public void markAsSynced() {
+        this.syncedAt = LocalDateTime.now();
+    }
+    
+    public boolean needsSync() {
+        return syncedAt == null || 
+               (lastModifiedAt != null && lastModifiedAt.isAfter(syncedAt));
     }
 
     public static WaybleZone from(WaybleZoneRegisterDto dto) {
@@ -96,6 +126,8 @@ public class WaybleZone extends BaseEntity {
                 .rating(dto.averageRating() != null ? dto.averageRating() : 0.0)
                 .reviewCount(dto.reviewCount())
                 .likes(dto.likes())
+                .lastModifiedAt(LocalDateTime.now())
+                .syncedAt(null)
                 .build();
     }
 }
