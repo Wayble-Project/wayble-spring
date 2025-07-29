@@ -2,6 +2,7 @@ package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.direction.dto.response.WayblePathResponse;
+import com.wayble.server.direction.entity.Node;
 import com.wayble.server.direction.exception.WalkingErrorCase;
 import com.wayble.server.direction.external.tmap.TMapClient;
 import com.wayble.server.direction.external.tmap.dto.request.TMapRequest;
@@ -52,9 +53,9 @@ public class WalkingService {
     private long findNearestNode(double lat, double lon) {
         return graphInit.getNodeMap().values().stream()
                 .min(Comparator.comparingDouble(
-                        node -> HaversineUtil.haversine(lat, lon, node.lat, node.lon)
+                        node -> HaversineUtil.haversine(lat, lon, node.lat(), node.lon())
                 ))
-                .map(node -> node.id)
+                .map(Node::id)
                 .orElseThrow(() -> new ApplicationException(WalkingErrorCase.NODE_NOT_FOUND));
     }
 }

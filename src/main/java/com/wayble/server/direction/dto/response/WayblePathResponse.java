@@ -39,14 +39,10 @@ public record WayblePathResponse(
             List<WayblePoint> points,
             List<double[]> polyline
     ) {
-        List<WayblePoint> wayblePoints = points.stream()
-                .map(n -> new WayblePoint(n.lat, n.lon, n.type))
-                .toList();
-
         return WayblePathResponse.builder()
                 .distance(distance)
                 .time(time)
-                .points(wayblePoints)
+                .points(points)
                 .polyline(polyline)
                 .build();
     }

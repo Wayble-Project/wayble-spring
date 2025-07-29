@@ -2,9 +2,10 @@ package com.wayble.server.direction.entity;
 
 import java.util.List;
 
-public class Edge {
-    public long from;
-    public long to;
-    public double length;
-    public List<double[]> geometry;
+public record Edge(
+        long from,
+        long to,
+        double length,
+        List<double[]> geometry
+) {
 }

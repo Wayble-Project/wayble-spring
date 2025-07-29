@@ -28,12 +28,12 @@ public class WaybleDijkstraService {
                 .map(id -> {
                     Node node = graphInit.getNodeMap().get(id);
                     Type type = markerMap.getOrDefault(id, Type.NONE);
-                    return new WayblePathResponse.WayblePoint(node.lat, node.lon, type);
+                    return new WayblePathResponse.WayblePoint(node.lat(), node.lon(), type);
                 }).toList();
 
         List<double[]> polyline = createPolyLine(path);
 
-        return WayblePathResponse.of(totalTime, totalDistance, wayblePoints, polyline);
+        return WayblePathResponse.of(totalDistance, totalTime, wayblePoints, polyline);
     }
 
     private List<double[]> createPolyLine(List<Long> path) {
@@ -46,13 +46,13 @@ public class WaybleDijkstraService {
             long to = path.get(i + 1);
 
             Edge edge = adjacencyList.getOrDefault(from, List.of()).stream()
-                    .filter(e -> e.to == to)
+                    .filter(e -> e.to() == to)
                     .findFirst()
                     .orElse(null);
 
             // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
-            if (edge != null && edge.geometry != null) {
-                for (double[] coord : edge.geometry) {
+            if (edge != null && edge.geometry() != null) {
+                for (double[] coord : edge.geometry()) {
                     if (last == null || last[0] != coord[0] || last[1] != coord[1]) {
                         polyline.add(coord);
                         last = coord;
@@ -62,8 +62,8 @@ public class WaybleDijkstraService {
                 Node fromNode = graphInit.getNodeMap().get(from);
                 Node toNode = graphInit.getNodeMap().get(to);
 
-                double[] fromCoord = new double[]{fromNode.lon, fromNode.lat};
-                double[] toCoord = new double[]{toNode.lon, toNode.lat};
+                double[] fromCoord = new double[]{fromNode.lon(), fromNode.lat()};
+                double[] toCoord = new double[]{toNode.lon(), toNode.lat()};
 
                 // 중복 확인 후, 중복 X일 때만 추가
                 if (last == null || last[0] != fromCoord[0] || last[1] != fromCoord[1]) {
@@ -89,12 +89,12 @@ public class WaybleDijkstraService {
             long to = path.get(i + 1);
 
             Edge edge = adjacencyList.getOrDefault(from, List.of()).stream()
-                    .filter(edge1 -> edge1.to == to)
+                    .filter(edge1 -> edge1.to() == to)
                     .findFirst()
                     .orElse(null);
 
             if (edge != null) {
-                totalTime += edge.length / averageSpeed;
+                totalTime += edge.length() / averageSpeed;
             }
         }
         return totalTime;
@@ -107,9 +107,9 @@ public class WaybleDijkstraService {
             long from = path.get(i);
             long to = path.get(i + 1);
             totalDistance += graphInit.getGraph().get(from).stream()
-                    .filter(edge -> edge.to == to)
+                    .filter(edge -> edge.to() == to)
                     .findFirst()
-                    .map(edge -> edge.length)
+                    .map(Edge::length)
                     .orElse(0.0);
         }
         return totalDistance;
@@ -118,25 +118,25 @@ public class WaybleDijkstraService {
     private List<Long> dijkstra(long start, long end) {
         Map<Long, Double> dist = new HashMap<>();
         Map<Long, Long> prev = new HashMap<>();
-        PriorityQueue<long[]> pq = new PriorityQueue<>(Comparator.comparingDouble(value -> value[1]));
+        PriorityQueue<double[]> pq = new PriorityQueue<>(Comparator.comparingDouble(value -> value[1]));
 
         graphInit.getGraph().keySet().forEach(key -> {
             dist.put(key, Double.POSITIVE_INFINITY);
         });
         dist.put(start, 0.0);
-        pq.add(new long[]{start, 0});
+        pq.add(new double[]{start, 0.0});
 
         while (!pq.isEmpty()) {
-            long[] current = pq.poll();
-            long u = current[0];
+            double[] current = pq.poll();
+            long u = (long) current[0];
             if (u == end) break;
 
             for (Edge edge : graphInit.getGraph().getOrDefault(u, List.of())) {
-                double alt = dist.get(u) + edge.length;
-                if (alt < dist.get(edge.to)) {
-                    dist.put(edge.to, alt);
-                    prev.put(edge.to, u);
-                    pq.add(new long[]{edge.to, (long) alt});
+                double alt = dist.get(u) + edge.length();
+                if (alt < dist.get(edge.to())) {
+                    dist.put(edge.to(), alt);
+                    prev.put(edge.to(), u);
+                    pq.add(new double[]{edge.to(), alt});
                 }
             }
         }
