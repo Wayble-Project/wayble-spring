@@ -4,7 +4,7 @@ on:
   #    push:
   #      branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "feature/seungmin" ]
 
 permissions:
   contents: read
@@ -180,23 +180,23 @@ jobs:
             exit 1
           fi
 
-      # ✅ 배포 성공 알림 (Discord)
-      - name: Send success webhook to Discord
-        if: success()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"✅ EC2 배포 성공! (브랜치: develop)\"}" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-      # ❌ 배포 실패 알림 (Discord)
-      - name: Send failure webhook to Discord
-        if: failure()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"❌ EC2 배포 실패! 확인이 필요합니다.\"}" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+#      # ✅ 배포 성공 알림 (Discord)
+#      - name: Send success webhook to Discord
+#        if: success()
+#        run: |
+#          curl -H "Content-Type: application/json" \
+#               -X POST \
+#               -d "{\"content\": \"✅ EC2 배포 성공! (브랜치: develop)\"}" \
+#               ${{ secrets.DISCORD_WEBHOOK_URL }}
+#
+#      # ❌ 배포 실패 알림 (Discord)
+#      - name: Send failure webhook to Discord
+#        if: failure()
+#        run: |
+#          curl -H "Content-Type: application/json" \
+#               -X POST \
+#               -d "{\"content\": \"❌ EC2 배포 실패! 확인이 필요합니다.\"}" \
+#               ${{ secrets.DISCORD_WEBHOOK_URL }}
 
 
 
