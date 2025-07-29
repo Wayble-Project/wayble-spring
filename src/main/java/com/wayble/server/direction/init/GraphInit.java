@@ -28,11 +28,7 @@ public class GraphInit {
     private List<Edge> edges;
     private List<WaybleMarker> markers;
     private Map<Long, List<Edge>> adjacencyList;
-
-    @Getter
     private Map<Long, Node> nodeMap;
-
-    @Getter
     private Map<Long, Type> markerMap;
 
     @PostConstruct
@@ -99,7 +95,15 @@ public class GraphInit {
         return waybleMarkers;
     }
 
+    public Map<Long, Node> getNodeMap() {
+        return Collections.unmodifiableMap(nodeMap);
+    }
+
+    public Map<Long, Type> getMarkerMap() {
+        return Collections.unmodifiableMap(markerMap);
+    }
+
     public Map<Long, List<Edge>> getGraph() {
-        return adjacencyList;
+        return Collections.unmodifiableMap(adjacencyList);
     }
 }
