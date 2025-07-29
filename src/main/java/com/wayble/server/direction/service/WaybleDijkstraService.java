@@ -20,8 +20,8 @@ public class WaybleDijkstraService {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
-        double totalDistance = calculateDistance(path);
-        double totalTime = calculateTime(path);
+        int totalDistance = (int) Math.round(calculateDistance(path));
+        int totalTime = (int) Math.round(calculateTime(path));
 
         List<WayblePathResponse.WayblePoint> wayblePoints = path.stream()
                 .map(id -> {
@@ -113,6 +113,7 @@ public class WaybleDijkstraService {
         }
         return totalDistance;
     }
+
     private List<Long> dijkstra(long start, long end) {
         Map<Long, Double> dist = new HashMap<>();
         Map<Long, Long> prev = new HashMap<>();
