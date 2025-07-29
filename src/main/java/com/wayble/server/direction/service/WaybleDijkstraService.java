@@ -21,6 +21,7 @@ public class WaybleDijkstraService {
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
         double totalDistance = calculateDistance(path);
+        double totalTime = calculateTime(path);
 
         List<WayblePathResponse.WayblePoint> wayblePoints = path.stream()
                 .map(id -> {
@@ -31,7 +32,7 @@ public class WaybleDijkstraService {
 
         List<double[]> polyline = createPolyLine(path);
 
-        return WayblePathResponse.of(totalDistance, wayblePoints, polyline);
+        return WayblePathResponse.of(totalTime, totalDistance, wayblePoints, polyline);
     }
 
     private List<double[]> createPolyLine(List<Long> path) {
@@ -108,6 +109,28 @@ public class WaybleDijkstraService {
         }
         Collections.reverse(path);
         return path;
+    }
+
+    private double calculateTime(List<Long> path) {
+        double averageSpeed = 1.2;
+        double totalTime = 0.0;
+
+        Map<Long, List<Edge>> adjacencyList = graphInit.getGraph();
+
+        for (int i = 0; i < path.size() - 1; i++) {
+            long from = path.get(i);
+            long to = path.get(i + 1);
+
+            Edge edge = adjacencyList.getOrDefault(from, List.of()).stream()
+                    .filter(edge1 -> edge1.to == to)
+                    .findFirst()
+                    .orElse(null);
+
+            if (edge != null) {
+                totalTime += edge.length / averageSpeed;
+            }
+        }
+        return totalTime;
     }
 
     private double calculateDistance(List<Long> path) {

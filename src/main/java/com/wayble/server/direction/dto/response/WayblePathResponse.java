@@ -7,6 +7,7 @@ import java.util.List;
 
 @Builder
 public record WayblePathResponse(
+        double time,
         double distance,
         List<WayblePoint> points,
         List<double[]> polyline
@@ -19,6 +20,7 @@ public record WayblePathResponse(
     ) {}
 
     public static WayblePathResponse of(
+            double time,
             double distance,
             List<WayblePoint> points,
             List<double[]> polyline
@@ -28,6 +30,7 @@ public record WayblePathResponse(
                 .toList();
 
         return WayblePathResponse.builder()
+                .time(time)
                 .distance(distance)
                 .points(wayblePoints)
                 .polyline(polyline)
