@@ -101,7 +101,7 @@ jobs:
             -e "xpack.security.enabled=false" \
             -e "network.host=0.0.0.0" \
             -e "ES_JAVA_OPTS=-Xms384m -Xmx384m" \
-            -v elasticsearch-data:/usr/share/elasticsearch/data \ 
+            -v elasticsearch-data:/usr/share/elasticsearch/data \
             es-with-nori:9.0.2
 
       - name: Wait for test Elasticsearch to be ready
