@@ -21,7 +21,8 @@ public class WaybleDijkstraService {
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
         int totalDistance = (int) Math.round(calculateDistance(path));
-        int totalTime = (int) Math.round(calculateTime(path));
+        // 노드 간 5초 대기 시간 추가 (횡단 보도, 보행자 상황 등 반영)
+        int totalTime = (int) Math.round(calculateTime(path)) + path.size() * 5;
 
         List<WayblePathResponse.WayblePoint> wayblePoints = path.stream()
                 .map(id -> {
@@ -78,7 +79,7 @@ public class WaybleDijkstraService {
     }
 
     private double calculateTime(List<Long> path) {
-        double averageSpeed = 1.2;
+        double averageSpeed = 1.0;
         double totalTime = 0.0;
 
         Map<Long, List<Edge>> adjacencyList = graphInit.getGraph();
