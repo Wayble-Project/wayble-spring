@@ -48,8 +48,8 @@ public class WaybleZoneDocument {
                 .thumbnailImageUrl(waybleZone.getMainImageUrl() != null ? waybleZone.getMainImageUrl() : null)   // TODO: 이미지 경로 추가
                 .address(EsAddress.from(waybleZone.getAddress()))
                 .facility(EsWaybleZoneFacility.from(waybleZone.getFacility()))
-                .averageRating(0.0)
-                .reviewCount(0)
+                .averageRating(waybleZone.getRating())
+                .reviewCount(waybleZone.getReviewCount())
                 .build();
     }
 
