@@ -55,6 +55,6 @@ public class WalkingService {
                         node -> HaversineUtil.haversine(lat, lon, node.lat, node.lon)
                 ))
                 .map(node -> node.id)
-                .orElseThrow(() -> new RuntimeException("Node not found"));
+                .orElseThrow(() -> new ApplicationException(WalkingErrorCase.NODE_NOT_FOUND));
     }
 }
