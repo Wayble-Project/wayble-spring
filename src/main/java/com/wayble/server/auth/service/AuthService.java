@@ -1,13 +1,13 @@
-package com.wayble.server.user.service.auth;
+package com.wayble.server.auth.service;
 
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.dto.UserLoginRequestDto;
-import com.wayble.server.user.dto.token.TokenResponseDto;
-import com.wayble.server.user.entity.RefreshToken;
+import com.wayble.server.auth.dto.TokenResponseDto;
+import com.wayble.server.auth.entity.RefreshToken;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.exception.UserErrorCase;
-import com.wayble.server.user.repository.RefreshTokenRepository;
+import com.wayble.server.auth.repository.RefreshTokenRepository;
 import com.wayble.server.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
