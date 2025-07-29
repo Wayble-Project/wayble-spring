@@ -37,6 +37,7 @@ public class WaybleDijkstraService {
     private List<double[]> createPolyLine(List<Long> path) {
         List<double[]> polyline = new ArrayList<>();
         Map<Long, List<Edge>> adjacencyList = graphInit.getGraph();
+        double[] last = null;
 
         for (int i = 0; i < path.size() - 1; i++) {
             long from = path.get(i);
@@ -47,14 +48,29 @@ public class WaybleDijkstraService {
                     .findFirst()
                     .orElse(null);
 
+            // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
             if (edge != null && edge.geometry != null) {
-                polyline.addAll(edge.geometry);
+                for (double[] coord : edge.geometry) {
+                    if (last == null || last[0] != coord[0] || last[1] != coord[1]) {
+                        polyline.add(coord);
+                        last = coord;
+                    }
+                }
             } else {
                 Node fromNode = graphInit.getNodeMap().get(from);
                 Node toNode = graphInit.getNodeMap().get(to);
 
-                polyline.add(new double[]{fromNode.lon, fromNode.lat});
-                polyline.add(new double[]{toNode.lon, toNode.lat});
+                double[] fromCoord = new double[]{fromNode.lon, fromNode.lat};
+                double[] toCoord = new double[]{toNode.lon, toNode.lat};
+
+                // 중복 확인 후, 중복 X일 때만 추가
+                if (last == null || last[0] != fromCoord[0] || last[1] != fromCoord[1]) {
+                    polyline.add(fromCoord);
+                }
+                if (last == null || last[0] != toCoord[0] || last[1] != toCoord[1]) {
+                    polyline.add(toCoord);
+                    last = toCoord;
+                }
             }
         }
         return polyline;
