@@ -33,6 +33,7 @@ public class WalkingController implements WalkingSwagger {
         return CommonResponse.success(walkingService.callTMapApi(request));
     }
 
+    @Override
     @GetMapping("/wayble")
     public CommonResponse<WayblePathResponse> getWayblePath(
             @RequestParam double startLat,

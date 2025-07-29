@@ -28,7 +28,7 @@ public class WaybleDijkstraService {
                 .map(id -> {
                     Node node = graphInit.getNodeMap().get(id);
                     Type type = markerMap.getOrDefault(id, Type.NONE);
-                    return new WayblePathResponse.WayblePoint(id, node.lat, node.lon, type);
+                    return new WayblePathResponse.WayblePoint(node.lat, node.lon, type);
                 }).toList();
 
         List<double[]> polyline = createPolyLine(path);
