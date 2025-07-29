@@ -1,6 +1,6 @@
 package com.wayble.server.auth.repository;
 
-import com.wayble.server.auth.enttiy.RefreshToken;
+import com.wayble.server.auth.entity.RefreshToken;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,4 +1,4 @@
-package com.wayble.server.auth.enttiy;
+package com.wayble.server.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

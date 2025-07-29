@@ -4,7 +4,7 @@ import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.dto.UserLoginRequestDto;
 import com.wayble.server.auth.dto.TokenResponseDto;
-import com.wayble.server.auth.enttiy.RefreshToken;
+import com.wayble.server.auth.entity.RefreshToken;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.auth.repository.RefreshTokenRepository;
