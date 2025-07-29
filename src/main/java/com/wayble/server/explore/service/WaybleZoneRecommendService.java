@@ -44,7 +44,7 @@ public class WaybleZoneRecommendService {
         List<WaybleZoneRecommendResponseDto> recommendResponseDtoList = waybleZoneRecommendRepository.searchPersonalWaybleZones(user, latitude, longitude, size);
 
         if (size == 1 && !recommendResponseDtoList.isEmpty()) {
-            Long zoneId = recommendResponseDtoList.get(0).zoneId();
+            Long zoneId = recommendResponseDtoList.get(0).waybleZoneInfo().zoneId();
 
             boolean logExist = recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId);
             if (logExist) {
@@ -57,7 +57,7 @@ public class WaybleZoneRecommendService {
         return recommendResponseDtoList;
     }
 
-    public Optional<WaybleZoneRecommendResponseDto> getTodayRecommendZone(Long userId) {
+    private Optional<WaybleZoneRecommendResponseDto> getTodayRecommendZone(Long userId) {
         LocalDate today = LocalDate.now();
         Optional<RecommendLogDocument> recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndRecommendationDate(userId, today);
 
@@ -72,7 +72,7 @@ public class WaybleZoneRecommendService {
         }
     }
 
-    public void saveRecommendLog(Long userId, Long zoneId) {
+    private void saveRecommendLog(Long userId, Long zoneId) {
         String logId = UUID.randomUUID().toString();
         LocalDate dateNow = LocalDate.now();
 
@@ -88,7 +88,7 @@ public class WaybleZoneRecommendService {
         recommendLogDocumentRepository.save(recommendLogDocument);
     }
 
-    public void updateRecommendLog(Long userId, Long zoneId) {
+    private void updateRecommendLog(Long userId, Long zoneId) {
         RecommendLogDocument recommendLogDocument = recommendLogDocumentRepository.findByUserIdAndZoneId(userId, zoneId)
                 .orElseThrow(() -> new ApplicationException(RecommendErrorCase.RECOMMEND_LOG_NOT_EXIST));
 

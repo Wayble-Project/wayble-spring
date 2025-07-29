@@ -22,14 +22,9 @@ public class UserService {
             throw new ApplicationException(UserErrorCase.USER_ALREADY_EXISTS);
         }
         User user = User.createUser(
-                req.nickname(),
-                req.username(),
                 req.email(),
                 passwordEncoder.encode(req.password()),
-                req.birthDate(),
-                req.gender(),
-                req.loginType(),
-                req.userType()
+                req.loginType()
         );
         userRepository.save(user);
     }

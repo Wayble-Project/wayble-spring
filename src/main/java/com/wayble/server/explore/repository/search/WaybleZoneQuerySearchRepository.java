@@ -4,8 +4,8 @@ import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchConditionDto;
-import com.wayble.server.explore.dto.search.WaybleZoneSearchResponseDto;
+import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
+import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +27,8 @@ public class WaybleZoneQuerySearchRepository{
     private final ElasticsearchOperations operations;
 
     private static final IndexCoordinates INDEX = IndexCoordinates.of("wayble_zone");
+
+    private static final int DISTRICT_SEARCH_SIZE = 3;
 
     public Slice<WaybleZoneSearchResponseDto> searchWaybleZonesByCondition(WaybleZoneSearchConditionDto cond, Pageable pageable) {
 

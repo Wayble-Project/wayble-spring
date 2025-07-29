@@ -38,12 +38,16 @@ public class ReviewService {
         Review review = Review.of(user, zone, dto.content(), dto.rating());
         reviewRepository.save(review);
 
+        double newRating = ((zone.getRating() * zone.getReviewCount()) + dto.rating()) / (zone.getReviewCount() + 1);
+        zone.updateRating(newRating);
+        zone.addReviewCount(1);
+
         if (dto.images() != null) {
             for (String imageUrl : dto.images()) {
                 reviewImageRepository.save(ReviewImage.of(review, imageUrl));
             }
         }
-
+        waybleZoneRepository.save(zone);
 
         // visitDate 및 facilities 저장은 필요시 추가 구현
     }

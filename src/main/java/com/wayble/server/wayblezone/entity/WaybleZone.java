@@ -4,11 +4,13 @@ import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
 import com.wayble.server.user.entity.UserPlaceWaybleZoneMapping;
+import com.wayble.server.wayblezone.dto.WaybleZoneRegisterDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,23 +40,94 @@ public class WaybleZone extends BaseEntity {
     private Address address; // 주소
 
     @Column(nullable = false)
+    @Builder.Default
     private double rating = 0.0; // 누적 평균 평점
 
+    @Column(nullable = false, name = "review_count")
+    @Builder.Default
+    private long reviewCount = 0; // 리뷰 수
+
     @Column(nullable = false)
-    private int reviewCount = 0; // 리뷰 수
+    @Builder.Default
+    private long likes = 0; // 즐겨찾기 수
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<WaybleZoneImage> waybleZoneImageList = new ArrayList<>();
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Review> reviewList = new ArrayList<>();
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<WaybleZoneOperatingHour> operatingHours = new ArrayList<>();
 
     @OneToOne(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
     private WaybleZoneFacility facility;
 
     @OneToMany(mappedBy = "waybleZone", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserPlaceWaybleZoneMapping> userPlaceMappings = new ArrayList<>();
+
+    // 대표 이미지 필드 추가
+    @Column(name = "main_image_url")
+    private String mainImageUrl;
+
+    // ES 동기화 추적 필드들
+    @Column(name = "last_modified_at")
+    private LocalDateTime lastModifiedAt; // 마지막 수정 시간
+    
+    @Column(name = "synced_at")
+    private LocalDateTime syncedAt; // ES와 마지막 동기화 시간
+
+    // 혹시 필요할수도 있어서 추가해놓음
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+        this.markAsModified();
+    }
+
+    public void updateRating(double averageRating) {
+        this.rating = averageRating;
+        this.markAsModified();
+    }
+
+    public void addReviewCount(long count) {
+        this.reviewCount += count;
+        this.markAsModified();
+    }
+
+    public void addLikes(long count) {
+        this.likes += count;
+        this.markAsModified(); // 변경 시 자동으로 수정 시간 갱신
+    }
+    
+    // ES 동기화 관련 메서드들
+    public void markAsModified() {
+        this.lastModifiedAt = LocalDateTime.now();
+    }
+    
+    public void markAsSynced() {
+        this.syncedAt = LocalDateTime.now();
+    }
+    
+    public boolean needsSync() {
+        return syncedAt == null || 
+               (lastModifiedAt != null && lastModifiedAt.isAfter(syncedAt));
+    }
+
+    public static WaybleZone from(WaybleZoneRegisterDto dto) {
+        return WaybleZone.builder()
+                .zoneName(dto.zoneName())
+                .contactNumber(dto.contactNumber())
+                .zoneType(dto.waybleZoneType())
+                .address(dto.address())
+                .mainImageUrl(dto.thumbnailImageUrl())
+                .rating(dto.averageRating() != null ? dto.averageRating() : 0.0)
+                .reviewCount(dto.reviewCount())
+                .likes(dto.likes())
+                .lastModifiedAt(LocalDateTime.now())
+                .syncedAt(null)
+                .build();
+    }
 }

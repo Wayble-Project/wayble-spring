@@ -29,9 +29,9 @@ public class UserPlaceService {
     private final UserPlaceWaybleZoneMappingRepository mappingRepository;
 
     @Transactional
-    public void saveUserPlace(UserPlaceRequestDto request) {
+    public void saveUserPlace(Long userId, UserPlaceRequestDto request) {
         // 유저 존재 확인
-        User user = userRepository.findById(request.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
         // 웨이블존 존재 확인
@@ -39,10 +39,12 @@ public class UserPlaceService {
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
         // 중복 저장 확인
-        boolean alreadySaved = mappingRepository.existsByUserPlace_User_IdAndWaybleZone_Id(request.userId(), request.waybleZoneId());
+        boolean alreadySaved = mappingRepository.existsByUserPlace_User_IdAndWaybleZone_Id(userId, request.waybleZoneId());
         if (alreadySaved) {
             throw new ApplicationException(UserErrorCase.PLACE_ALREADY_SAVED);
         }
+
+        waybleZone.addLikes(1);
 
         // 저장
         UserPlace userPlace = userPlaceRepository.save(
@@ -72,8 +74,7 @@ public class UserPlaceService {
             WaybleZone waybleZone = mapping.getWaybleZone();
 
             // 웨이블존 대표 이미지 가져오기
-            String imageUrl = waybleZone.getWaybleZoneImageList().stream()
-                    .findFirst().map(img -> img.getImageUrl()).orElse(null);
+            String imageUrl = waybleZone.getMainImageUrl();
 
             return UserPlaceListResponseDto.builder()
                     .place_id(userPlace.getId())
