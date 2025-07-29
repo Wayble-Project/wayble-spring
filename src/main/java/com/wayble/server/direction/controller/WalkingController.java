@@ -6,7 +6,6 @@ import com.wayble.server.direction.dto.response.WayblePathResponse;
 import com.wayble.server.direction.external.tmap.dto.request.TMapRequest;
 import com.wayble.server.direction.external.tmap.dto.response.TMapParsingResponse;
 import com.wayble.server.direction.service.WalkingService;
-import com.wayble.server.direction.service.WaybleDijkstraService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class WalkingController implements WalkingSwagger {
 
     private final WalkingService walkingService;
-    private final WaybleDijkstraService waybleDijkstraService;
 
     @Override
     @GetMapping()
@@ -42,6 +40,6 @@ public class WalkingController implements WalkingSwagger {
             @RequestParam double endLat,
             @RequestParam double endLon
     ) {
-        return CommonResponse.success(waybleDijkstraService.findWayblePath(startLat, startLon, endLat, endLon));
+        return CommonResponse.success(walkingService.findWayblePath(startLat, startLon, endLat, endLon));
     }
 }

@@ -7,7 +7,9 @@ import com.wayble.server.direction.entity.Edge;
 import com.wayble.server.direction.entity.Node;
 import com.wayble.server.direction.entity.WaybleMarker;
 import com.wayble.server.direction.entity.type.Type;
+import com.wayble.server.direction.service.util.HaversineUtil;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +25,12 @@ public class GraphInit {
     private List<Node> nodes;
     private List<Edge> edges;
     private List<WaybleMarker> markers;
+
+    @Getter
     private Map<Long, Node> nodeMap;
+
+    @Getter
     private Map<Long, Type> markerMap;
-    private Map<Long, List<Edge>> adjacencyList;
 
     @PostConstruct
     public void init() throws IOException {
@@ -91,7 +96,7 @@ public class GraphInit {
         for (WaybleMarker marker : markers) {
             long nearNode = nodes.stream()
                     .min(Comparator.comparingDouble(
-                            n -> haversine(marker.lat, marker.lon, n.lat, n.lon)
+                            n -> HaversineUtil.haversine(marker.lat, marker.lon, n.lat, n.lon)
                     ))
                     .map(node -> node.id)
                     .orElse(marker.id);
@@ -104,26 +109,7 @@ public class GraphInit {
         return waybleMarkers;
     }
 
-    private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371e3;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon/2) * Math.sin(dLon/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    }
-
     public Map<Long, List<Edge>> getGraph() {
         return adjacencyList;
-    }
-
-    public Map<Long, Node> getNodeMap() {
-        return nodeMap;
-    }
-
-    public Map<Long, Type> getMarkerMap() {
-        return markerMap;
     }
 }
