@@ -39,8 +39,7 @@ public class SecurityConfig {
                                 "/api/v1/users/reissue",
                                 "/api/v1/users/logout",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/api/v1/directions/walking/wayble"
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

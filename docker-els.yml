@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.elasticsearch
     container_name: elasticsearch
     image: es-with-nori:9.0.2
-    restart: always
+    restart: unless-stopped
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
