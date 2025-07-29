@@ -77,40 +77,6 @@ public class WaybleDijkstraService {
         return polyline;
     }
 
-    private List<Long> dijkstra(long start, long end) {
-        Map<Long, Double> dist = new HashMap<>();
-        Map<Long, Long> prev = new HashMap<>();
-        PriorityQueue<long[]> pq = new PriorityQueue<>(Comparator.comparingDouble(value -> value[1]));
-
-        graphInit.getGraph().keySet().forEach(key -> {
-            dist.put(key, Double.POSITIVE_INFINITY);
-        });
-        dist.put(start, 0.0);
-        pq.add(new long[]{start, 0});
-
-        while (!pq.isEmpty()) {
-            long[] current = pq.poll();
-            long u = current[0];
-            if (u == end) break;
-
-            for (Edge edge : graphInit.getGraph().getOrDefault(u, List.of())) {
-                double alt = dist.get(u) + edge.length;
-                if (alt < dist.get(edge.to)) {
-                    dist.put(edge.to, alt);
-                    prev.put(edge.to, u);
-                    pq.add(new long[]{edge.to, (long) alt});
-                }
-            }
-        }
-        List<Long> path = new ArrayList<>();
-
-        for (Long at = end; at != null; at = prev.get(at)) {
-            path.add(at);
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
     private double calculateTime(List<Long> path) {
         double averageSpeed = 1.2;
         double totalTime = 0.0;
@@ -146,5 +112,38 @@ public class WaybleDijkstraService {
                     .orElse(0.0);
         }
         return totalDistance;
+    }
+    private List<Long> dijkstra(long start, long end) {
+        Map<Long, Double> dist = new HashMap<>();
+        Map<Long, Long> prev = new HashMap<>();
+        PriorityQueue<long[]> pq = new PriorityQueue<>(Comparator.comparingDouble(value -> value[1]));
+
+        graphInit.getGraph().keySet().forEach(key -> {
+            dist.put(key, Double.POSITIVE_INFINITY);
+        });
+        dist.put(start, 0.0);
+        pq.add(new long[]{start, 0});
+
+        while (!pq.isEmpty()) {
+            long[] current = pq.poll();
+            long u = current[0];
+            if (u == end) break;
+
+            for (Edge edge : graphInit.getGraph().getOrDefault(u, List.of())) {
+                double alt = dist.get(u) + edge.length;
+                if (alt < dist.get(edge.to)) {
+                    dist.put(edge.to, alt);
+                    prev.put(edge.to, u);
+                    pq.add(new long[]{edge.to, (long) alt});
+                }
+            }
+        }
+        List<Long> path = new ArrayList<>();
+
+        for (Long at = end; at != null; at = prev.get(at)) {
+            path.add(at);
+        }
+        Collections.reverse(path);
+        return path;
     }
 }
