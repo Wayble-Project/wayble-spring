@@ -37,15 +37,16 @@ public class GraphInit {
 
         try {
             // 그래프
-            InputStream graphStream = getClass().getResourceAsStream("/seocho_pedestrian.json");
-            if (graphStream == null) {
-                throw new ApplicationException(WalkingErrorCase.GRAPH_FILE_NOT_FOUND);
-            }
-            JsonNode root = objectMapper.readTree(graphStream);
-            nodes = Arrays.asList(objectMapper.convertValue(root.get("nodes"), Node[].class));
-            edges = Arrays.asList(objectMapper.convertValue(root.get("edges"), Edge[].class));
+            try (InputStream graphStream = getClass().getResourceAsStream("/seocho_pedestrian.json")) {
+                if (graphStream == null) {
+                    throw new ApplicationException(WalkingErrorCase.GRAPH_FILE_NOT_FOUND);
+                }
+                JsonNode root = objectMapper.readTree(graphStream);
+                nodes = Arrays.asList(objectMapper.convertValue(root.get("nodes"), Node[].class));
+                edges = Arrays.asList(objectMapper.convertValue(root.get("edges"), Edge[].class));
 
-            nodeMap = nodes.stream().collect(Collectors.toMap(Node::id, node -> node));
+                nodeMap = nodes.stream().collect(Collectors.toMap(Node::id, node -> node));
+            }
 
             // 웨이블 마커
             try (InputStream markerStream = getClass().getResourceAsStream("/wayble_markers.json")) {
