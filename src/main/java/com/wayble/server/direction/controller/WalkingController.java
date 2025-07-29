@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/directions/walking")
+@RequestMapping("/api/v1/directions")
 public class WalkingController implements WalkingSwagger {
 
     private final WalkingService walkingService;
 
     @Override
-    @GetMapping()
+    @GetMapping("/walking")
     public CommonResponse<TMapParsingResponse> callTMapApi(
             @RequestParam double startX,
             @RequestParam double startY,
