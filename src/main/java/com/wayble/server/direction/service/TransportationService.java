@@ -52,6 +52,7 @@ public class TransportationService {
         return new TransportationResponseDto(steps, pageInfo);
     }
 
+
     private List<TransportationResponseDto.Step> returnDijstra(Node startTmp, Node endTmp){
 
         // 실제 노드·엣지 조회 및 컬렉션 복제
@@ -90,8 +91,15 @@ public class TransportationService {
 
         // 모든 엣지의 가중치 계산
         for (Edge edge : edges) {
+            if (edge == null) continue;
+
             Node from = edge.getStartNode();
             Node to = edge.getEndNode();
+
+            if (from == null || to == null || from.getId() == null || to.getId() == null) {
+                continue;
+            }
+
             int weight = (int)(haversine(
                     from.getLatitude(), from.getLongitude(),
                     to.getLatitude(), to.getLongitude()
@@ -128,14 +136,17 @@ public class TransportationService {
         PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> distance.getOrDefault(n.getId(), Integer.MAX_VALUE)));
         pq.add(start);
 
-        // 다익스트라 알고리즘 실행
         while (!pq.isEmpty()) {
             Node curr = pq.poll();
 
-            if (visited.contains(curr.getId())) continue;
+            if (visited.contains(curr.getId())) {
+                continue;
+            }
             visited.add(curr.getId());
 
-            if (curr.equals(end)) break;
+            if (curr.equals(end)) {
+                break;
+            }
 
             for (Edge edge : graph.getOrDefault(curr.getId(), List.of())) {
                 if (edge == null || edge.getEndNode() == null) continue;
@@ -143,13 +154,33 @@ public class TransportationService {
                 Node neighbor = edge.getEndNode();
                 if (visited.contains(neighbor.getId())) continue;
 
+                if (edge.getStartNode() == null || edge.getEndNode() == null ||
+                        edge.getStartNode().getId() == null || edge.getEndNode().getId() == null) {
+                    continue;
+                }
+
                 Pair<Long, Long> key = Pair.of(edge.getStartNode().getId(), edge.getEndNode().getId());
-                int weight = weightMap.getOrDefault(key,
+                int baseWeight = weightMap.getOrDefault(key,
                         (int)(haversine(
                                 edge.getStartNode().getLatitude(), edge.getStartNode().getLongitude(),
                                 edge.getEndNode().getLatitude(), edge.getEndNode().getLongitude()
                         ) * 1000)
                 );
+
+                // 간단한 경로 선호를 위한 가중치 조정
+                int weight = baseWeight;
+
+                // 환승 패널티 (교통수단 변경 시 추가 비용)
+                Edge prevEdgeForCurr = prevEdge.get(curr.getId());
+                if (prevEdgeForCurr != null &&
+                        prevEdgeForCurr.getEdgeType() != edge.getEdgeType() &&
+                        prevEdgeForCurr.getEdgeType() != DirectionType.WALK &&
+                        edge.getEdgeType() != DirectionType.WALK) {
+                    weight += 2000; // 환승 패널티 대폭 증가
+                }
+
+                // 단계 수 패널티 (경로 단계가 많을수록 불이익)
+                weight += 500; // 각 단계마다 추가 비용 대폭 증가
 
                 int alt = distance.get(curr.getId()) + weight;
                 if (alt < distance.get(neighbor.getId())) {
@@ -161,7 +192,7 @@ public class TransportationService {
             }
         }
 
-        // 역추적으로 경로 생성
+        // 역추적해 경로 steps 생성
         List<TransportationResponseDto.Step> steps = new LinkedList<>();
         Node current = end;
         Set<Long> backtrackVisited = new HashSet<>();
@@ -177,11 +208,15 @@ public class TransportationService {
                 break;
             }
 
+            // Null 처리 추가
+            String fromName = (edge.getStartNode() != null) ? edge.getStartNode().getStationName() : "Unknown";
+            String toName = (edge.getEndNode() != null) ? edge.getEndNode().getStationName() : "Unknown";
+
             steps.add(0, new TransportationResponseDto.Step(
                     edge.getEdgeType(),
                     (edge.getRoute() != null) ? edge.getRoute().getRouteName() : null,
-                    edge.getStartNode().getStationName(),
-                    edge.getEndNode().getStationName()
+                    fromName,
+                    toName
             ));
 
             current = prevNode.get(current.getId());
@@ -196,12 +231,20 @@ public class TransportationService {
             Long nodeId = node.getId();
             if (nodeId != null) {
                 graph.put(nodeId, new ArrayList<>());
+            } else {
+                System.out.println("❗ ID가 null인 node 발견: " + node.getStationName());
             }
         }
         for (Edge edge : edges) {
+            if (edge == null) continue;
+
             Node start = edge.getStartNode();
-            Long startId = start != null ? start.getId() : null;
-            graph.get(edge.getStartNode().getId()).add(edge);
+            if (start == null || start.getId() == null) continue;
+
+            Long startId = start.getId();
+            if (!graph.containsKey(startId)) continue;
+
+            graph.get(startId).add(edge);
         }
         return graph;
     }
