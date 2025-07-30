@@ -1,6 +1,5 @@
 package com.wayble.server.user.controller;
 
-import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
@@ -9,7 +8,6 @@ import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserInfoService;
 import com.wayble.server.user.service.UserService;
-import com.wayble.server.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
