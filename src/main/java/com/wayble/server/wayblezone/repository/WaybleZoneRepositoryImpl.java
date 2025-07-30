@@ -2,6 +2,8 @@ package com.wayble.server.wayblezone.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.wayble.server.admin.dto.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.explore.dto.common.FacilityResponseDto;
 import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
@@ -10,6 +12,7 @@ import com.wayble.server.wayblezone.entity.WaybleZone;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.wayble.server.wayblezone.entity.QWaybleZone.waybleZone;
@@ -123,6 +126,113 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
                 .where(waybleZone.lastModifiedAt.gt(since))
                 .limit(limit)
                 .fetch();
+    }
+
+    @Override
+    public List<AdminWaybleZoneThumbnailDto> findWaybleZonesWithPaging(int page, int size) {
+        return queryFactory
+                .select(Projections.constructor(AdminWaybleZoneThumbnailDto.class,
+                        waybleZone.id,
+                        waybleZone.zoneName,
+                        waybleZone.zoneType,
+                        waybleZone.reviewCount,
+                        waybleZone.likes,
+                        waybleZone.rating,
+                        waybleZone.address.state
+                                .concat(" ")
+                                .concat(waybleZone.address.city.coalesce(""))
+                                .concat(" ")
+                                .concat(waybleZone.address.district.coalesce(""))
+                                .concat(" ")
+                                .concat(waybleZone.address.streetAddress.coalesce(""))
+                                .concat(" ")
+                                .concat(waybleZone.address.detailAddress.coalesce("")),
+                        waybleZone.facility
+                ))
+                .from(waybleZone)
+                .leftJoin(waybleZone.facility)
+                .orderBy(waybleZone.id.asc())
+                .offset((long) page * size)
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public Optional<AdminWaybleZoneDetailDto> findAdminWaybleZoneDetailById(Long zoneId) {
+        // 1. WaybleZone을 모든 연관 엔티티와 함께 fetch join으로 조회
+        WaybleZone zone = queryFactory
+                .selectFrom(waybleZone)
+                .leftJoin(waybleZone.facility).fetchJoin()
+                .leftJoin(waybleZone.operatingHours).fetchJoin()
+                .leftJoin(waybleZone.waybleZoneImageList).fetchJoin()
+                .leftJoin(waybleZone.reviewList).fetchJoin()
+                .where(waybleZone.id.eq(zoneId))
+                .fetchOne();
+
+        if (zone == null) {
+            return Optional.empty();
+        }
+
+        // 2. DTO 변환
+        AdminWaybleZoneDetailDto.FacilityInfo facilityInfo = null;
+        if (zone.getFacility() != null) {
+            facilityInfo = new AdminWaybleZoneDetailDto.FacilityInfo(
+                    zone.getFacility(),
+                    zone.getFacility() + " 이용 가능"
+            );
+        }
+
+        // 3. 운영시간 정보 변환
+        List<AdminWaybleZoneDetailDto.OperatingHourInfo> operatingHours = zone.getOperatingHours().stream()
+                .map(hour -> new AdminWaybleZoneDetailDto.OperatingHourInfo(
+                        hour.getDayOfWeek().toString(),
+                        hour.getStartTime().toString(),
+                        hour.getCloseTime().toString(),
+                        hour.getIsClosed()
+                ))
+                .collect(Collectors.toList());
+
+        // 4. 이미지 URL 목록 변환
+        List<String> imageUrls = zone.getWaybleZoneImageList().stream()
+                .map(image -> image.getImageUrl())
+                .collect(Collectors.toList());
+
+        // 5. 최근 리뷰 정보 변환 (최대 5개, 최신순)
+        List<AdminWaybleZoneDetailDto.RecentReviewInfo> recentReviews = zone.getReviewList().stream()
+                .sorted((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt())) // 최신순 정렬
+                .limit(5)
+                .map(review -> new AdminWaybleZoneDetailDto.RecentReviewInfo(
+                        review.getId(),
+                        review.getContent(),
+                        review.getRating(),
+                        review.getUser().getUsername(), // User 엔티티에서 이름 가져오기
+                        review.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
+        // 6. 최종 DTO 생성
+        AdminWaybleZoneDetailDto detailDto = new AdminWaybleZoneDetailDto(
+                zone.getId(),
+                zone.getZoneName(),
+                zone.getContactNumber(),
+                zone.getZoneType(),
+                zone.getAddress().toFullAddress(),
+                zone.getAddress().getLatitude(),
+                zone.getAddress().getLongitude(), 
+                zone.getRating(),
+                zone.getReviewCount(),
+                zone.getLikes(),
+                zone.getMainImageUrl(),
+                zone.getCreatedAt(),
+                zone.getLastModifiedAt(),
+                zone.getSyncedAt(),
+                facilityInfo,
+                operatingHours,
+                imageUrls,
+                recentReviews
+        );
+
+        return Optional.of(detailDto);
     }
 
     // 내부 클래스로 visit count 담을 DTO
