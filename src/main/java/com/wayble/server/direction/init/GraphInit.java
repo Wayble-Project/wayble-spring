@@ -11,7 +11,6 @@ import com.wayble.server.direction.entity.type.Type;
 import com.wayble.server.direction.exception.WalkingErrorCase;
 import com.wayble.server.direction.service.util.HaversineUtil;
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -16,6 +16,9 @@ public class WaybleDijkstraService {
 
     private final GraphInit graphInit;
 
+    // 11cm의 오차 허용
+    private static final double TOLERANCE = 0.000001;
+
     public WayblePathResponse createWayblePath(long start, long end) {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
@@ -53,7 +56,7 @@ public class WaybleDijkstraService {
             // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
             if (edge != null && edge.geometry() != null) {
                 for (double[] coord : edge.geometry()) {
-                    if (last == null || last[0] != coord[0] || last[1] != coord[1]) {
+                    if (last == null || isDifferent(last, coord)) {
                         polyline.add(coord);
                         last = coord;
                     }
@@ -66,10 +69,10 @@ public class WaybleDijkstraService {
                 double[] toCoord = new double[]{toNode.lon(), toNode.lat()};
 
                 // 중복 확인 후, 중복 X일 때만 추가
-                if (last == null || last[0] != fromCoord[0] || last[1] != fromCoord[1]) {
+                if (last == null || isDifferent(last, fromCoord)) {
                     polyline.add(fromCoord);
                 }
-                if (last == null || last[0] != toCoord[0] || last[1] != toCoord[1]) {
+                if (last == null || isDifferent(last, toCoord)) {
                     polyline.add(toCoord);
                     last = toCoord;
                 }
@@ -120,9 +123,9 @@ public class WaybleDijkstraService {
         Map<Long, Long> prev = new HashMap<>();
         PriorityQueue<double[]> pq = new PriorityQueue<>(Comparator.comparingDouble(value -> value[1]));
 
-        graphInit.getGraph().keySet().forEach(key -> {
-            dist.put(key, Double.POSITIVE_INFINITY);
-        });
+        graphInit.getGraph().keySet().forEach(key ->
+            dist.put(key, Double.POSITIVE_INFINITY)
+        );
         dist.put(start, 0.0);
         pq.add(new double[]{start, 0.0});
 
@@ -147,5 +150,9 @@ public class WaybleDijkstraService {
         }
         Collections.reverse(path);
         return path;
+    }
+
+    private boolean isDifferent(double[] a, double[] b) {
+        return Math.abs(a[0] - b[0]) > TOLERANCE || Math.abs(a[1] - b[1]) > TOLERANCE;
     }
 }
