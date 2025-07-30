@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웨이블존 관리 - Wayble 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-wayble-blue rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </a>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-xl font-semibold text-gray-900">웨이블존 관리</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/admin/dashboard" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                    </a>
+                    <span class="text-sm text-gray-700">
+                        <span th:text="${adminUsername}" class="font-medium"></span>님
+                    </span>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">웨이블존 목록</h2>
+                    <p class="mt-1 text-sm text-gray-600">
+                        총 <span th:text="${pageData.totalElements}" class="font-medium text-wayble-blue"></span>개의 웨이블존이 등록되어 있습니다
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-500">
+                        <span th:text="${pageData.currentPage + 1}"></span> / <span th:text="${pageData.totalPages}"></span> 페이지
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div th:if="${param.error}" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-800">웨이블존을 찾을 수 없습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 웨이블존 목록 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="grid grid-cols-1 gap-6" th:if="${pageData.content != null and !pageData.content.isEmpty()}">
+                    <div th:each="zone : ${pageData.content}" 
+                         class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                         th:onclick="'window.location.href=\'/admin/wayble-zones/' + ${zone.zoneId} + '\''">
+                        
+                        <div class="flex items-start justify-between">
+                            <!-- 좌측: 기본 정보 -->
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h3 class="text-lg font-medium text-gray-900" th:text="${zone.zoneName}"></h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                          th:classappend="${zone.zoneType.name() == 'RESTAURANT'} ? 'bg-green-100 text-green-800' : (${zone.zoneType.name() == 'CAFE'} ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')"
+                                          th:text="${zone.zoneType.name()}">
+                                    </span>
+                                </div>
+                                
+                                <div class="text-sm text-gray-600 mb-3">
+                                    <div class="flex items-center space-x-4">
+                                        <span class="flex items-center">
+                                            <svg class="h-4 w-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span th:text="${zone.address}"></span>
+                                        </span>
+                                    </div>
+                                    <div class="mt-1">
+                                        <span th:text="${zone.facilityInfo}" class="text-gray-500"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 우측: 통계 정보 -->
+                            <div class="ml-6 flex-shrink-0">
+                                <div class="flex items-center space-x-6 text-sm">
+                                    <div class="text-center">
+                                        <div class="flex items-center text-yellow-600">
+                                            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            <span th:text="${#numbers.formatDecimal(zone.rating, 1, 1)}"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500">평점</div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="flex items-center text-blue-600">
+                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                            </svg>
+                                            <span th:text="${zone.reviewCount}"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500">리뷰</div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="flex items-center text-red-600">
+                                            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span th:text="${zone.likes}"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500">좋아요</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 데이터가 없을 때 -->
+                <div th:if="${pageData.content == null or pageData.content.isEmpty()}" 
+                     class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">웨이블존이 없습니다</h3>
+                    <p class="mt-1 text-sm text-gray-500">등록된 웨이블존이 아직 없습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:if="${pageData.totalPages > 1}" class="mt-6">
+            <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
+                <div class="flex flex-1 justify-between sm:hidden">
+                    <a th:if="${pageData.hasPrevious}" 
+                       th:href="@{/admin/wayble-zones(page=${pageData.currentPage - 1}, size=${pageData.pageSize})}"
+                       class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        이전
+                    </a>
+                    <a th:if="${pageData.hasNext}" 
+                       th:href="@{/admin/wayble-zones(page=${pageData.currentPage + 1}, size=${pageData.pageSize})}"
+                       class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        다음
+                    </a>
+                </div>
+                
+                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            총 <span class="font-medium" th:text="${pageData.totalElements}"></span>개 중 
+                            <span class="font-medium" th:text="${pageData.currentPage * pageData.pageSize + 1}"></span>-<span class="font-medium" th:text="${(pageData.currentPage + 1) * pageData.pageSize > pageData.totalElements ? pageData.totalElements : (pageData.currentPage + 1) * pageData.pageSize}"></span>개 표시
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+                            <!-- 이전 페이지 버튼 -->
+                            <a th:if="${pageData.hasPrevious}" 
+                               th:href="@{/admin/wayble-zones(page=${pageData.currentPage - 1}, size=${pageData.pageSize})}"
+                               class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                            
+                            <!-- 페이지 번호들 -->
+                            <span th:each="pageNum : ${#numbers.sequence(T(java.lang.Math).max(0, pageData.currentPage - 2), T(java.lang.Math).min(pageData.totalPages - 1, pageData.currentPage + 2))}">
+                                <a th:if="${pageNum != pageData.currentPage}"
+                                   th:href="@{/admin/wayble-zones(page=${pageNum}, size=${pageData.pageSize})}"
+                                   th:text="${pageNum + 1}"
+                                   class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                </a>
+                                <span th:if="${pageNum == pageData.currentPage}"
+                                      th:text="${pageNum + 1}"
+                                      class="relative z-10 inline-flex items-center bg-wayble-blue px-4 py-2 text-sm font-semibold text-white">
+                                </span>
+                            </span>
+                            
+                            <!-- 다음 페이지 버튼 -->
+                            <a th:if="${pageData.hasNext}" 
+                               th:href="@{/admin/wayble-zones(page=${pageData.currentPage + 1}, size=${pageData.pageSize})}"
+                               class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</body>
+</html>

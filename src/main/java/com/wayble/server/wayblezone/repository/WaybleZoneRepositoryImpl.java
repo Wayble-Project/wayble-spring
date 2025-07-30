@@ -159,13 +159,10 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
 
     @Override
     public Optional<AdminWaybleZoneDetailDto> findAdminWaybleZoneDetailById(Long zoneId) {
-        // 1. WaybleZone을 모든 연관 엔티티와 함께 fetch join으로 조회
+        // 1. 기본 WaybleZone 정보와 facility 조회
         WaybleZone zone = queryFactory
                 .selectFrom(waybleZone)
                 .leftJoin(waybleZone.facility).fetchJoin()
-                .leftJoin(waybleZone.operatingHours).fetchJoin()
-                .leftJoin(waybleZone.waybleZoneImageList).fetchJoin()
-                .leftJoin(waybleZone.reviewList).fetchJoin()
                 .where(waybleZone.id.eq(zoneId))
                 .fetchOne();
 
@@ -182,35 +179,12 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
             );
         }
 
-        // 3. 운영시간 정보 변환
-        List<AdminWaybleZoneDetailDto.OperatingHourInfo> operatingHours = zone.getOperatingHours().stream()
-                .map(hour -> new AdminWaybleZoneDetailDto.OperatingHourInfo(
-                        hour.getDayOfWeek().toString(),
-                        hour.getStartTime().toString(),
-                        hour.getCloseTime().toString(),
-                        hour.getIsClosed()
-                ))
-                .collect(Collectors.toList());
+        // 3. 빈 리스트로 초기화 (컬렉션은 나중에 필요시 별도 쿼리로 로드)
+        List<AdminWaybleZoneDetailDto.OperatingHourInfo> operatingHours = List.of();
+        List<String> imageUrls = List.of();
+        List<AdminWaybleZoneDetailDto.RecentReviewInfo> recentReviews = List.of();
 
-        // 4. 이미지 URL 목록 변환
-        List<String> imageUrls = zone.getWaybleZoneImageList().stream()
-                .map(image -> image.getImageUrl())
-                .collect(Collectors.toList());
-
-        // 5. 최근 리뷰 정보 변환 (최대 5개, 최신순)
-        List<AdminWaybleZoneDetailDto.RecentReviewInfo> recentReviews = zone.getReviewList().stream()
-                .sorted((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt())) // 최신순 정렬
-                .limit(5)
-                .map(review -> new AdminWaybleZoneDetailDto.RecentReviewInfo(
-                        review.getId(),
-                        review.getContent(),
-                        review.getRating(),
-                        review.getUser().getUsername(), // User 엔티티에서 이름 가져오기
-                        review.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
-
-        // 6. 최종 DTO 생성
+        // 4. 최종 DTO 생성
         AdminWaybleZoneDetailDto detailDto = new AdminWaybleZoneDetailDto(
                 zone.getId(),
                 zone.getZoneName(),

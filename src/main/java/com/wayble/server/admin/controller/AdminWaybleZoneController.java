@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class AdminWaybleZoneController {
     }
 
     @GetMapping("/{waybleZoneId}")
-    public CommonResponse<AdminWaybleZoneDetailDto> findWaybleZoneById(@PathVariable("waybleZoneId") long waybleZoneId) {
+    public CommonResponse<Optional<AdminWaybleZoneDetailDto>> findWaybleZoneById(@PathVariable("waybleZoneId") long waybleZoneId) {
         return CommonResponse.success(adminWaybleZoneService.findWaybleZoneById(waybleZoneId));
     }
 }
