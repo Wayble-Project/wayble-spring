@@ -109,7 +109,7 @@ public class WaybleDijkstraService {
         for (int i = 0; i < path.size() - 1; i++) {
             long from = path.get(i);
             long to = path.get(i + 1);
-            totalDistance += graphInit.getGraph().get(from).stream()
+            totalDistance += graphInit.getGraph().getOrDefault(from, List.of()).stream()
                     .filter(edge -> edge.to() == to)
                     .findFirst()
                     .map(Edge::length)
