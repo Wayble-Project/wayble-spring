@@ -29,7 +29,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/admin/**") // 관리자 페이지는 CSRF 비활성화
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -43,7 +45,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/",
                                 "/index",
-                                "/index.html"
+                                "/index.html",
+                                "/admin/**" // 관리자 페이지 허용
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
