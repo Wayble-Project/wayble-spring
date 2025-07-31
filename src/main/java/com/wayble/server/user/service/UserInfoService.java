@@ -3,6 +3,7 @@ package com.wayble.server.user.service;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
+import com.wayble.server.user.dto.UserInfoResponseDto;
 import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
@@ -94,5 +95,23 @@ public class UserInfoService {
         }
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public UserInfoResponseDto getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
+        if (user.getNickname() == null) {
+            throw new ApplicationException(UserErrorCase.USER_INFO_NOT_EXISTS);
+        }
+        return UserInfoResponseDto.builder()
+                .nickname(user.getNickname())
+                .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : null)
+                .gender(user.getGender())
+                .userType(user.getUserType())
+                .disabilityType(user.getDisabilityType())
+                .mobilityAid(user.getMobilityAid())
+                .profileImageUrl(user.getProfileImageUrl())
+                .build();
     }
 }
