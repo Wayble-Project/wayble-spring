@@ -26,5 +26,9 @@ public class UserInfoRegisterRequestDto {
     private UserType userType;
 
     private List<String> disabilityType; // 장애 유형, (userType == DISABLED만 값 존재)
+
     private List<String> mobilityAid;  // 이동보조수단, (userType == DISABLED만 값 존재)
+
+    // TODO: 현재 와이어프레임에 유저 이미지 등록하는 로직이 없어서 유저 정보 등록에서 이미지 등록 안하면 해당 필드 추후 삭제
+    private String profileImageUrl;
 }
