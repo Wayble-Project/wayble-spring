@@ -3,6 +3,7 @@ package com.wayble.server.user.controller;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
+import com.wayble.server.user.dto.UserInfoResponseDto;
 import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
 import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.exception.UserErrorCase;
@@ -67,10 +68,7 @@ public class UserController {
     }
 
     @PatchMapping("/info")
-    @Operation(
-            summary = "내 정보 수정",
-            description = "유저가 자신의 정보를 수정합니다."
-    )
+    @Operation(summary = "내 정보 수정", description = "유저가 자신의 정보를 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "내 정보 수정 완료"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
@@ -88,5 +86,21 @@ public class UserController {
 
         userInfoService.updateUserInfo(userId, dto);
         return CommonResponse.success("내 정보 수정 완료");
+    }
+
+    @GetMapping("/info")
+    @Operation(summary = "내 정보 조회", description = "현재 로그인된 유저의 상세 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저 정보가 존재하지 않습니다."),
+            @ApiResponse(responseCode = "401", description = "인증 필요")
+    })
+    public CommonResponse<UserInfoResponseDto> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof Long userId)) {
+            throw new ApplicationException(UserErrorCase.FORBIDDEN);
+        }
+        UserInfoResponseDto info = userInfoService.getUserInfo(userId);
+        return CommonResponse.success(info);
     }
 }
