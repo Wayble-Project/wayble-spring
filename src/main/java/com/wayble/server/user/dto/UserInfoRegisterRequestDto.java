@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class UserInfoRegisterRequestDto {
     @NotBlank(message = "닉네임은 필수입니다.")
@@ -23,6 +25,6 @@ public class UserInfoRegisterRequestDto {
     @NotNull(message = "유저 타입은 필수입니다.")
     private UserType userType;
 
-    private String disabilityType; // 장애 유형, (userType == DISABLED만 값 존재)
-    private String mobilityAid; // 이동보조수단, (userType == DISABLED만 값 존재)
+    private List<String> disabilityType; // 장애 유형, (userType == DISABLED만 값 존재)
+    private List<String> mobilityAid;  // 이동보조수단, (userType == DISABLED만 값 존재)
 }
