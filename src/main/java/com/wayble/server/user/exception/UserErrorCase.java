@@ -17,7 +17,8 @@ public enum UserErrorCase implements ErrorCase {
     FORBIDDEN(403, 1007, "권한이 없습니다."),
     KAKAO_AUTH_FAILED(401, 1008, "카카오 인증에 실패하였습니다."),
     USER_INFO_ALREADY_EXISTS(400,1009, "이미 등록된 정보가 있습니다."),
-    INVALID_BIRTH_DATE(400, 1010, "생년월일 형식이 올바르지 않습니다.");
+    INVALID_BIRTH_DATE(400, 1010, "생년월일 형식이 올바르지 않습니다."),
+    USER_INFO_NOT_EXISTS(401,2002, "유저 정보가 존재하지 않습니다.");
 
     private final Integer httpStatusCode;
     private final Integer errorCode;
