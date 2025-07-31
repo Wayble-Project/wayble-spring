@@ -39,6 +39,7 @@ public class UserInfoService {
         }
         user.setGender(dto.getGender());
         user.setUserType(dto.getUserType());
+        user.updateProfileImageUrl(dto.getProfileImageUrl());
 
         if (dto.getUserType() == UserType.DISABLED) {
             // 장애 유형,이동보조수단 설정
@@ -78,6 +79,11 @@ public class UserInfoService {
         // 유저 타입 수정
         if (dto.getUserType() != null) {
             user.setUserType(dto.getUserType());
+        }
+
+        // 유저 프로필 이미지 수정
+        if (dto.getProfileImageUrl() != null) {
+            user.updateProfileImageUrl(dto.getProfileImageUrl());
         }
 
         UserType finalUserType = dto.getUserType() != null ? dto.getUserType() : user.getUserType();
