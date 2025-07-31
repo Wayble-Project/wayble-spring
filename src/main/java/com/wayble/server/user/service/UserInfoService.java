@@ -27,7 +27,7 @@ public class UserInfoService {
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
         // 이미 등록된 정보가 있으면 에러 처리
-        if (user.getNickname() != null) {
+        if (user.getNickname() != null || user.getBirthDate() != null || user.getGender() != null) {
             throw new ApplicationException(UserErrorCase.USER_INFO_ALREADY_EXISTS);
         }
 
@@ -107,7 +107,7 @@ public class UserInfoService {
     public UserInfoResponseDto getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
-        if (user.getNickname() == null) {
+        if (user.getNickname() == null || user.getBirthDate() == null || user.getGender() == null) {
             throw new ApplicationException(UserErrorCase.USER_INFO_NOT_EXISTS);
         }
         return UserInfoResponseDto.builder()
