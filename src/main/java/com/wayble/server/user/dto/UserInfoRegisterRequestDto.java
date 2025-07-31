@@ -5,6 +5,7 @@ import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
@@ -30,5 +31,6 @@ public class UserInfoRegisterRequestDto {
     private List<String> mobilityAid;  // 이동보조수단, (userType == DISABLED만 값 존재)
 
     // TODO: 현재 와이어프레임에 유저 이미지 등록하는 로직이 없어서 유저 정보 등록에서 이미지 등록 안하면 해당 필드 추후 삭제
+    @Pattern(regexp = "^(https?://).*", message = "올바른 URL 형식이어야 합니다.")
     private String profileImageUrl;
 }
