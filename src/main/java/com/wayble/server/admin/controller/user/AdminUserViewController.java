@@ -62,4 +62,44 @@ public class AdminUserViewController {
 
         return "admin/user/user-detail";
     }
+    
+    @GetMapping("/deleted")
+    public String getDeletedUsers(HttpSession session, Model model,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "100") int size) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+
+        // 페이징 데이터 조회
+        AdminUserPageDto pageData = adminUserService.getDeletedUsersWithPaging(page, size);
+
+        model.addAttribute("pageData", pageData);
+        model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+
+        log.debug("삭제된 사용자 목록 조회 - 페이지: {}, 전체: {}", page, pageData.totalElements());
+
+        return "admin/user/deleted-users";
+    }
+
+    @GetMapping("/deleted/{id}")
+    public String getDeletedUserDetail(HttpSession session, Model model, @PathVariable Long id) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+
+        Optional<AdminUserDetailDto> userOpt = adminUserService.findDeletedUserById(id);
+        if (userOpt.isEmpty()) {
+            return "redirect:/admin/users/deleted?error=notfound";
+        }
+
+        model.addAttribute("user", userOpt.get());
+        model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+
+        log.debug("삭제된 사용자 상세 조회 - ID: {}", id);
+
+        return "admin/user/deleted-user-detail";
+    }
 }

@@ -36,4 +36,22 @@ public class AdminUserController {
     public CommonResponse<Optional<AdminUserDetailDto>> findUserById(@PathVariable("userId") long userId) {
         return CommonResponse.success(adminUserService.findUserById(userId));
     }
+    
+    @GetMapping("/deleted/count")
+    public CommonResponse<Long> getTotalDeletedUserCount() {
+        return CommonResponse.success(adminUserService.getTotalDeletedUserCount());
+    }
+    
+    @GetMapping("/deleted")
+    public CommonResponse<List<AdminUserThumbnailDto>> findDeletedUsers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "100") int size)
+    {
+        return CommonResponse.success(adminUserService.findDeletedUsersByPage(page, size));
+    }
+    
+    @GetMapping("/deleted/{userId}")
+    public CommonResponse<Optional<AdminUserDetailDto>> findDeletedUserById(@PathVariable("userId") long userId) {
+        return CommonResponse.success(adminUserService.findDeletedUserById(userId));
+    }
 }

@@ -76,11 +76,13 @@ public class AdminController {
         
         // 통계 데이터 조회
         long totalUserCount = adminUserService.getTotalUserCount();
+        long totalDeletedUserCount = adminUserService.getTotalDeletedUserCount();
         long totalWaybleZoneCount = adminWaybleZoneService.getTotalWaybleZoneCounts();
         
         model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
         model.addAttribute("systemStatus", systemStatus);
         model.addAttribute("totalUserCount", totalUserCount);
+        model.addAttribute("totalDeletedUserCount", totalDeletedUserCount);
         model.addAttribute("totalWaybleZoneCount", totalWaybleZoneCount);
         return "admin/dashboard";
     }

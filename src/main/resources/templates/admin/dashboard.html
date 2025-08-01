@@ -130,7 +130,7 @@
                 <p class="text-lg text-gray-600">Wayble 서비스 관리 도구</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
                 <!-- 유저 관리 -->
                 <a href="/admin/users" class="group block h-full">
                     <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-green-500 h-full flex flex-col">
@@ -168,6 +168,30 @@
                                 <p class="text-gray-600 text-lg mb-6">웨이블존 조회, 수정, 삭제 및 상세 정보 관리</p>
                             </div>
                             <div class="inline-flex items-center text-wayble-blue font-semibold group-hover:text-blue-700">
+                                관리하기 
+                                <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 삭제된 사용자 관리 -->
+                <a href="/admin/users/deleted" class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-red-500 h-full flex flex-col">
+                        <div class="p-8 text-center flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="mx-auto w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mb-6 group-hover:bg-red-600 transition-colors duration-300">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors duration-300">삭제된 사용자</h4>
+                                <p class="text-gray-600 text-lg mb-6">soft delete된 사용자 계정 조회 및 관리</p>
+                                <div class="text-3xl font-bold text-red-600 mb-2" th:text="${totalDeletedUserCount} + '명'">0명</div>
+                            </div>
+                            <div class="inline-flex items-center text-red-600 font-semibold group-hover:text-red-700">
                                 관리하기 
                                 <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
