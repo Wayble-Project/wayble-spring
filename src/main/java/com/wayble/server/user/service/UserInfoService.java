@@ -39,7 +39,7 @@ public class UserInfoService {
         }
         user.setGender(dto.getGender());
         user.setUserType(dto.getUserType());
-        user.updateProfileImageUrl(dto.getProfileImageUrl());
+        // (추후 사용 가능) user.updateProfileImageUrl(dto.getProfileImageUrl());
 
         if (dto.getUserType() == UserType.DISABLED) {
             // 장애 유형,이동보조수단 설정
@@ -81,10 +81,11 @@ public class UserInfoService {
             user.setUserType(dto.getUserType());
         }
 
-        // 유저 프로필 이미지 수정
+        /* 유저 프로필 이미지 수정
         if (dto.getProfileImageUrl() != null) {
             user.updateProfileImageUrl(dto.getProfileImageUrl());
         }
+         */
 
         UserType finalUserType = dto.getUserType() != null ? dto.getUserType() : user.getUserType();
         if (finalUserType == UserType.DISABLED) {
@@ -117,7 +118,7 @@ public class UserInfoService {
                 .userType(user.getUserType())
                 .disabilityType(user.getDisabilityType())
                 .mobilityAid(user.getMobilityAid())
-                .profileImageUrl(user.getProfileImageUrl())
+                // (추후 사용 가능) .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
 }
