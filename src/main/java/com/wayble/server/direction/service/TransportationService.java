@@ -13,8 +13,10 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.Objects;
 
 import static com.wayble.server.direction.exception.DirectionErrorCase.PATH_NOT_FOUND;
+
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +61,9 @@ public class TransportationService {
         nodes = new ArrayList<>(nodeRepository.findAll());
         edges = new ArrayList<>(edgeRepository.findAll());
 
+        System.out.println("📍 디버깅: 출발지=" + startTmp.getStationName() + ", 도착지=" + endTmp.getStationName());
+        System.out.println("📍 디버깅: 전체 노드 수=" + nodes.size() + ", 전체 엣지 수=" + edges.size());
+
         // 가장 가까운 실제 정류장 찾기 (임시 노드 추가 전에)
         Node nearestToStart = nodes.stream()
                 .min(Comparator.comparingDouble(n ->
@@ -73,6 +78,9 @@ public class TransportationService {
                         haversine(endTmp.getLatitude(), endTmp.getLongitude(),
                                 n.getLatitude(), n.getLongitude())))
                 .orElse(nearestToStart); // fallback to same station if no other option
+
+        System.out.println("📍 디버깅: 출발 가장 가까운 역=" + nearestToStart.getStationName());
+        System.out.println("📍 디버깅: 도착 가장 가까운 역=" + nearestToEnd.getStationName());
 
         // 임시 노드를 리스트에 추가
         nodes.add(startTmp);
@@ -197,32 +205,95 @@ public class TransportationService {
         Node current = end;
         Set<Long> backtrackVisited = new HashSet<>();
 
+        System.out.println("📍 디버깅: 도착지 거리=" + distance.get(end.getId()));
+        if (distance.get(end.getId()) == Integer.MAX_VALUE) {
+            System.out.println("⚠️ 경로를 찾을 수 없음: 도착지에 도달할 수 없음");
+            return steps; // 빈 리스트 반환
+        }
+
+        // 먼저 모든 엣지를 수집
+        List<Edge> pathEdges = new ArrayList<>();
         while (current != null && !current.equals(start)) {
             if (backtrackVisited.contains(current.getId())) {
+                System.out.println("⚠️ 순환 감지: " + current.getStationName());
                 break;
             }
             backtrackVisited.add(current.getId());
 
             Edge edge = prevEdge.get(current.getId());
             if (edge == null) {
+                System.out.println("⚠️ 이전 엣지가 null: " + current.getStationName());
                 break;
             }
-
-            // Null 처리 추가
-            String fromName = (edge.getStartNode() != null) ? edge.getStartNode().getStationName() : "Unknown";
-            String toName = (edge.getEndNode() != null) ? edge.getEndNode().getStationName() : "Unknown";
-
-            steps.add(0, new TransportationResponseDto.Step(
-                    edge.getEdgeType(),
-                    (edge.getRoute() != null) ? edge.getRoute().getRouteName() : null,
-                    fromName,
-                    toName
-            ));
-
+            pathEdges.add(0, edge);
             current = prevNode.get(current.getId());
         }
-        return steps;
 
+        // 연속된 같은 노선의 구간들을 합치기
+        return mergeConsecutiveRoutes(pathEdges);
+
+    }
+
+    private List<TransportationResponseDto.Step> mergeConsecutiveRoutes(List<Edge> pathEdges) {
+        List<TransportationResponseDto.Step> mergedSteps = new ArrayList<>();
+        
+        if (pathEdges.isEmpty()) {
+            return mergedSteps;
+        }
+        
+        int i = 0;
+        while (i < pathEdges.size()) {
+            Edge currentEdge = pathEdges.get(i);
+            DirectionType currentType = currentEdge.getEdgeType();
+            String currentRouteName = (currentEdge.getRoute() != null) ? currentEdge.getRoute().getRouteName() : null;
+            
+            // 시작 노드
+            String fromName = (currentEdge.getStartNode() != null) ? currentEdge.getStartNode().getStationName() : "Unknown";
+            String toName = (currentEdge.getEndNode() != null) ? currentEdge.getEndNode().getStationName() : "Unknown";
+            
+            // 도보인 경우 또는 연속된 같은 노선이 없는 경우 그대로 추가
+            if (currentType == DirectionType.WALK || currentRouteName == null) {
+                mergedSteps.add(new TransportationResponseDto.Step(
+                    currentType,
+                    currentRouteName,
+                    fromName,
+                    toName
+                ));
+                i++;
+                continue;
+            }
+            
+            // 연속된 같은 노선 찾기
+            int j = i + 1;
+            while (j < pathEdges.size()) {
+                Edge nextEdge = pathEdges.get(j);
+                String nextRouteName = (nextEdge.getRoute() != null) ? nextEdge.getRoute().getRouteName() : null;
+                
+                // 같은 노선이 아니면 중단
+                if (nextEdge.getEdgeType() != currentType || 
+                    !Objects.equals(currentRouteName, nextRouteName)) {
+                    break;
+                }
+                j++;
+            }
+            
+            // 마지막 엣지의 도착 노드를 최종 도착지로 설정
+            if (j > i + 1) {
+                Edge lastEdge = pathEdges.get(j - 1);
+                toName = (lastEdge.getEndNode() != null) ? lastEdge.getEndNode().getStationName() : "Unknown";
+            }
+            
+            mergedSteps.add(new TransportationResponseDto.Step(
+                currentType,
+                currentRouteName,
+                fromName,
+                toName
+            ));
+            
+            i = j;
+        }
+        
+        return mergedSteps;
     }
 
     private Map<Long, List<Edge>> buildGraph(List<Node> nodes, List<Edge> edges) {
