@@ -1,6 +1,9 @@
 package com.wayble.server.admin.controller;
 
+import com.wayble.server.admin.dto.SystemStatusDto;
+import com.wayble.server.admin.service.AdminSystemService;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -13,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
+
+    private final AdminSystemService adminSystemService;
 
     @Value("${spring.admin.username}")
     private String adminUsername;
@@ -56,7 +62,16 @@ public class AdminController {
             return "redirect:/admin";
         }
         
+        // 시스템 상태 조회
+        SystemStatusDto systemStatus = SystemStatusDto.of(
+            adminSystemService.isApiServerHealthy(),
+            adminSystemService.isDatabaseHealthy(),
+            adminSystemService.isElasticsearchHealthy(),
+            adminSystemService.isFileStorageHealthy()
+        );
+        
         model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+        model.addAttribute("systemStatus", systemStatus);
         return "admin/dashboard";
     }
 

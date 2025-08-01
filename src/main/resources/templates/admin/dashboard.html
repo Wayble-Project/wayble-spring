@@ -203,29 +203,33 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-900">API 서버</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                정상
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                  th:classappend="${systemStatus.apiServerStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                  th:text="${systemStatus.apiServerStatus} ? '정상' : '오류'">
                             </span>
                         </div>
 
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-900">데이터베이스</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                정상
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                  th:classappend="${systemStatus.databaseStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                  th:text="${systemStatus.databaseStatus} ? '정상' : '오류'">
                             </span>
                         </div>
 
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-900">Elasticsearch</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                정상
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                  th:classappend="${systemStatus.elasticsearchStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                  th:text="${systemStatus.elasticsearchStatus} ? '정상' : '오류'">
                             </span>
                         </div>
 
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-900">파일 스토리지</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                정상
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                  th:classappend="${systemStatus.fileStorageStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                  th:text="${systemStatus.fileStorageStatus} ? '정상' : '오류'">
                             </span>
                         </div>
                     </div>
