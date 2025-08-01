@@ -1,6 +1,5 @@
 package com.wayble.server.user.entity;
 
-import com.wayble.server.common.converter.StringListConverter;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
 import jakarta.persistence.*;
