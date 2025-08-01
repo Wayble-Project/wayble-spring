@@ -16,5 +16,5 @@ public class UserInfoResponseDto {
     private UserType userType;
     private List<String> disabilityType; // 복수 선택 가능
     private List<String> mobilityAid;    // 복수 선택 가능
-    private String profileImageUrl;
+    // private String profileImageUrl; (추후 사용 가능)
 }

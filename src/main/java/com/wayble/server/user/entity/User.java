@@ -66,7 +66,7 @@ public class User extends BaseEntity {
 
     @Convert(converter = StringListConverter.class)
     @Column(name = "mobility_aid")
-    private List<String> mobilityAid;  // 이동 보조 수단 (안내견,지팡이,동행인,휠체어)
+    private List<String> mobilityAid;  // 이동 보조 수단 (안내견,지팡이,휠체어,없음)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();

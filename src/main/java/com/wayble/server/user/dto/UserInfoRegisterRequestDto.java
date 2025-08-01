@@ -30,7 +30,8 @@ public class UserInfoRegisterRequestDto {
 
     private List<String> mobilityAid;  // 이동보조수단, (userType == DISABLED만 값 존재)
 
-    // TODO: 현재 와이어프레임에 유저 이미지 등록하는 로직이 없어서 유저 정보 등록에서 이미지 등록 안하면 해당 필드 추후 삭제
+    /* 유저 이미지 등록 관련 (추후에 사용할 수도 있어서 주석처리)
     @Pattern(regexp = "^(https?://).*", message = "올바른 URL 형식이어야 합니다.")
     private String profileImageUrl;
+     */
 }
