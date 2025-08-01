@@ -126,7 +126,7 @@ public class User extends BaseEntity {
 
     public void setDisabilityType(List<DisabilityType> disabilityType) { this.disabilityType = disabilityType; }
 
-    public void setMobilityAid(List<DisabilityType> disabilityType) { this.mobilityAid = mobilityAid; }
+    public void setMobilityAid(List<MobilityAid> mobilityAid) { this.mobilityAid = mobilityAid; }
 
     public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
 
