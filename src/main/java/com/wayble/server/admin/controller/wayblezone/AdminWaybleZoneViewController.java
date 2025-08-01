@@ -1,17 +1,19 @@
 package com.wayble.server.admin.controller.wayblezone;
 
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZonePageDto;
 import com.wayble.server.admin.service.AdminWaybleZoneService;
+import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
@@ -61,5 +63,51 @@ public class AdminWaybleZoneViewController {
         log.debug("웨이블존 상세 조회 - ID: {}", id);
 
         return "admin/wayblezone/wayble-zone-detail";
+    }
+    
+    @GetMapping("/create")
+    public String createWaybleZoneForm(HttpSession session, Model model) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+        
+        model.addAttribute("createDto", new AdminWaybleZoneCreateDto(
+            "", "", null, "", "", "", "", "", null, null, ""
+        ));
+        model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
+        model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+        
+        return "admin/wayblezone/wayble-zone-create";
+    }
+    
+    @PostMapping("/create")
+    public String createWaybleZone(HttpSession session, 
+                                  @Valid @ModelAttribute("createDto") AdminWaybleZoneCreateDto createDto,
+                                  BindingResult bindingResult,
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+        
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
+            model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+            return "admin/wayblezone/wayble-zone-create";
+        }
+        
+        try {
+            Long waybleZoneId = adminWaybleZoneService.createWaybleZone(createDto);
+            redirectAttributes.addFlashAttribute("successMessage", "웨이블존이 성공적으로 생성되었습니다.");
+            return "redirect:/admin/wayble-zones/" + waybleZoneId;
+        } catch (Exception e) {
+            log.error("웨이블존 생성 실패", e);
+            model.addAttribute("errorMessage", "웨이블존 생성에 실패했습니다: " + e.getMessage());
+            model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
+            model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+            return "admin/wayblezone/wayble-zone-create";
+        }
     }
 }

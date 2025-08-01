@@ -1,9 +1,12 @@
 package com.wayble.server.admin.service;
 
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZonePageDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.admin.repository.AdminWaybleZoneRepository;
+import com.wayble.server.explore.service.WaybleZoneDocumentService;
+import com.wayble.server.wayblezone.entity.WaybleZone;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminWaybleZoneService {
     private final AdminWaybleZoneRepository adminWaybleZoneRepository;
+    private final WaybleZoneDocumentService waybleZoneDocumentService;
 
     public long getTotalWaybleZoneCounts() {
         return adminWaybleZoneRepository.count();
@@ -42,5 +46,28 @@ public class AdminWaybleZoneService {
 
     public Optional<AdminWaybleZoneDetailDto> findWaybleZoneById(Long waybleZoneId) {
         return adminWaybleZoneRepository.findAdminWaybleZoneDetailById(waybleZoneId);
+    }
+    
+    @Transactional
+    public Long createWaybleZone(AdminWaybleZoneCreateDto adminWaybleZoneCreateDto) {
+        try {
+            WaybleZone waybleZone = WaybleZone.fromAdminDto(adminWaybleZoneCreateDto);
+            WaybleZone savedZone = adminWaybleZoneRepository.save(waybleZone);
+            
+            log.info("새 웨이블존 생성 완료 - ID: {}, 이름: {}", savedZone.getId(), savedZone.getZoneName());
+            
+            try {
+                waybleZoneDocumentService.saveDocumentFromEntity(savedZone);
+                log.info("WaybleZoneDocument 동기화 완료 - ID: {}", savedZone.getId());
+            } catch (Exception esException) {
+                log.warn("WaybleZoneDocument 동기화 실패, 데이터 불일치 발생 가능 - ID: {}, 오류: {}", 
+                        savedZone.getId(), esException.getMessage());
+            }
+            
+            return savedZone.getId();
+        } catch (Exception e) {
+            log.error("웨이블존 생성 실패", e);
+            throw new RuntimeException("웨이블존 생성에 실패했습니다", e);
+        }
     }
 }

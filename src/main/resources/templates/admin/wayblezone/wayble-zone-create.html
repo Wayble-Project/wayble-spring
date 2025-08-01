@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웨이블존 생성 - Wayble 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-wayble-blue rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </a>
+                    </div>
+                    <div class="ml-4">
+                        <div class="flex items-center space-x-2">
+                            <a href="/admin/wayble-zones" class="text-gray-500 hover:text-gray-700">웨이블존 관리</a>
+                            <span class="text-gray-400">/</span>
+                            <h1 class="text-xl font-semibold text-gray-900">웨이블존 생성</h1>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/admin/wayble-zones" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <span class="text-sm text-gray-700">
+                        <span th:text="${adminUsername}" class="font-medium"></span>님
+                    </span>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">새 웨이블존 생성</h2>
+            <p class="mt-1 text-sm text-gray-600">새로운 웨이블존을 등록하세요</p>
+        </div>
+
+        <!-- 에러/성공 메시지 -->
+        <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-800" th:text="${errorMessage}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 생성 폼 -->
+        <div class="bg-white shadow rounded-lg">
+            <form th:action="@{/admin/wayble-zones/create}" th:object="${createDto}" method="post" class="px-6 py-6">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    
+                    <!-- 웨이블존 이름 -->
+                    <div class="sm:col-span-2">
+                        <label for="zoneName" class="block text-sm font-medium text-gray-700">웨이블존 이름 *</label>
+                        <input type="text" 
+                               th:field="*{zoneName}"
+                               id="zoneName" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                               placeholder="웨이블존 이름을 입력하세요">
+                        <p th:if="${#fields.hasErrors('zoneName')}" th:errors="*{zoneName}" class="mt-1 text-sm text-red-600"></p>
+                    </div>
+
+                    <!-- 연락처 -->
+                    <div>
+                        <label for="contactNumber" class="block text-sm font-medium text-gray-700">연락처</label>
+                        <input type="text" 
+                               th:field="*{contactNumber}"
+                               id="contactNumber" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                               placeholder="연락처를 입력하세요">
+                        <p th:if="${#fields.hasErrors('contactNumber')}" th:errors="*{contactNumber}" class="mt-1 text-sm text-red-600"></p>
+                    </div>
+
+                    <!-- 웨이블존 타입 -->
+                    <div>
+                        <label for="zoneType" class="block text-sm font-medium text-gray-700">웨이블존 타입 *</label>
+                        <select th:field="*{zoneType}" 
+                                id="zoneType" 
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm">
+                            <option value="">타입을 선택하세요</option>
+                            <option th:each="type : ${waybleZoneTypes}" 
+                                    th:value="${type}" 
+                                    th:text="${type == T(com.wayble.server.wayblezone.entity.WaybleZoneType).RESTAURANT ? '음식점' : 
+                                             type == T(com.wayble.server.wayblezone.entity.WaybleZoneType).CAFE ? '카페' : 
+                                             type == T(com.wayble.server.wayblezone.entity.WaybleZoneType).CONVENIENCE ? '편의점' : type}"></option>
+                        </select>
+                        <p th:if="${#fields.hasErrors('zoneType')}" th:errors="*{zoneType}" class="mt-1 text-sm text-red-600"></p>
+                    </div>
+
+                    <!-- 주소 정보 -->
+                    <div class="sm:col-span-2">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">주소 정보</h3>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            
+                            <!-- 시/도 -->
+                            <div>
+                                <label for="state" class="block text-sm font-medium text-gray-700">시/도 *</label>
+                                <input type="text" 
+                                       th:field="*{state}"
+                                       id="state" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 서울특별시">
+                                <p th:if="${#fields.hasErrors('state')}" th:errors="*{state}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- 시/군/구 -->
+                            <div>
+                                <label for="city" class="block text-sm font-medium text-gray-700">시/군/구 *</label>
+                                <input type="text" 
+                                       th:field="*{city}"
+                                       id="city" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 강남구">
+                                <p th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- 동/읍/면 -->
+                            <div>
+                                <label for="district" class="block text-sm font-medium text-gray-700">동/읍/면</label>
+                                <input type="text" 
+                                       th:field="*{district}"
+                                       id="district" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 역삼동">
+                                <p th:if="${#fields.hasErrors('district')}" th:errors="*{district}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- 도로명 주소 -->
+                            <div>
+                                <label for="streetAddress" class="block text-sm font-medium text-gray-700">도로명 주소</label>
+                                <input type="text" 
+                                       th:field="*{streetAddress}"
+                                       id="streetAddress" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 테헤란로 123">
+                                <p th:if="${#fields.hasErrors('streetAddress')}" th:errors="*{streetAddress}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- 상세 주소 -->
+                            <div class="sm:col-span-2">
+                                <label for="detailAddress" class="block text-sm font-medium text-gray-700">상세 주소</label>
+                                <input type="text" 
+                                       th:field="*{detailAddress}"
+                                       id="detailAddress" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 1층">
+                                <p th:if="${#fields.hasErrors('detailAddress')}" th:errors="*{detailAddress}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- 위도 -->
+                            <div>
+                                <label for="latitude" class="block text-sm font-medium text-gray-700">위도 *</label>
+                                <input type="number" 
+                                       th:field="*{latitude}"
+                                       id="latitude" 
+                                       step="0.0000001"
+                                       min="-90" max="90"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 37.5665">
+                                <p th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+
+                            <!-- 경도 -->
+                            <div>
+                                <label for="longitude" class="block text-sm font-medium text-gray-700">경도 *</label>
+                                <input type="number" 
+                                       th:field="*{longitude}"
+                                       id="longitude" 
+                                       step="0.0000001"
+                                       min="-180" max="180"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                                       placeholder="예: 126.9780">
+                                <p th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}" class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 대표 이미지 URL -->
+                    <div class="sm:col-span-2">
+                        <label for="mainImageUrl" class="block text-sm font-medium text-gray-700">대표 이미지 URL</label>
+                        <input type="url" 
+                               th:field="*{mainImageUrl}"
+                               id="mainImageUrl" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-wayble-blue focus:border-wayble-blue sm:text-sm"
+                               placeholder="https://example.com/image.jpg">
+                        <p th:if="${#fields.hasErrors('mainImageUrl')}" th:errors="*{mainImageUrl}" class="mt-1 text-sm text-red-600"></p>
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="mt-6 flex items-center justify-end space-x-4">
+                    <a href="/admin/wayble-zones" 
+                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                        취소
+                    </a>
+                    <button type="submit" 
+                            class="bg-wayble-blue hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                        웨이블존 생성
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

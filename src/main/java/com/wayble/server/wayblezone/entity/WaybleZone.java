@@ -1,5 +1,6 @@
 package com.wayble.server.wayblezone.entity;
 
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
@@ -126,6 +127,32 @@ public class WaybleZone extends BaseEntity {
                 .rating(dto.averageRating() != null ? dto.averageRating() : 0.0)
                 .reviewCount(dto.reviewCount())
                 .likes(dto.likes())
+                .lastModifiedAt(LocalDateTime.now())
+                .syncedAt(null)
+                .build();
+    }
+
+    public static WaybleZone fromAdminDto(AdminWaybleZoneCreateDto dto) {
+        Address dtoAddress = Address
+                .builder()
+                .state(dto.state())
+                .city(dto.city())
+                .district(dto.district())
+                .streetAddress(dto.streetAddress())
+                .detailAddress(dto.detailAddress())
+                .latitude(dto.latitude())
+                .longitude(dto.longitude())
+                .build();
+
+        return WaybleZone.builder()
+                .zoneName(dto.zoneName())
+                .contactNumber(dto.contactNumber())
+                .zoneType(dto.zoneType())
+                .address(dtoAddress)
+                .mainImageUrl(null)
+                .rating(0.0)
+                .reviewCount(0)
+                .likes(0)
                 .lastModifiedAt(LocalDateTime.now())
                 .syncedAt(null)
                 .build();

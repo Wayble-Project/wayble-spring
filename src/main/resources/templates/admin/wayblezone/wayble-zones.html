@@ -64,6 +64,13 @@
                     </p>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <a href="/admin/wayble-zones/create" 
+                       class="bg-wayble-blue hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out flex items-center">
+                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        새 웨이블존 생성
+                    </a>
                     <div class="text-sm text-gray-500">
                         <span th:text="${pageData.currentPage + 1}"></span> / <span th:text="${pageData.totalPages}"></span> 페이지
                     </div>
