@@ -73,7 +73,7 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">전체 사용자</dt>
-                                <dd class="text-lg font-medium text-gray-900">5,678명</dd>
+                                <dd class="text-lg font-medium text-gray-900" th:text="${totalUserCount} + '명'">0명</dd>
                             </dl>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">전체 웨이블존</dt>
-                                <dd class="text-lg font-medium text-gray-900">1,234개</dd>
+                                <dd class="text-lg font-medium text-gray-900" th:text="${totalWaybleZoneCount} + '개'">0개</dd>
                             </dl>
                         </div>
                     </div>

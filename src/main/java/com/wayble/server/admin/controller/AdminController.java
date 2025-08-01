@@ -2,6 +2,8 @@ package com.wayble.server.admin.controller;
 
 import com.wayble.server.admin.dto.SystemStatusDto;
 import com.wayble.server.admin.service.AdminSystemService;
+import com.wayble.server.admin.service.AdminUserService;
+import com.wayble.server.admin.service.AdminWaybleZoneService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminController {
 
     private final AdminSystemService adminSystemService;
+    private final AdminUserService adminUserService;
+    private final AdminWaybleZoneService adminWaybleZoneService;
 
     @Value("${spring.admin.username}")
     private String adminUsername;
@@ -70,8 +74,14 @@ public class AdminController {
             adminSystemService.isFileStorageHealthy()
         );
         
+        // 통계 데이터 조회
+        long totalUserCount = adminUserService.getTotalUserCount();
+        long totalWaybleZoneCount = adminWaybleZoneService.getTotalWaybleZoneCounts();
+        
         model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
         model.addAttribute("systemStatus", systemStatus);
+        model.addAttribute("totalUserCount", totalUserCount);
+        model.addAttribute("totalWaybleZoneCount", totalWaybleZoneCount);
         return "admin/dashboard";
     }
 
