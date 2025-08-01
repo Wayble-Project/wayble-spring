@@ -1,7 +1,7 @@
-package com.wayble.server.admin.controller;
+package com.wayble.server.admin.controller.user;
 
-import com.wayble.server.admin.dto.AdminUserDetailDto;
-import com.wayble.server.admin.dto.AdminUserThumbnailDto;
+import com.wayble.server.admin.dto.user.AdminUserDetailDto;
+import com.wayble.server.admin.dto.user.AdminUserThumbnailDto;
 import com.wayble.server.admin.service.AdminUserService;
 import com.wayble.server.common.response.CommonResponse;
 import lombok.RequiredArgsConstructor;

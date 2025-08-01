@@ -1,4 +1,4 @@
-package com.wayble.server.admin.dto;
+package com.wayble.server.admin.dto.wayblezone;
 
 import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;

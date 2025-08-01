@@ -1,7 +1,7 @@
-package com.wayble.server.admin.controller;
+package com.wayble.server.admin.controller.wayblezone;
 
-import com.wayble.server.admin.dto.AdminWaybleZoneDetailDto;
-import com.wayble.server.admin.dto.AdminWaybleZoneThumbnailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.admin.service.AdminWaybleZoneService;
 import com.wayble.server.common.response.CommonResponse;
 

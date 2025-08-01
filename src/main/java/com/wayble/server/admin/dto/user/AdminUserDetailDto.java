@@ -1,4 +1,4 @@
-package com.wayble.server.admin.dto;
+package com.wayble.server.admin.dto.user;
 
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;

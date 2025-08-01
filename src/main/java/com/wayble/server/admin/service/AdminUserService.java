@@ -1,8 +1,8 @@
 package com.wayble.server.admin.service;
 
-import com.wayble.server.admin.dto.AdminUserDetailDto;
-import com.wayble.server.admin.dto.AdminUserPageDto;
-import com.wayble.server.admin.dto.AdminUserThumbnailDto;
+import com.wayble.server.admin.dto.user.AdminUserDetailDto;
+import com.wayble.server.admin.dto.user.AdminUserPageDto;
+import com.wayble.server.admin.dto.user.AdminUserThumbnailDto;
 import com.wayble.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

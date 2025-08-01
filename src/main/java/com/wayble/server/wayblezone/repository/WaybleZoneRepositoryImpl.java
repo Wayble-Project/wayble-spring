@@ -2,8 +2,8 @@ package com.wayble.server.wayblezone.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.wayble.server.admin.dto.AdminWaybleZoneDetailDto;
-import com.wayble.server.admin.dto.AdminWaybleZoneThumbnailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.explore.dto.common.FacilityResponseDto;
 import com.wayble.server.explore.dto.common.WaybleZoneInfoResponseDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;

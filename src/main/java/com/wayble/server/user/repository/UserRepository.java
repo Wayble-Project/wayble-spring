@@ -1,7 +1,7 @@
 package com.wayble.server.user.repository;
 
-import com.wayble.server.admin.dto.AdminUserDetailDto;
-import com.wayble.server.admin.dto.AdminUserThumbnailDto;
+import com.wayble.server.admin.dto.user.AdminUserDetailDto;
+import com.wayble.server.admin.dto.user.AdminUserThumbnailDto;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

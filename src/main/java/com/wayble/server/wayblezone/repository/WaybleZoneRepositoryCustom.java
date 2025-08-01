@@ -1,7 +1,7 @@
 package com.wayble.server.wayblezone.repository;
 
-import com.wayble.server.admin.dto.AdminWaybleZoneDetailDto;
-import com.wayble.server.admin.dto.AdminWaybleZoneThumbnailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 
