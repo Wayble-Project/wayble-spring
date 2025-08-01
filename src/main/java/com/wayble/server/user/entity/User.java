@@ -59,14 +59,17 @@ public class User extends BaseEntity {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
-    @Convert(converter = StringListConverter.class)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_disability_type", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
     @Column(name = "disability_type")
-    private List<String> disabilityType; // 장애 유형 (발달장애,시각장애,지체장애,청각장애)
+    private List<DisabilityType> disabilityType = new ArrayList<>(); // 장애 유형 (발달장애,시각장애,지체장애,청각장애)
 
-
-    @Convert(converter = StringListConverter.class)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_mobility_aid", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
     @Column(name = "mobility_aid")
-    private List<String> mobilityAid;  // 이동 보조 수단 (안내견,지팡이,휠체어,없음)
+    private List<MobilityAid> mobilityAid = new ArrayList<>(); // 이동보조수단 (안내견,지팡이,휠체어,없음)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
@@ -121,9 +124,9 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void setDisabilityType(List<String> disabilityType) { this.disabilityType = disabilityType; }
+    public void setDisabilityType(List<DisabilityType> disabilityType) { this.disabilityType = disabilityType; }
 
-    public void setMobilityAid(List<String> mobilityAid) { this.mobilityAid = mobilityAid; }
+    public void setMobilityAid(List<DisabilityType> disabilityType) { this.mobilityAid = mobilityAid; }
 
     public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
 
