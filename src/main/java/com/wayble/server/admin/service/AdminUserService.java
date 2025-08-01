@@ -3,10 +3,10 @@ package com.wayble.server.admin.service;
 import com.wayble.server.admin.dto.user.AdminUserDetailDto;
 import com.wayble.server.admin.dto.user.AdminUserPageDto;
 import com.wayble.server.admin.dto.user.AdminUserThumbnailDto;
+import com.wayble.server.admin.repository.AdminUserRepository;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.UserType;
-import com.wayble.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,11 +26,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminUserService {
     
-    private final UserRepository userRepository;
+    private final AdminUserRepository adminUserRepository;
     
     public long getTotalUserCount() {
         try {
-            return userRepository.count();
+            return adminUserRepository.count();
         } catch (Exception e) {
             log.error("사용자 수 조회 실패", e);
             return 0;
@@ -40,8 +40,8 @@ public class AdminUserService {
     public AdminUserPageDto getUsersWithPaging(int page, int size) {
         int offset = page * size;
         
-        List<AdminUserThumbnailDto> content = userRepository.findUsersWithPaging(offset, size);
-        long totalElements = userRepository.count();
+        List<AdminUserThumbnailDto> content = adminUserRepository.findUsersWithPaging(offset, size);
+        long totalElements = adminUserRepository.count();
         
         log.debug("사용자 페이징 조회 - 페이지: {}, 크기: {}, 전체: {}", page, size, totalElements);
         
@@ -50,16 +50,16 @@ public class AdminUserService {
     
     public List<AdminUserThumbnailDto> findUsersByPage(int page, int size) {
         int offset = page * size;
-        return userRepository.findUsersWithPaging(offset, size);
+        return adminUserRepository.findUsersWithPaging(offset, size);
     }
     
     public Optional<AdminUserDetailDto> findUserById(Long userId) {
-        return userRepository.findAdminUserDetailById(userId);
+        return adminUserRepository.findAdminUserDetailById(userId);
     }
     
     public long getTotalDeletedUserCount() {
         try {
-            return userRepository.countDeletedUsers();
+            return adminUserRepository.countDeletedUsers();
         } catch (Exception e) {
             log.error("삭제된 사용자 수 조회 실패", e);
             return 0;
@@ -69,11 +69,11 @@ public class AdminUserService {
     public AdminUserPageDto getDeletedUsersWithPaging(int page, int size) {
         int offset = page * size;
         
-        List<Object[]> rawResults = userRepository.findDeletedUsersWithPaging(offset, size);
+        List<Object[]> rawResults = adminUserRepository.findDeletedUsersWithPaging(offset, size);
         List<AdminUserThumbnailDto> content = rawResults.stream()
                 .map(this::convertToThumbnailDto)
                 .toList();
-        long totalElements = userRepository.countDeletedUsers();
+        long totalElements = adminUserRepository.countDeletedUsers();
         
         log.debug("삭제된 사용자 페이징 조회 - 페이지: {}, 크기: {}, 전체: {}", page, size, totalElements);
         
@@ -82,14 +82,14 @@ public class AdminUserService {
     
     public List<AdminUserThumbnailDto> findDeletedUsersByPage(int page, int size) {
         int offset = page * size;
-        List<Object[]> rawResults = userRepository.findDeletedUsersWithPaging(offset, size);
+        List<Object[]> rawResults = adminUserRepository.findDeletedUsersWithPaging(offset, size);
         return rawResults.stream()
                 .map(this::convertToThumbnailDto)
                 .toList();
     }
     
     public Optional<AdminUserDetailDto> findDeletedUserById(Long userId) {
-        List<Object[]> rawResults = userRepository.findDeletedUserDetailById(userId);
+        List<Object[]> rawResults = adminUserRepository.findDeletedUserDetailById(userId);
         if (rawResults.isEmpty()) {
             return Optional.empty();
         }
