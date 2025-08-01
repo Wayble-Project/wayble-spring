@@ -44,7 +44,6 @@ public class AdminSystemService {
     
     public boolean isFileStorageHealthy() {
         // 파일 스토리지 상태 체크 (예: S3 연결 확인 등)
-        // 현재는 단순히 true로 반환
         return true;
     }
 }

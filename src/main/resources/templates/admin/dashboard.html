@@ -58,28 +58,7 @@
         </div>
 
         <!-- 통계 카드 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- 전체 웨이블존 수 -->
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="h-8 w-8 bg-blue-500 rounded-md flex items-center justify-center">
-                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">전체 웨이블존</dt>
-                                <dd class="text-lg font-medium text-gray-900">1,234개</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- 전체 사용자 수 -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
                 <div class="p-5">
@@ -95,6 +74,27 @@
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">전체 사용자</dt>
                                 <dd class="text-lg font-medium text-gray-900">5,678명</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 전체 웨이블존 수 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">전체 웨이블존</dt>
+                                <dd class="text-lg font-medium text-gray-900">1,234개</dd>
                             </dl>
                         </div>
                     </div>
@@ -121,178 +121,100 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 동기화 상태 -->
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="h-8 w-8 bg-purple-500 rounded-md flex items-center justify-center">
-                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">ES 동기화</dt>
-                                <dd class="text-lg font-medium text-green-600">정상</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 메인 콘텐츠 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- 최근 활동 -->
-            <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">최근 활동</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex-shrink-0">
-                                <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                                    <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-900">새로운 웨이블존 등록</p>
-                                <p class="text-xs text-gray-500">5분 전</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-3">
-                            <div class="flex-shrink-0">
-                                <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <svg class="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-900">신규 사용자 가입</p>
-                                <p class="text-xs text-gray-500">15분 전</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-3">
-                            <div class="flex-shrink-0">
-                                <div class="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                    <svg class="h-4 w-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" clip-rule="evenodd"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-900">데이터 동기화 완료</p>
-                                <p class="text-xs text-gray-500">30분 전</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 시스템 상태 -->
-            <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">시스템 상태</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-900">API 서버</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                  th:classappend="${systemStatus.apiServerStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                  th:text="${systemStatus.apiServerStatus} ? '정상' : '오류'">
-                            </span>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-900">데이터베이스</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                  th:classappend="${systemStatus.databaseStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                  th:text="${systemStatus.databaseStatus} ? '정상' : '오류'">
-                            </span>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-900">Elasticsearch</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                  th:classappend="${systemStatus.elasticsearchStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                  th:text="${systemStatus.elasticsearchStatus} ? '정상' : '오류'">
-                            </span>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-900">파일 스토리지</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                  th:classappend="${systemStatus.fileStorageStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                  th:text="${systemStatus.fileStorageStatus} ? '정상' : '오류'">
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- 관리 메뉴 -->
-        <div class="mt-8">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">관리 메뉴</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="/admin/wayble-zones" class="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">웨이블존 관리</p>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="#" class="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">사용자 관리</p>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="#" class="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">통계 보기</p>
+        <div class="mt-12">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">관리 메뉴</h3>
+                <p class="text-lg text-gray-600">Wayble 서비스 관리 도구</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- 유저 관리 -->
+                <a href="#" class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-green-500 h-full flex flex-col">
+                        <div class="p-8 text-center flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="mx-auto w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition-colors duration-300">유저 관리</h4>
+                                <p class="text-gray-600 text-lg mb-6">사용자 계정 조회, 수정, 삭제 및 권한 관리</p>
+                            </div>
+                            <div class="inline-flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                                관리하기 
+                                <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </a>
 
-                <a href="#" class="block p-6 bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">시스템 설정</p>
+                <!-- 웨이블존 관리 - 메인 기능 -->
+                <a href="/admin/wayble-zones" class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-wayble-blue h-full flex flex-col">
+                        <div class="p-8 text-center flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="mx-auto w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mb-6 group-hover:bg-wayble-blue transition-colors duration-300">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-wayble-blue transition-colors duration-300">웨이블존 관리</h4>
+                                <p class="text-gray-600 text-lg mb-6">웨이블존 조회, 수정, 삭제 및 상세 정보 관리</p>
+                            </div>
+                            <div class="inline-flex items-center text-wayble-blue font-semibold group-hover:text-blue-700">
+                                관리하기 
+                                <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </a>
+
+                <!-- 시스템 상태 -->
+                <div class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg border-2 border-gray-100 h-full flex flex-col">
+                        <div class="p-8 flex-1 flex flex-col">
+                            <div class="text-center mb-6">
+                                <div class="mx-auto w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center mb-6">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900">시스템 상태</h4>
+                            </div>
+                            <div class="space-y-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg text-gray-700">API 서버</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                          th:classappend="${systemStatus.apiServerStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                          th:text="${systemStatus.apiServerStatus} ? '정상' : '오류'">
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg text-gray-700">데이터베이스</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                          th:classappend="${systemStatus.databaseStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                          th:text="${systemStatus.databaseStatus} ? '정상' : '오류'">
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg text-gray-700">Elasticsearch</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                          th:classappend="${systemStatus.elasticsearchStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                          th:text="${systemStatus.elasticsearchStatus} ? '정상' : '오류'">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
