@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndLoginType(String email, LoginType loginType);
     
     @Query("""
-        SELECT new com.wayble.server.admin.dto.AdminUserThumbnailDto(
+        SELECT new com.wayble.server.admin.dto.user.AdminUserThumbnailDto(
             u.id, u.nickname, u.email, u.birthDate, u.gender, 
             u.loginType, u.userType, u.disabilityType, u.mobilityAid
         )
@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<AdminUserThumbnailDto> findUsersWithPaging(@Param("offset") int offset, @Param("size") int size);
     
     @Query("""
-        SELECT new com.wayble.server.admin.dto.AdminUserDetailDto(
+        SELECT new com.wayble.server.admin.dto.user.AdminUserDetailDto(
             u.id, u.nickname, u.username, u.email, u.birthDate, u.gender, 
             u.loginType, u.userType, u.profileImageUrl, u.disabilityType, 
             u.mobilityAid, u.createdAt, u.updatedAt

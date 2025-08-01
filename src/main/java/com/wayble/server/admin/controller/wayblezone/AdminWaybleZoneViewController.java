@@ -40,7 +40,7 @@ public class AdminWaybleZoneViewController {
 
         log.debug("웨이블존 목록 조회 - 페이지: {}, 전체: {}", page, pageData.totalElements());
 
-        return "admin/wayble-zones";
+        return "admin/wayblezone/wayble-zones";
     }
 
     @GetMapping("/{id}")
@@ -52,7 +52,7 @@ public class AdminWaybleZoneViewController {
 
         Optional<AdminWaybleZoneDetailDto> waybleZoneOpt = adminWaybleZoneService.findWaybleZoneById(id);
         if (waybleZoneOpt.isEmpty()) {
-            return "redirect:/admin/wayble-zones?error=notfound";
+            return "redirect:/admin/wayblezone/wayble-zones?error=notfound";
         }
 
         model.addAttribute("waybleZone", waybleZoneOpt.get());
@@ -60,6 +60,6 @@ public class AdminWaybleZoneViewController {
 
         log.debug("웨이블존 상세 조회 - ID: {}", id);
 
-        return "admin/wayble-zone-detail";
+        return "admin/wayblezone/wayble-zone-detail";
     }
 }

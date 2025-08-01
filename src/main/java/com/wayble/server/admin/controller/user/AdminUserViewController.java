@@ -40,7 +40,7 @@ public class AdminUserViewController {
 
         log.debug("사용자 목록 조회 - 페이지: {}, 전체: {}", page, pageData.totalElements());
 
-        return "admin/users";
+        return "admin/user/users";
     }
 
     @GetMapping("/{id}")
@@ -52,7 +52,7 @@ public class AdminUserViewController {
 
         Optional<AdminUserDetailDto> userOpt = adminUserService.findUserById(id);
         if (userOpt.isEmpty()) {
-            return "redirect:/admin/users?error=notfound";
+            return "redirect:/admin/user/users?error=notfound";
         }
 
         model.addAttribute("user", userOpt.get());
@@ -60,6 +60,6 @@ public class AdminUserViewController {
 
         log.debug("사용자 상세 조회 - ID: {}", id);
 
-        return "admin/user-detail";
+        return "admin/user/user-detail";
     }
 }
