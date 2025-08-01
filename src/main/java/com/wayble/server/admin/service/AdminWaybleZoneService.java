@@ -3,7 +3,7 @@ package com.wayble.server.admin.service;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZonePageDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
-import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
+import com.wayble.server.admin.repository.AdminWaybleZoneRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,18 +17,18 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AdminWaybleZoneService {
-    private final WaybleZoneRepository waybleZoneRepository;
+    private final AdminWaybleZoneRepository adminWaybleZoneRepository;
 
     public long getTotalWaybleZoneCounts() {
-        return waybleZoneRepository.count();
+        return adminWaybleZoneRepository.count();
     }
 
     public AdminWaybleZonePageDto getWaybleZonesWithPaging(int page, int size) {
         // 페이징 데이터 조회
-        List<AdminWaybleZoneThumbnailDto> content = waybleZoneRepository.findWaybleZonesWithPaging(page, size);
+        List<AdminWaybleZoneThumbnailDto> content = adminWaybleZoneRepository.findWaybleZonesWithPaging(page, size);
         
         // 전체 개수 조회
-        long totalElements = waybleZoneRepository.count();
+        long totalElements = adminWaybleZoneRepository.count();
         
         log.debug("웨이블존 페이징 조회 - 페이지: {}, 크기: {}, 전체: {}", page, size, totalElements);
         
@@ -37,10 +37,10 @@ public class AdminWaybleZoneService {
     }
 
     public List<AdminWaybleZoneThumbnailDto> findWaybleZonesByPage(int page, int size) {
-        return waybleZoneRepository.findWaybleZonesWithPaging(page, size);
+        return adminWaybleZoneRepository.findWaybleZonesWithPaging(page, size);
     }
 
     public Optional<AdminWaybleZoneDetailDto> findWaybleZoneById(Long waybleZoneId) {
-        return waybleZoneRepository.findAdminWaybleZoneDetailById(waybleZoneId);
+        return adminWaybleZoneRepository.findAdminWaybleZoneDetailById(waybleZoneId);
     }
 }
