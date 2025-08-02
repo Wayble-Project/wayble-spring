@@ -3,7 +3,9 @@ package com.wayble.server.admin.service;
 import com.wayble.server.admin.dto.user.AdminUserDetailDto;
 import com.wayble.server.admin.dto.user.AdminUserPageDto;
 import com.wayble.server.admin.dto.user.AdminUserThumbnailDto;
+import com.wayble.server.admin.exception.AdminErrorCase;
 import com.wayble.server.admin.repository.AdminUserRepository;
+import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.UserType;
@@ -93,7 +95,49 @@ public class AdminUserService {
         if (rawResults.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(convertToDetailDto(rawResults.get(0)));
+        
+        Object[] row = rawResults.get(0);
+        log.debug("삭제된 사용자 데이터 조회 - ID: {}, 데이터: {}", userId, java.util.Arrays.toString(row));
+        
+        return Optional.of(convertToDetailDto(row));
+    }
+    
+    @Transactional
+    public void restoreUser(Long userId) {
+        try {
+            // 삭제된 사용자가 존재하는지 먼저 확인
+            Optional<AdminUserDetailDto> deletedUserOpt = findDeletedUserById(userId);
+            if (deletedUserOpt.isEmpty()) {
+                throw new ApplicationException(AdminErrorCase.USER_NOT_FOUND);
+            }
+            
+            log.info("사용자 복원 시작 - ID: {}, 이메일: {}", userId, deletedUserOpt.get().email());
+            
+            // 사용자 계정 복원
+            int restoredUser = adminUserRepository.restoreUserById(userId);
+            log.debug("사용자 계정 복원 완료 - ID: {}, 처리된 행: {}", userId, restoredUser);
+            
+            // 연관된 리뷰들 복원
+            int restoredReviews = adminUserRepository.restoreUserReviews(userId);
+            log.debug("사용자 리뷰 복원 완료 - ID: {}, 복원된 리뷰: {}", userId, restoredReviews);
+            
+            // 리뷰 이미지들 복원
+            int restoredReviewImages = adminUserRepository.restoreUserReviewImages(userId);
+            log.debug("사용자 리뷰 이미지 복원 완료 - ID: {}, 복원된 이미지: {}", userId, restoredReviewImages);
+            
+            // 사용자 즐겨찾기 복원
+            int restoredUserPlaces = adminUserRepository.restoreUserPlaces(userId);
+            log.debug("사용자 즐겨찾기 복원 완료 - ID: {}, 복원된 즐겨찾기: {}", userId, restoredUserPlaces);
+            
+            log.info("사용자 복원 완료 - ID: {}, 계정: {}, 리뷰: {}, 리뷰이미지: {}, 즐겨찾기: {}", 
+                    userId, restoredUser, restoredReviews, restoredReviewImages, restoredUserPlaces);
+            
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("사용자 복원 실패 - ID: {}", userId, e);
+            throw new RuntimeException("사용자 복원에 실패했습니다", e);
+        }
     }
     
     private AdminUserThumbnailDto convertToThumbnailDto(Object[] row) {
@@ -124,9 +168,9 @@ public class AdminUserService {
         String disabilityType = (String) row[9];
         String mobilityAid = (String) row[10];
         Timestamp createdAtStamp = (Timestamp) row[11];
-        LocalDateTime createdAt = createdAtStamp.toLocalDateTime();
+        LocalDateTime createdAt = createdAtStamp != null ? createdAtStamp.toLocalDateTime() : null;
         Timestamp updatedAtStamp = (Timestamp) row[12];
-        LocalDateTime updatedAt = updatedAtStamp.toLocalDateTime();
+        LocalDateTime updatedAt = updatedAtStamp != null ? updatedAtStamp.toLocalDateTime() : null;
         
         return new AdminUserDetailDto(id, nickname, username, email, birthDate, gender,
                                     loginType, userType, profileImageUrl, disabilityType,

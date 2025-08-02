@@ -8,10 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
@@ -101,5 +99,26 @@ public class AdminUserViewController {
         log.debug("삭제된 사용자 상세 조회 - ID: {}", id);
 
         return "admin/user/deleted-user-detail";
+    }
+    
+    @PostMapping("/deleted/{id}/restore")
+    public String restoreUser(HttpSession session, 
+                             @PathVariable Long id,
+                             RedirectAttributes redirectAttributes) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+        
+        try {
+            adminUserService.restoreUser(id);
+            redirectAttributes.addFlashAttribute("successMessage", "사용자가 성공적으로 복원되었습니다.");
+            log.info("사용자 복원 완료 - ID: {}, 관리자: {}", id, session.getAttribute("adminUsername"));
+            return "redirect:/admin/users/" + id;
+        } catch (Exception e) {
+            log.error("사용자 복원 실패 - ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "사용자 복원에 실패했습니다: " + e.getMessage());
+            return "redirect:/admin/users/deleted/" + id;
+        }
     }
 }
