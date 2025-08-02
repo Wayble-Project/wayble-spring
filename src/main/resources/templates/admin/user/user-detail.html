@@ -192,17 +192,12 @@
                     </div>
                     <div class="px-6 py-4">
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-900">-</div>
+                            <div class="text-2xl font-bold text-blue-600" th:text="${user.reviewCount}">0</div>
                             <div class="text-sm text-gray-500">작성한 리뷰 수</div>
                         </div>
                         <div class="mt-4 text-center">
-                            <div class="text-2xl font-bold text-gray-900">-</div>
+                            <div class="text-2xl font-bold text-green-600" th:text="${user.userPlaceCount}">0</div>
                             <div class="text-sm text-gray-500">좋아요한 장소 수</div>
-                        </div>
-                        <div class="mt-4 text-center">
-                            <div class="text-sm text-gray-400">
-                                통계 정보는 추후 구현 예정입니다
-                            </div>
                         </div>
                     </div>
                 </div>

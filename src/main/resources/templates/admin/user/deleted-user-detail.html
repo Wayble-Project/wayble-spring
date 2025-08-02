@@ -225,16 +225,16 @@
                     </div>
                     <div class="px-6 py-4">
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-400">-</div>
-                            <div class="text-sm text-gray-500">작성한 리뷰 수</div>
+                            <div class="text-2xl font-bold text-red-600" th:text="${user.reviewCount}">0</div>
+                            <div class="text-sm text-gray-500">작성한 리뷰 수 (삭제된 것 포함)</div>
                         </div>
                         <div class="mt-4 text-center">
-                            <div class="text-2xl font-bold text-gray-400">-</div>
-                            <div class="text-sm text-gray-500">좋아요한 장소 수</div>
+                            <div class="text-2xl font-bold text-orange-600" th:text="${user.userPlaceCount}">0</div>
+                            <div class="text-sm text-gray-500">좋아요한 장소 수 (삭제된 것 포함)</div>
                         </div>
                         <div class="mt-4 text-center">
-                            <div class="text-sm text-gray-400">
-                                삭제된 사용자의 통계는 표시되지 않습니다
+                            <div class="text-sm text-gray-500">
+                                복원 시 활성 상태인 데이터만 다시 표시됩니다
                             </div>
                         </div>
                     </div>

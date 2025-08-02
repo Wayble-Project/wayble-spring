@@ -20,6 +20,8 @@ public record AdminUserDetailDto(
     String disabilityType,
     String mobilityAid,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    Long reviewCount,
+    Long userPlaceCount
 ) {
 }

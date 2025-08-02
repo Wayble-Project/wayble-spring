@@ -25,15 +25,13 @@ public interface AdminUserRepository extends JpaRepository<User, Long> {
     List<AdminUserThumbnailDto> findUsersWithPaging(@Param("offset") int offset, @Param("size") int size);
     
     @Query("""
-        SELECT new com.wayble.server.admin.dto.user.AdminUserDetailDto(
-            u.id, u.nickname, u.username, u.email, u.birthDate, u.gender, 
-            u.loginType, u.userType, u.profileImageUrl, u.disabilityType, 
-            u.mobilityAid, u.createdAt, u.updatedAt
-        )
+        SELECT u.id, u.nickname, u.username, u.email, u.birthDate, u.gender, 
+               u.loginType, u.userType, u.profileImageUrl, u.disabilityType, 
+               u.mobilityAid, u.createdAt, u.updatedAt
         FROM User u 
         WHERE u.id = :userId
         """)
-    Optional<AdminUserDetailDto> findAdminUserDetailById(@Param("userId") Long userId);
+    List<Object[]> findAdminUserDetailByIdRaw(@Param("userId") Long userId);
     
     @Query(value = """
         SELECT u.id, u.nickname, u.email, u.birth_date, u.gender, 
@@ -90,5 +88,15 @@ public interface AdminUserRepository extends JpaRepository<User, Long> {
         """, nativeQuery = true)
     int restoreUserPlaces(@Param("userId") Long userId);
     
+    @Query(value = "SELECT COUNT(*) FROM review WHERE user_id = :userId AND deleted_at IS NULL", nativeQuery = true)
+    long countUserReviews(@Param("userId") Long userId);
     
+    @Query(value = "SELECT COUNT(*) FROM user_place WHERE user_id = :userId AND deleted_at IS NULL", nativeQuery = true)
+    long countUserPlaces(@Param("userId") Long userId);
+    
+    @Query(value = "SELECT COUNT(*) FROM review WHERE user_id = :userId", nativeQuery = true)
+    long countUserReviewsIncludingDeleted(@Param("userId") Long userId);
+    
+    @Query(value = "SELECT COUNT(*) FROM user_place WHERE user_id = :userId", nativeQuery = true)
+    long countUserPlacesIncludingDeleted(@Param("userId") Long userId);
 }

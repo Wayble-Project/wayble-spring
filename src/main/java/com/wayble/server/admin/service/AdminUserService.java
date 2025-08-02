@@ -56,7 +56,16 @@ public class AdminUserService {
     }
     
     public Optional<AdminUserDetailDto> findUserById(Long userId) {
-        return adminUserRepository.findAdminUserDetailById(userId);
+        List<Object[]> rawResults = adminUserRepository.findAdminUserDetailByIdRaw(userId);
+        if (rawResults.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        Object[] row = rawResults.get(0);
+        long reviewCount = adminUserRepository.countUserReviews(userId);
+        long userPlaceCount = adminUserRepository.countUserPlaces(userId);
+        
+        return Optional.of(convertToDetailDtoWithStats(row, reviewCount, userPlaceCount));
     }
     
     public long getTotalDeletedUserCount() {
@@ -99,7 +108,11 @@ public class AdminUserService {
         Object[] row = rawResults.get(0);
         log.debug("삭제된 사용자 데이터 조회 - ID: {}, 데이터: {}", userId, java.util.Arrays.toString(row));
         
-        return Optional.of(convertToDetailDto(row));
+        // 삭제된 사용자의 경우 삭제된 것들도 포함하여 통계 조회
+        long reviewCount = adminUserRepository.countUserReviewsIncludingDeleted(userId);
+        long userPlaceCount = adminUserRepository.countUserPlacesIncludingDeleted(userId);
+        
+        return Optional.of(convertToDetailDto(row, reviewCount, userPlaceCount));
     }
     
     @Transactional
@@ -155,7 +168,7 @@ public class AdminUserService {
                                        loginType, userType, disabilityType, mobilityAid);
     }
     
-    private AdminUserDetailDto convertToDetailDto(Object[] row) {
+    private AdminUserDetailDto convertToDetailDto(Object[] row, long reviewCount, long userPlaceCount) {
         Long id = convertToLong(row[0]);
         String nickname = (String) row[1];
         String username = (String) row[2];
@@ -174,7 +187,27 @@ public class AdminUserService {
         
         return new AdminUserDetailDto(id, nickname, username, email, birthDate, gender,
                                     loginType, userType, profileImageUrl, disabilityType,
-                                    mobilityAid, createdAt, updatedAt);
+                                    mobilityAid, createdAt, updatedAt, reviewCount, userPlaceCount);
+    }
+    
+    private AdminUserDetailDto convertToDetailDtoWithStats(Object[] row, long reviewCount, long userPlaceCount) {
+        Long id = convertToLong(row[0]);
+        String nickname = (String) row[1];
+        String username = (String) row[2];
+        String email = (String) row[3];
+        LocalDate birthDate = row[4] != null ? (LocalDate) row[4] : null;
+        Gender gender = row[5] != null ? (Gender) row[5] : null;
+        LoginType loginType = (LoginType) row[6];
+        UserType userType = (UserType) row[7];
+        String profileImageUrl = (String) row[8];
+        String disabilityType = (String) row[9];
+        String mobilityAid = (String) row[10];
+        LocalDateTime createdAt = row[11] != null ? (LocalDateTime) row[11] : null;
+        LocalDateTime updatedAt = row[12] != null ? (LocalDateTime) row[12] : null;
+        
+        return new AdminUserDetailDto(id, nickname, username, email, birthDate, gender,
+                                    loginType, userType, profileImageUrl, disabilityType,
+                                    mobilityAid, createdAt, updatedAt, reviewCount, userPlaceCount);
     }
     
     private Long convertToLong(Object value) {
