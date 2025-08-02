@@ -42,7 +42,10 @@ public class AdminUserService {
     public AdminUserPageDto getUsersWithPaging(int page, int size) {
         int offset = page * size;
         
-        List<AdminUserThumbnailDto> content = adminUserRepository.findUsersWithPaging(offset, size);
+        List<Object[]> rawResults = adminUserRepository.findUsersWithPagingRaw(offset, size);
+        List<AdminUserThumbnailDto> content = rawResults.stream()
+                .map(this::convertToThumbnailDto)
+                .toList();
         long totalElements = adminUserRepository.count();
         
         log.debug("사용자 페이징 조회 - 페이지: {}, 크기: {}, 전체: {}", page, size, totalElements);
@@ -52,7 +55,10 @@ public class AdminUserService {
     
     public List<AdminUserThumbnailDto> findUsersByPage(int page, int size) {
         int offset = page * size;
-        return adminUserRepository.findUsersWithPaging(offset, size);
+        List<Object[]> rawResults = adminUserRepository.findUsersWithPagingRaw(offset, size);
+        return rawResults.stream()
+                .map(this::convertToThumbnailDto)
+                .toList();
     }
     
     public Optional<AdminUserDetailDto> findUserById(Long userId) {
@@ -195,15 +201,17 @@ public class AdminUserService {
         String nickname = (String) row[1];
         String username = (String) row[2];
         String email = (String) row[3];
-        LocalDate birthDate = row[4] != null ? (LocalDate) row[4] : null;
-        Gender gender = row[5] != null ? (Gender) row[5] : null;
-        LoginType loginType = (LoginType) row[6];
-        UserType userType = (UserType) row[7];
+        LocalDate birthDate = row[4] != null ? ((Date) row[4]).toLocalDate() : null;
+        Gender gender = row[5] != null ? Gender.valueOf((String) row[5]) : null;
+        LoginType loginType = LoginType.valueOf((String) row[6]);
+        UserType userType = UserType.valueOf((String) row[7]);
         String profileImageUrl = (String) row[8];
         String disabilityType = (String) row[9];
         String mobilityAid = (String) row[10];
-        LocalDateTime createdAt = row[11] != null ? (LocalDateTime) row[11] : null;
-        LocalDateTime updatedAt = row[12] != null ? (LocalDateTime) row[12] : null;
+        Timestamp createdAtStamp = (Timestamp) row[11];
+        LocalDateTime createdAt = createdAtStamp != null ? createdAtStamp.toLocalDateTime() : null;
+        Timestamp updatedAtStamp = (Timestamp) row[12];
+        LocalDateTime updatedAt = updatedAtStamp != null ? updatedAtStamp.toLocalDateTime() : null;
         
         return new AdminUserDetailDto(id, nickname, username, email, birthDate, gender,
                                     loginType, userType, profileImageUrl, disabilityType,

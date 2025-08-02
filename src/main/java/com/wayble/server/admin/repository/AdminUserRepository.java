@@ -13,24 +13,23 @@ import java.util.Optional;
 
 public interface AdminUserRepository extends JpaRepository<User, Long> {
     
-    @Query("""
-        SELECT new com.wayble.server.admin.dto.user.AdminUserThumbnailDto(
-            u.id, u.nickname, u.email, u.birthDate, u.gender, 
-            u.loginType, u.userType, u.disabilityType, u.mobilityAid
-        )
-        FROM User u
-        ORDER BY u.createdAt DESC
+    @Query(value = """
+        SELECT u.id, u.nickname, u.email, u.birth_date, u.gender, 
+               u.login_type, u.user_type, u.disability_type, u.mobility_aid
+        FROM user u
+        WHERE u.deleted_at IS NULL
+        ORDER BY u.created_at DESC
         LIMIT :size OFFSET :offset
-        """)
-    List<AdminUserThumbnailDto> findUsersWithPaging(@Param("offset") int offset, @Param("size") int size);
+        """, nativeQuery = true)
+    List<Object[]> findUsersWithPagingRaw(@Param("offset") int offset, @Param("size") int size);
     
-    @Query("""
-        SELECT u.id, u.nickname, u.username, u.email, u.birthDate, u.gender, 
-               u.loginType, u.userType, u.profileImageUrl, u.disabilityType, 
-               u.mobilityAid, u.createdAt, u.updatedAt
-        FROM User u 
-        WHERE u.id = :userId
-        """)
+    @Query(value = """
+        SELECT u.id, u.nickname, u.username, u.email, u.birth_date, u.gender, 
+               u.login_type, u.user_type, u.profile_image_url, u.disability_type, 
+               u.mobility_aid, u.created_at, u.updated_at
+        FROM user u 
+        WHERE u.id = :userId AND u.deleted_at IS NULL
+        """, nativeQuery = true)
     List<Object[]> findAdminUserDetailByIdRaw(@Param("userId") Long userId);
     
     @Query(value = """
