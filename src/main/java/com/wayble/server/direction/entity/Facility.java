@@ -1,8 +1,8 @@
 package com.wayble.server.direction.entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Getter
@@ -18,24 +18,19 @@ public class Facility {
     @Column(name="stationName")
     private String stationName;
 
-    @Column(name = "lift_latitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
-    @Nullable
+    @Column(name = "lift_latitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
     private Double liftLatitude;
 
-    @Column(name = "lift_longitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
-    @Nullable
+    @Column(name = "lift_longitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
     private Double liftLongitude;
 
-    @Column(name = "lift_exit_Num")
-    @Nullable
+    @Column(name = "lift_exit_Num", nullable = true)
     private Integer liftExitNum;
 
-    @Column(name = "elevator_latitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
-    @Nullable
-    private Integer elevatorLatitude;
+    @Column(name = "elevator_latitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
+    private Double elevatorLatitude;
 
-    @Column(name = "elevator_longitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
-    @Nullable
+    @Column(name = "elevator_longitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
     private Double elevatorLongitude;
 
     @OneToOne
