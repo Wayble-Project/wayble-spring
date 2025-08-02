@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 상세정보 - Wayble 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-wayble-blue rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </a>
+                    </div>
+                    <div class="ml-4">
+                        <div class="flex items-center space-x-2">
+                            <a href="/admin/users" class="text-gray-500 hover:text-gray-700">사용자 관리</a>
+                            <span class="text-gray-400">/</span>
+                            <h1 class="text-xl font-semibold text-gray-900">상세정보</h1>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/admin/users" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <span class="text-sm text-gray-700">
+                        <span th:text="${adminUsername}" class="font-medium"></span>님
+                    </span>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900" th:text="${user.nickname ?: '닉네임 없음'}"></h2>
+                    <p class="mt-1 text-sm text-gray-600">사용자 상세 정보</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                          th:classappend="${user.userType.name() == 'GENERAL'} ? 'bg-blue-100 text-blue-800' : (${user.userType.name() == 'DISABLED'} ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800')"
+                          th:text="${user.userType.name()}">
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                          th:classappend="${user.loginType.name() == 'WAYBLE'} ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'"
+                          th:text="${user.loginType.name()}">
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 메인 정보 -->
+            <div class="lg:col-span-2">
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">기본 정보</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">사용자 ID</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.id}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">닉네임</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.nickname ?: '설정되지 않음'}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">사용자명</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.username ?: '설정되지 않음'}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">이메일</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.email}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">생년월일</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.birthDate != null ? #temporals.format(user.birthDate, 'yyyy년 MM월 dd일') : '설정되지 않음'}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">성별</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.gender != null ? user.gender.name() : '설정되지 않음'}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">로그인 타입</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.loginType.name()}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">사용자 타입</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.userType.name()}"></dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-gray-500">프로필 이미지</dt>
+                                <dd class="mt-1 text-sm text-gray-900">
+                                    <div th:if="${user.profileImageUrl}" class="flex items-center space-x-4">
+                                        <img th:src="${user.profileImageUrl}" alt="프로필 이미지" class="h-16 w-16 rounded-full object-cover">
+                                        <span th:text="${user.profileImageUrl}" class="text-xs text-gray-500 break-all"></span>
+                                    </div>
+                                    <span th:unless="${user.profileImageUrl}" class="text-gray-400">설정되지 않음</span>
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- 시간 정보 -->
+                <div class="mt-6 bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">시간 정보</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">가입일</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy년 MM월 dd일 HH:mm:ss') : '정보 없음'}"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">마지막 수정일</dt>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.updatedAt != null ? #temporals.format(user.updatedAt, 'yyyy년 MM월 dd일 HH:mm:ss') : '정보 없음'}"></dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 사이드바 - 장애 관련 정보 -->
+            <div>
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">장애 관련 정보</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <dl class="space-y-6">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">장애 유형</dt>
+                                <dd class="mt-1">
+                                    <span th:if="${user.disabilityType}" 
+                                          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                                          th:text="${user.disabilityType}">
+                                    </span>
+                                    <span th:unless="${user.disabilityType}" class="text-sm text-gray-400">설정되지 않음</span>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">이동 보조 수단</dt>
+                                <dd class="mt-1">
+                                    <span th:if="${user.mobilityAid}" 
+                                          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                                          th:text="${user.mobilityAid}">
+                                    </span>
+                                    <span th:unless="${user.mobilityAid}" class="text-sm text-gray-400">설정되지 않음</span>
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- 통계 정보 -->
+                <div class="mt-6 bg-white shadow rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">활동 통계</h3>
+                    </div>
+                    <div class="px-6 py-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" th:text="${user.reviewCount}">0</div>
+                            <div class="text-sm text-gray-500">작성한 리뷰 수</div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <div class="text-2xl font-bold text-green-600" th:text="${user.userPlaceCount}">0</div>
+                            <div class="text-sm text-gray-500">좋아요한 장소 수</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

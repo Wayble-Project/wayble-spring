@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wayble 관리자 로그인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full space-y-8 p-8">
+        <div>
+            <div class="mx-auto h-12 w-12 bg-wayble-blue rounded-full flex items-center justify-center">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Wayble 관리자
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                관리자 계정으로 로그인하세요
+            </p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- 에러 메시지 -->
+            <div th:if="${error}" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-800" th:text="${error}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <form class="space-y-6" th:action="@{/admin/login}" method="post">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">
+                        사용자명
+                    </label>
+                    <div class="mt-1">
+                        <input id="username" name="username" type="text" required 
+                               class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-wayble-blue focus:border-wayble-blue focus:z-10 sm:text-sm"
+                               placeholder="관리자 사용자명을 입력하세요">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">
+                        비밀번호
+                    </label>
+                    <div class="mt-1">
+                        <input id="password" name="password" type="password" required 
+                               class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-wayble-blue focus:border-wayble-blue focus:z-10 sm:text-sm"
+                               placeholder="비밀번호를 입력하세요">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-wayble-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wayble-blue transition duration-150 ease-in-out">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <svg class="h-5 w-5 text-blue-300 group-hover:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                        로그인
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center">
+            <p class="text-xs text-gray-500">
+                © 2025 Wayble. 관리자 전용 페이지입니다.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 엔터 키로 폼 제출
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('form').submit();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -29,4 +29,8 @@ public class WaybleZoneDocumentService {
     public void saveDocumentFromDto(WaybleZoneRegisterDto dto) {
         waybleZoneDocumentRepository.save(WaybleZoneDocument.fromDto(dto));
     }
+
+    public void deleteDocumentById(Long id) {
+        waybleZoneDocumentRepository.deleteById(id);
+    }
 }

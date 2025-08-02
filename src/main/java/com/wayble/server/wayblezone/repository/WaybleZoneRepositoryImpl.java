@@ -10,6 +10,7 @@ import com.wayble.server.wayblezone.entity.WaybleZone;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.wayble.server.wayblezone.entity.QWaybleZone.waybleZone;
@@ -124,6 +125,7 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
                 .limit(limit)
                 .fetch();
     }
+
 
     // 내부 클래스로 visit count 담을 DTO
     public static class VisitCount {

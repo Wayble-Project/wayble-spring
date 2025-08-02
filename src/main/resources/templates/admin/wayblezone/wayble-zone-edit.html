@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웨이블존 수정 - Wayble 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-wayble-blue rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </a>
+                    </div>
+                    <div class="ml-4">
+                        <div class="flex items-center space-x-2">
+                            <a href="/admin/wayble-zones" class="text-gray-500 hover:text-gray-700">웨이블존 관리</a>
+                            <span class="text-gray-400">/</span>
+                            <a th:href="@{/admin/wayble-zones/{id}(id=${updateDto.id})}" class="text-gray-500 hover:text-gray-700" th:text="${updateDto.zoneName}">웨이블존 상세</a>
+                            <span class="text-gray-400">/</span>
+                            <h1 class="text-xl font-semibold text-gray-900">수정</h1>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/admin/wayble-zones/{id}(id=${updateDto.id})}" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <span class="text-sm text-gray-700">
+                        <span th:text="${adminUsername}" class="font-medium"></span>님
+                    </span>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">웨이블존 정보 수정</h2>
+            <p class="mt-1 text-sm text-gray-600">웨이블존 정보를 수정하세요</p>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div th:if="${successMessage}" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-800" th:text="${successMessage}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-800" th:text="${errorMessage}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 수정 폼 -->
+        <div class="bg-white shadow-lg rounded-xl border border-gray-100">
+            <div class="px-8 py-6 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                            <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">웨이블존 정보 수정</h3>
+                        <p class="text-sm text-gray-500">웨이블존의 정보를 수정해주세요</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form th:action="@{/admin/wayble-zones/{id}/edit(id=${updateDto.id})}" th:object="${updateDto}" method="post" class="px-8 py-6">
+                <!-- Hidden field for ID -->
+                <input type="hidden" th:field="*{id}">
+                
+                <div class="space-y-8">
+                    
+                    <!-- 기본 정보 섹션 -->
+                    <div class="space-y-6">
+                        <div class="border-l-4 border-wayble-blue pl-4">
+                            <h4 class="text-base font-semibold text-gray-900">기본 정보</h4>
+                            <p class="text-sm text-gray-600">웨이블존의 기본 정보를 수정하세요</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <!-- 웨이블존 이름 -->
+                            <div class="sm:col-span-2">
+                                <label for="zoneName" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    웨이블존 이름 <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="text" 
+                                           th:field="*{zoneName}"
+                                           id="zoneName" 
+                                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                           placeholder="웨이블존 이름을 입력하세요">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p th:if="${#fields.hasErrors('zoneName')}" th:errors="*{zoneName}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 연락처 -->
+                            <div>
+                                <label for="contactNumber" class="block text-sm font-semibold text-gray-700 mb-2">연락처</label>
+                                <div class="relative">
+                                    <input type="text" 
+                                           th:field="*{contactNumber}"
+                                           id="contactNumber" 
+                                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                           placeholder="연락처를 입력하세요">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p th:if="${#fields.hasErrors('contactNumber')}" th:errors="*{contactNumber}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 웨이블존 타입 -->
+                            <div>
+                                <label for="zoneType" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    웨이블존 타입 <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select th:field="*{zoneType}" 
+                                            id="zoneType" 
+                                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 text-sm appearance-none bg-white">
+                                        <option value="">타입을 선택하세요</option>
+                                        <option th:each="type : ${waybleZoneTypes}" 
+                                                th:value="${type}" 
+                                                th:text="${type == T(com.wayble.server.wayblezone.entity.WaybleZoneType).RESTAURANT ? '음식점' : 
+                                                         type == T(com.wayble.server.wayblezone.entity.WaybleZoneType).CAFE ? '카페' : 
+                                                         type == T(com.wayble.server.wayblezone.entity.WaybleZoneType).CONVENIENCE ? '편의점' : type}"></option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p th:if="${#fields.hasErrors('zoneType')}" th:errors="*{zoneType}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 주소 정보 섹션 -->
+                    <div class="space-y-6">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <h4 class="text-base font-semibold text-gray-900">주소 정보</h4>
+                            <p class="text-sm text-gray-600">웨이블존의 정확한 위치 정보를 수정하세요</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            
+                            <!-- 시/도 -->
+                            <div>
+                                <label for="state" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    시/도 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       th:field="*{state}"
+                                       id="state" 
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                       placeholder="예: 서울특별시">
+                                <p th:if="${#fields.hasErrors('state')}" th:errors="*{state}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 시/군/구 -->
+                            <div>
+                                <label for="city" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    시/군/구 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       th:field="*{city}"
+                                       id="city" 
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                       placeholder="예: 강남구">
+                                <p th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 동/읍/면 -->
+                            <div>
+                                <label for="district" class="block text-sm font-semibold text-gray-700 mb-2">동/읍/면</label>
+                                <input type="text" 
+                                       th:field="*{district}"
+                                       id="district" 
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                       placeholder="예: 역삼동">
+                                <p th:if="${#fields.hasErrors('district')}" th:errors="*{district}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 도로명 주소 -->
+                            <div>
+                                <label for="streetAddress" class="block text-sm font-semibold text-gray-700 mb-2">도로명 주소</label>
+                                <input type="text" 
+                                       th:field="*{streetAddress}"
+                                       id="streetAddress" 
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                       placeholder="예: 테헤란로 123">
+                                <p th:if="${#fields.hasErrors('streetAddress')}" th:errors="*{streetAddress}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 상세 주소 -->
+                            <div class="sm:col-span-2">
+                                <label for="detailAddress" class="block text-sm font-semibold text-gray-700 mb-2">상세 주소</label>
+                                <input type="text" 
+                                       th:field="*{detailAddress}"
+                                       id="detailAddress" 
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                       placeholder="예: 1층">
+                                <p th:if="${#fields.hasErrors('detailAddress')}" th:errors="*{detailAddress}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 위도 -->
+                            <div>
+                                <label for="latitude" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    위도 <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="number" 
+                                           th:field="*{latitude}"
+                                           id="latitude" 
+                                           step="0.000000001"
+                                           min="-90" max="90"
+                                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                           placeholder="예: 37.5665123456">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+
+                            <!-- 경도 -->
+                            <div>
+                                <label for="longitude" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    경도 <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="number" 
+                                           th:field="*{longitude}"
+                                           id="longitude" 
+                                           step="0.000000001"
+                                           min="-180" max="180"
+                                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                           placeholder="예: 126.9780123456">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}" class="mt-2 text-sm text-red-600 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 이미지 정보 섹션 -->
+                    <div class="space-y-6">
+                        <div class="border-l-4 border-purple-500 pl-4">
+                            <h4 class="text-base font-semibold text-gray-900">이미지 정보</h4>
+                            <p class="text-sm text-gray-600">웨이블존의 대표 이미지를 수정하세요</p>
+                        </div>
+                        
+                        <!-- 대표 이미지 URL -->
+                        <div>
+                            <label for="mainImageUrl" class="block text-sm font-semibold text-gray-700 mb-2">대표 이미지 URL</label>
+                            <div class="relative">
+                                <input type="url" 
+                                       th:field="*{mainImageUrl}"
+                                       id="mainImageUrl" 
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-wayble-blue focus:border-wayble-blue transition-colors duration-200 placeholder-gray-400 text-sm"
+                                       placeholder="https://example.com/image.jpg">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p th:if="${#fields.hasErrors('mainImageUrl')}" th:errors="*{mainImageUrl}" class="mt-2 text-sm text-red-600 flex items-center">
+                                <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        <span class="text-red-500">*</span> 표시는 필수 입력 항목입니다
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a th:href="@{/admin/wayble-zones/{id}(id=${updateDto.id})}" 
+                           class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wayble-blue transition-colors duration-200">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            취소
+                        </a>
+                        <button type="submit" 
+                                class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-lg transform hover:scale-105 transition-all duration-200">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            변경사항 저장
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

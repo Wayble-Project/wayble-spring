@@ -1,5 +1,6 @@
 package com.wayble.server.wayblezone.entity;
 
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
@@ -102,6 +103,32 @@ public class WaybleZone extends BaseEntity {
         this.markAsModified(); // 변경 시 자동으로 수정 시간 갱신
     }
     
+    // 관리자 업데이트 메서드들
+    public void updateZoneName(String zoneName) {
+        this.zoneName = zoneName;
+        this.markAsModified();
+    }
+    
+    public void updateContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+        this.markAsModified();
+    }
+    
+    public void updateZoneType(WaybleZoneType zoneType) {
+        this.zoneType = zoneType;
+        this.markAsModified();
+    }
+    
+    public void updateAddress(Address address) {
+        this.address = address;
+        this.markAsModified();
+    }
+    
+    public void updateMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+        this.markAsModified();
+    }
+    
     // ES 동기화 관련 메서드들
     public void markAsModified() {
         this.lastModifiedAt = LocalDateTime.now();
@@ -126,6 +153,32 @@ public class WaybleZone extends BaseEntity {
                 .rating(dto.averageRating() != null ? dto.averageRating() : 0.0)
                 .reviewCount(dto.reviewCount())
                 .likes(dto.likes())
+                .lastModifiedAt(LocalDateTime.now())
+                .syncedAt(null)
+                .build();
+    }
+
+    public static WaybleZone fromAdminDto(AdminWaybleZoneCreateDto dto) {
+        Address dtoAddress = Address
+                .builder()
+                .state(dto.state())
+                .city(dto.city())
+                .district(dto.district())
+                .streetAddress(dto.streetAddress())
+                .detailAddress(dto.detailAddress())
+                .latitude(dto.latitude())
+                .longitude(dto.longitude())
+                .build();
+
+        return WaybleZone.builder()
+                .zoneName(dto.zoneName())
+                .contactNumber(dto.contactNumber())
+                .zoneType(dto.zoneType())
+                .address(dtoAddress)
+                .mainImageUrl(null)
+                .rating(0.0)
+                .reviewCount(0)
+                .likes(0)
                 .lastModifiedAt(LocalDateTime.now())
                 .syncedAt(null)
                 .build();
