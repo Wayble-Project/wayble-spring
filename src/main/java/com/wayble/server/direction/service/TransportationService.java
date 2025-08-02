@@ -24,6 +24,7 @@ public class TransportationService {
     private final NodeRepository nodeRepository;
     private final EdgeRepository edgeRepository;
     private final EdgeService edgeService;
+    private final FacilityService facilityService;
 
     private List<Node> nodes;
     private List<Edge> edges;
@@ -246,6 +247,11 @@ public class TransportationService {
             Edge currentEdge = pathEdges.get(i);
             DirectionType currentType = currentEdge.getEdgeType();
             String currentRouteName = (currentEdge.getRoute() != null) ? currentEdge.getRoute().getRouteName() : null;
+            TransportationResponseDto.NodeInfo currentInfo = null;
+            if (currentType == DirectionType.SUBWAY) {
+                currentInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId());
+            }
+
             
             // 시작 노드
             String fromName = (currentEdge.getStartNode() != null) ? currentEdge.getStartNode().getStationName() : "Unknown";
@@ -256,6 +262,7 @@ public class TransportationService {
                 mergedSteps.add(new TransportationResponseDto.Step(
                     currentType,
                     currentRouteName,
+                    currentInfo,
                     fromName,
                     toName
                 ));
@@ -286,6 +293,7 @@ public class TransportationService {
             mergedSteps.add(new TransportationResponseDto.Step(
                 currentType,
                 currentRouteName,
+                currentInfo,
                 fromName,
                 toName
             ));
