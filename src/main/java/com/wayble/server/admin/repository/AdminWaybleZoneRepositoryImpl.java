@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
+import com.wayble.server.common.entity.Address;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 
 import java.util.List;
@@ -74,6 +75,7 @@ public class AdminWaybleZoneRepositoryImpl implements AdminWaybleZoneRepositoryC
         List<AdminWaybleZoneDetailDto.OperatingHourInfo> operatingHours = List.of();
         List<String> imageUrls = List.of();
         List<AdminWaybleZoneDetailDto.RecentReviewInfo> recentReviews = List.of();
+        Address address = zone.getAddress();
 
         // 4. 최종 DTO 생성
         AdminWaybleZoneDetailDto detailDto = new AdminWaybleZoneDetailDto(
@@ -81,6 +83,7 @@ public class AdminWaybleZoneRepositoryImpl implements AdminWaybleZoneRepositoryC
                 zone.getZoneName(),
                 zone.getContactNumber(),
                 zone.getZoneType(),
+                zone.getAddress(),
                 zone.getAddress().toFullAddress(),
                 zone.getAddress().getLatitude(),
                 zone.getAddress().getLongitude(), 

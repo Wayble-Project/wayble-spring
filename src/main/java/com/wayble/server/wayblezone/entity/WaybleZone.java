@@ -103,6 +103,32 @@ public class WaybleZone extends BaseEntity {
         this.markAsModified(); // 변경 시 자동으로 수정 시간 갱신
     }
     
+    // 관리자 업데이트 메서드들
+    public void updateZoneName(String zoneName) {
+        this.zoneName = zoneName;
+        this.markAsModified();
+    }
+    
+    public void updateContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+        this.markAsModified();
+    }
+    
+    public void updateZoneType(WaybleZoneType zoneType) {
+        this.zoneType = zoneType;
+        this.markAsModified();
+    }
+    
+    public void updateAddress(Address address) {
+        this.address = address;
+        this.markAsModified();
+    }
+    
+    public void updateMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+        this.markAsModified();
+    }
+    
     // ES 동기화 관련 메서드들
     public void markAsModified() {
         this.lastModifiedAt = LocalDateTime.now();

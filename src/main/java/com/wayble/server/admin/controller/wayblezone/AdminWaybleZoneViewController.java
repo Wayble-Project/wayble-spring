@@ -3,6 +3,7 @@ package com.wayble.server.admin.controller.wayblezone;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZonePageDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneUpdateDto;
 import com.wayble.server.admin.service.AdminWaybleZoneService;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 import jakarta.servlet.http.HttpSession;
@@ -108,6 +109,75 @@ public class AdminWaybleZoneViewController {
             model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
             model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
             return "admin/wayblezone/wayble-zone-create";
+        }
+    }
+    
+    @GetMapping("/{id}/edit")
+    public String editWaybleZoneForm(HttpSession session, Model model, @PathVariable Long id) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+        
+        Optional<AdminWaybleZoneDetailDto> waybleZoneOpt = adminWaybleZoneService.findWaybleZoneById(id);
+        if (waybleZoneOpt.isEmpty()) {
+            return "redirect:/admin/wayble-zones?error=notfound";
+        }
+        
+        AdminWaybleZoneDetailDto waybleZone = waybleZoneOpt.get();
+        AdminWaybleZoneUpdateDto updateDto = AdminWaybleZoneUpdateDto.fromDetailDto(waybleZone);
+        
+        model.addAttribute("updateDto", updateDto);
+        model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
+        model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+        
+        return "admin/wayblezone/wayble-zone-edit";
+    }
+    
+    @PostMapping("/{id}/edit")
+    public String updateWaybleZone(HttpSession session, 
+                                  @PathVariable Long id,
+                                  @Valid @ModelAttribute("updateDto") AdminWaybleZoneUpdateDto updateDto,
+                                  BindingResult bindingResult,
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+        
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
+            model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+            return "admin/wayblezone/wayble-zone-edit";
+        }
+        
+        // DTO의 ID와 URL의 ID 일치 확인
+        AdminWaybleZoneUpdateDto validatedDto = new AdminWaybleZoneUpdateDto(
+            id,
+            updateDto.zoneName(),
+            updateDto.contactNumber(),
+            updateDto.zoneType(),
+            updateDto.state(),
+            updateDto.city(),
+            updateDto.district(),
+            updateDto.streetAddress(),
+            updateDto.detailAddress(),
+            updateDto.latitude(),
+            updateDto.longitude(),
+            updateDto.mainImageUrl()
+        );
+        
+        try {
+            Long waybleZoneId = adminWaybleZoneService.updateWaybleZone(validatedDto);
+            redirectAttributes.addFlashAttribute("successMessage", "웨이블존이 성공적으로 수정되었습니다.");
+            return "redirect:/admin/wayble-zones/" + waybleZoneId;
+        } catch (Exception e) {
+            log.error("웨이블존 수정 실패", e);
+            model.addAttribute("errorMessage", "웨이블존 수정에 실패했습니다: " + e.getMessage());
+            model.addAttribute("waybleZoneTypes", WaybleZoneType.values());
+            model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
+            return "admin/wayblezone/wayble-zone-edit";
         }
     }
 }

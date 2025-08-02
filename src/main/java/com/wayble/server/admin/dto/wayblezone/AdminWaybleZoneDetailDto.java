@@ -1,5 +1,6 @@
 package com.wayble.server.admin.dto.wayblezone;
 
+import com.wayble.server.common.entity.Address;
 import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
 
@@ -11,6 +12,7 @@ public record AdminWaybleZoneDetailDto(
         String zoneName,
         String contactNumber,
         WaybleZoneType zoneType,
+        Address address,
         String fullAddress,
         Double latitude,
         Double longitude,
