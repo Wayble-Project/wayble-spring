@@ -180,4 +180,25 @@ public class AdminWaybleZoneViewController {
             return "admin/wayblezone/wayble-zone-edit";
         }
     }
+    
+    @PostMapping("/{id}/delete")
+    public String deleteWaybleZone(HttpSession session, 
+                                  @PathVariable Long id,
+                                  RedirectAttributes redirectAttributes) {
+        // 로그인 확인
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return "redirect:/admin";
+        }
+        
+        try {
+            adminWaybleZoneService.deleteWaybleZone(id);
+            redirectAttributes.addFlashAttribute("successMessage", "웨이블존이 성공적으로 삭제되었습니다.");
+            log.info("웨이블존 삭제 완료 - ID: {}, 관리자: {}", id, session.getAttribute("adminUsername"));
+            return "redirect:/admin/wayble-zones";
+        } catch (Exception e) {
+            log.error("웨이블존 삭제 실패 - ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "웨이블존 삭제에 실패했습니다: " + e.getMessage());
+            return "redirect:/admin/wayble-zones/" + id;
+        }
+    }
 }

@@ -12,6 +12,7 @@ import com.wayble.server.explore.service.WaybleZoneDocumentService;
 import com.wayble.server.user.repository.UserPlaceWaybleZoneMappingRepository;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
+import com.wayble.server.wayblezone.repository.WaybleZoneVisitLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class AdminWaybleZoneService {
     private final WaybleZoneDocumentService waybleZoneDocumentService;
     private final WaybleZoneRepository waybleZoneRepository;
     private final UserPlaceWaybleZoneMappingRepository userPlaceWaybleZoneMappingRepository;
+    private final WaybleZoneVisitLogRepository waybleZoneVisitLogRepository;
 
     public long getTotalWaybleZoneCounts() {
         return adminWaybleZoneRepository.count();
@@ -127,19 +129,67 @@ public class AdminWaybleZoneService {
 
     @Transactional
     public void deleteWaybleZone(Long waybleZoneId) {
-        WaybleZone waybleZone = waybleZoneRepository.findById(waybleZoneId)
-                .orElseThrow(() -> new ApplicationException(AdminErrorCase.WAYBLE_ZONE_NOT_FOUND));
+        try {
+            WaybleZone waybleZone = waybleZoneRepository.findById(waybleZoneId)
+                    .orElseThrow(() -> new ApplicationException(AdminErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
-        waybleZone.getReviewList().forEach(review -> {
-            review.softDelete();
-        });
-        waybleZone.getOperatingHours().forEach(operatingHour -> {
-            operatingHour.softDelete();
-        });
-        waybleZone.getFacility().softDelete();
-        userPlaceWaybleZoneMappingRepository.deleteAll(waybleZone.getUserPlaceMappings());
+            log.info("웨이블존 삭제 시작 - ID: {}, 이름: {}", waybleZoneId, waybleZone.getZoneName());
 
-        waybleZone.softDelete();
-        waybleZoneDocumentService.deleteDocumentById(waybleZoneId);
+            // 연관된 리뷰들 soft delete
+            waybleZone.getReviewList().forEach(review -> {
+                review.softDelete();
+                // 리뷰 이미지들도 함께 soft delete
+                review.getReviewImageList().forEach(reviewImage -> reviewImage.softDelete());
+            });
+            log.debug("웨이블존 리뷰 삭제 완료 - ID: {}, 리뷰 개수: {}", waybleZoneId, waybleZone.getReviewList().size());
+
+            // 운영시간 정보 soft delete
+            waybleZone.getOperatingHours().forEach(operatingHour -> {
+                operatingHour.softDelete();
+            });
+            log.debug("웨이블존 운영시간 삭제 완료 - ID: {}, 운영시간 개수: {}", waybleZoneId, waybleZone.getOperatingHours().size());
+
+            // 시설 정보 soft delete (null 체크)
+            if (waybleZone.getFacility() != null) {
+                waybleZone.getFacility().softDelete();
+                log.debug("웨이블존 시설 정보 삭제 완료 - ID: {}", waybleZoneId);
+            }
+
+            // 웨이블존 이미지들 soft delete
+            waybleZone.getWaybleZoneImageList().forEach(image -> image.softDelete());
+            log.debug("웨이블존 이미지 삭제 완료 - ID: {}, 이미지 개수: {}", waybleZoneId, waybleZone.getWaybleZoneImageList().size());
+
+            // 사용자 즐겨찾기 매핑 hard delete (참조 관계 제거)
+            userPlaceWaybleZoneMappingRepository.deleteAll(waybleZone.getUserPlaceMappings());
+            log.debug("웨이블존 사용자 매핑 삭제 완료 - ID: {}, 매핑 개수: {}", waybleZoneId, waybleZone.getUserPlaceMappings().size());
+
+            // 방문 로그 삭제 (해당 웨이블존의 모든 방문 로그 삭제)
+            try {
+                waybleZoneVisitLogRepository.deleteByZoneId(waybleZoneId);
+                log.debug("웨이블존 방문 로그 삭제 완료 - ID: {}", waybleZoneId);
+            } catch (Exception e) {
+                log.warn("웨이블존 방문 로그 삭제 실패 - ID: {}, 오류: {}", waybleZoneId, e.getMessage());
+            }
+
+            // 웨이블존 자체 soft delete
+            waybleZone.softDelete();
+            log.info("웨이블존 soft delete 완료 - ID: {}", waybleZoneId);
+
+            // Elasticsearch 문서 삭제
+            try {
+                waybleZoneDocumentService.deleteDocumentById(waybleZoneId);
+                log.info("WaybleZoneDocument 삭제 완료 - ID: {}", waybleZoneId);
+            } catch (Exception esException) {
+                log.warn("WaybleZoneDocument 삭제 실패, 수동 정리 필요 - ID: {}, 오류: {}", 
+                        waybleZoneId, esException.getMessage());
+            }
+
+            log.info("웨이블존 삭제 완료 - ID: {}", waybleZoneId);
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("웨이블존 삭제 실패 - ID: {}", waybleZoneId, e);
+            throw new RuntimeException("웨이블존 삭제에 실패했습니다", e);
+        }
     }
 }
