@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 @Entity
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "facility")
@@ -18,20 +20,11 @@ public class Facility {
     @Column(name="stationName")
     private String stationName;
 
-    @Column(name = "lift_latitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
-    private Double liftLatitude;
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Lift> lifts;
 
-    @Column(name = "lift_longitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
-    private Double liftLongitude;
-
-    @Column(name = "lift_exit_Num", nullable = true)
-    private Integer liftExitNum;
-
-    @Column(name = "elevator_latitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
-    private Double elevatorLatitude;
-
-    @Column(name = "elevator_longitude", columnDefinition = "DECIMAL(10,7)", nullable = true)
-    private Double elevatorLongitude;
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Elevator> elevators;
 
     @OneToOne
     @MapsId
