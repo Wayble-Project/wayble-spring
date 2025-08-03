@@ -1,7 +1,8 @@
 package com.wayble.server.direction.service;
 
-import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.direction.exception.DirectionErrorCase;
+import com.wayble.server.direction.dto.request.PlaceSaveRequest;
+import com.wayble.server.direction.entity.Place;
+import com.wayble.server.direction.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +10,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DirectionService {
 
-    public void makeException() {
-        throw new ApplicationException(DirectionErrorCase.PATH_NOT_FOUND);
+    private final PlaceRepository placeRepository;
+
+    public void savePlace(PlaceSaveRequest request) {
+        Place place = Place.of(
+                request.name(),
+                request.address(),
+                request.latitude(),
+                request.longitude()
+        );
+        placeRepository.save(place);
     }
 }
