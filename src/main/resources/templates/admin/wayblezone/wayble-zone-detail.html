@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웨이블존 상세정보 - Wayble 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-wayble-blue rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </a>
+                    </div>
+                    <div class="ml-4">
+                        <div class="flex items-center space-x-2">
+                            <a href="/admin/wayble-zones" class="text-gray-500 hover:text-gray-700">웨이블존 관리</a>
+                            <span class="text-gray-400">/</span>
+                            <h1 class="text-xl font-semibold text-gray-900">상세정보</h1>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/admin/wayble-zones" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <span class="text-sm text-gray-700">
+                        <span th:text="${adminUsername}" class="font-medium"></span>님
+                    </span>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- 페이지 헤더 -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900" th:text="${waybleZone.zoneName}"></h2>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                              th:classappend="${waybleZone.zoneType.name() == 'RESTAURANT'} ? 'bg-green-100 text-green-800' : (${waybleZone.zoneType.name() == 'CAFE'} ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')"
+                              th:text="${waybleZone.zoneType.name()}">
+                        </span>
+                        <span class="text-sm text-gray-500">ID: <span th:text="${waybleZone.zoneId}"></span></span>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <a th:href="@{/admin/wayble-zones/{id}/edit(id=${waybleZone.zoneId})}" 
+                       class="bg-wayble-blue hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        편집
+                    </a>
+                    <button onclick="openDeleteModal()" 
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        삭제
+                    </button>
+                    <button onclick="window.history.back()" 
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">
+                        뒤로가기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 기본 정보 -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">기본 정보</h3>
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">웨이블존명</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.zoneName}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">연락처</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.contactNumber ?: '정보 없음'}"></dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500">주소</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.fullAddress}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">위도</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.latitude}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">경도</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.longitude}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">등록일</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${#temporals.format(waybleZone.createdAt, 'yyyy-MM-dd HH:mm')}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">최종 수정일</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.lastModifiedAt != null ? #temporals.format(waybleZone.lastModifiedAt, 'yyyy-MM-dd HH:mm') : '정보 없음'}"></dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 통계 정보 -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">통계 정보</h3>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center">
+                                <div class="flex items-center text-yellow-600">
+                                    <svg class="h-6 w-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span class="text-2xl font-bold" th:text="${#numbers.formatDecimal(waybleZone.rating, 1, 1)}"></span>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">평점</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="flex items-center justify-center">
+                                <div class="flex items-center text-blue-600">
+                                    <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                    </svg>
+                                    <span class="text-2xl font-bold" th:text="${waybleZone.reviewCount}"></span>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">리뷰 수</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="flex items-center justify-center">
+                                <div class="flex items-center text-red-600">
+                                    <svg class="h-6 w-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-2xl font-bold" th:text="${waybleZone.likes}"></span>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">좋아요</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 시설 정보 -->
+            <div class="bg-white shadow rounded-lg" th:if="${waybleZone.facility != null}">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">시설 정보</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">시설 타입</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.facility.facilityType}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">설명</dt>
+                            <dd class="mt-1 text-sm text-gray-900" th:text="${waybleZone.facility.description}"></dd>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 운영시간 -->
+            <div class="bg-white shadow rounded-lg" th:if="${waybleZone.operatingHours != null and !waybleZone.operatingHours.isEmpty()}">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">운영시간</h3>
+                    <div class="space-y-2">
+                        <div th:each="hour : ${waybleZone.operatingHours}" class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-700" th:text="${hour.dayOfWeek}"></span>
+                            <span class="text-sm text-gray-900" 
+                                  th:text="${hour.isHoliday} ? '휴무' : ${hour.openTime} + ' - ' + ${hour.closeTime}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 이미지 갤러리 -->
+            <div class="lg:col-span-2 bg-white shadow rounded-lg" th:if="${waybleZone.imageUrls != null and !waybleZone.imageUrls.isEmpty()}">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">이미지 갤러리</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div th:each="imageUrl : ${waybleZone.imageUrls}" class="aspect-square">
+                            <img th:src="${imageUrl}" alt="웨이블존 이미지" 
+                                 class="w-full h-full object-cover rounded-lg border border-gray-200 hover:opacity-75 cursor-pointer"
+                                 onclick="openImageModal(this.src)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 최근 리뷰 -->
+            <div class="lg:col-span-2 bg-white shadow rounded-lg" th:if="${waybleZone.recentReviews != null and !waybleZone.recentReviews.isEmpty()}">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">최근 리뷰 (최대 5개)</h3>
+                    <div class="space-y-4">
+                        <div th:each="review : ${waybleZone.recentReviews}" 
+                             class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="font-medium text-gray-900" th:text="${review.userName}"></span>
+                                        <div class="flex items-center">
+                                            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                                  th:classappend="${i <= review.rating} ? 'text-yellow-400' : 'text-gray-300'"
+                                                  class="text-sm">★</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}"></span>
+                                    </div>
+                                    <p class="text-sm text-gray-700" th:text="${review.content}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 동기화 정보 -->
+            <div class="lg:col-span-2 bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">동기화 정보</h3>
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">최종 동기화 시간</dt>
+                            <dd class="mt-1 text-sm text-gray-900" 
+                                th:text="${waybleZone.syncedAt != null ? #temporals.format(waybleZone.syncedAt, 'yyyy-MM-dd HH:mm') : '동기화 대기 중'}"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">동기화 상태</dt>
+                            <dd class="mt-1">
+                                <span th:if="${waybleZone.syncedAt != null and (waybleZone.lastModifiedAt == null or waybleZone.syncedAt.isAfter(waybleZone.lastModifiedAt))}"
+                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    동기화 완료
+                                </span>
+                                <span th:if="${waybleZone.syncedAt == null or (waybleZone.lastModifiedAt != null and waybleZone.lastModifiedAt.isAfter(waybleZone.syncedAt))}"
+                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    동기화 필요
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 모달 -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50" onclick="closeImageModal()">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="relative max-w-4xl max-h-full">
+                <img id="modalImage" src="" alt="" class="max-w-full max-h-full object-contain">
+                <button onclick="closeImageModal()" 
+                        class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" onclick="closeDeleteModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" onclick="event.stopPropagation()">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-lg font-medium text-gray-900">웨이블존 삭제</h3>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-sm text-gray-500 mb-3">
+                            정말로 이 웨이블존을 삭제하시겠습니까?
+                        </p>
+                        <div class="bg-red-50 border border-red-200 rounded-md p-3">
+                            <p class="text-sm text-red-800 font-medium mb-2">삭제 시 다음 데이터들이 함께 삭제됩니다:</p>
+                            <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
+                                <li>웨이블존 기본 정보</li>
+                                <li>연관된 이미지</li>
+                                <li>운영시간 정보</li>
+                                <li>시설 정보</li>
+                                <li>리뷰 데이터</li>
+                                <li>방문 로그</li>
+                                <li>사용자 즐겨찾기</li>
+                            </ul>
+                            <p class="text-sm text-red-800 font-medium mt-2">
+                                이 작업은 되돌릴 수 없습니다.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeDeleteModal()" 
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">
+                            취소
+                        </button>
+                        <button onclick="deleteWaybleZone()" 
+                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('modalImage').src = '';
+        }
+        
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+        
+        function closeDeleteModal(event) {
+            if (event && event.target !== event.currentTarget) {
+                return;
+            }
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+        
+        function deleteWaybleZone() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = window.location.pathname + '/delete';
+            
+            const csrfToken = document.querySelector('meta[name="_csrf"]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken.getAttribute('content');
+                form.appendChild(csrfInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+</body>
+</html>

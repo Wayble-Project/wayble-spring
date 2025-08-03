@@ -1,5 +1,6 @@
 package com.wayble.server.user.entity;
 
+import com.wayble.server.common.converter.StringListConverter;
 import com.wayble.server.common.entity.BaseEntity;
 import com.wayble.server.review.entity.Review;
 import jakarta.persistence.*;
@@ -58,11 +59,14 @@ public class User extends BaseEntity {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
+    @Convert(converter = StringListConverter.class)
     @Column(name = "disability_type")
-    private String disabilityType; // 장애 유형 (발달장애,시각장애,지체장애,청각장애)
+    private List<String> disabilityType; // 장애 유형 (발달장애,시각장애,지체장애,청각장애)
 
+
+    @Convert(converter = StringListConverter.class)
     @Column(name = "mobility_aid")
-    private String mobilityAid; // 이동 보조 수단 (안내견,지팡이,동행인,휠체어)
+    private List<String> mobilityAid;  // 이동 보조 수단 (안내견,지팡이,동행인,휠체어)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList = new ArrayList<>();
@@ -117,9 +121,9 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void setDisabilityType(String disabilityType) { this.disabilityType = disabilityType; }
+    public void setDisabilityType(List<String> disabilityType) { this.disabilityType = disabilityType; }
 
-    public void setMobilityAid(String mobilityAid) { this.mobilityAid = mobilityAid; }
+    public void setMobilityAid(List<String> mobilityAid) { this.mobilityAid = mobilityAid; }
 
     public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
 
