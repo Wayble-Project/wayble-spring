@@ -105,16 +105,16 @@ public class UserController {
     @Operation(summary = "닉네임 중복 확인", description = "유저가 등록하려고 하는 닉네임이 이미 사용 중인지 확인합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "중복 여부 반환"),
-            @ApiResponse(responseCode = "400", description = "파라미터 누락 등 잘못된 요청")
+            @ApiResponse(responseCode = "400", description = "파라미터 누락 등 잘못된 요청"),
+            @ApiResponse(responseCode = "409", description = "닉네임 중복")
     })
     public CommonResponse<NicknameCheckResponse> checkNickname(@RequestParam(value = "nickname", required = false) String nickname) {
         if (nickname == null || nickname.trim().isEmpty()) {
-            throw new ApplicationException(UserErrorCase.NICKNAME_REQUIRED);
+            throw new ApplicationException(UserErrorCase.NICKNAME_REQUIRED); // 파라미터 누락
         }
-
-        boolean available = userInfoService.isNicknameAvailable(nickname.trim());
-        String message = available ? "사용 가능한 닉네임입니다." : "이미 사용 중인 닉네임입니다.";
-
-        return CommonResponse.success(new NicknameCheckResponse(available, message));
+        if (!userInfoService.isNicknameAvailable(nickname.trim())) {
+            throw new ApplicationException(UserErrorCase.NICKNAME_DUPLICATED); // 닉네임 중복
+        }
+        return CommonResponse.success(new NicknameCheckResponse(true, "사용 가능한 닉네임입니다."));
     }
 }
