@@ -121,4 +121,10 @@ public class UserInfoService {
                 // (추후 사용 가능) .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
+
+    @Transactional
+    public boolean isNicknameAvailable(String nickname) {
+        // DB에 동일 닉네임 존재 여부 확인
+        return !userRepository.existsByNickname(nickname);
+    }
 }
