@@ -1,5 +1,6 @@
 package com.wayble.server.direction.entity;
 
+import com.wayble.server.common.entity.Address;
 import com.wayble.server.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,7 +21,7 @@ public class Place extends BaseEntity {
     private String name;
 
     @Column(name = "address", nullable = false)
-    private String address;
+    private Address address;
 
     @Column(name = "latitude", nullable = false)
     private long latitude;
@@ -29,14 +30,14 @@ public class Place extends BaseEntity {
     private long longitude;
 
     @Builder
-    public Place(String name, String address, long latitude, long longitude) {
+    public Place(String name, Address address, long latitude, long longitude) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public static Place of(String name, String address, long latitude, long longitude) {
+    public static Place of(String name, Address address, long latitude, long longitude) {
         return Place.builder()
                 .name(name)
                 .address(address)

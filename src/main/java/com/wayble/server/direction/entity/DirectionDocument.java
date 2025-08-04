@@ -1,5 +1,6 @@
 package com.wayble.server.direction.entity;
 
+import com.wayble.server.explore.entity.EsAddress;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,19 +26,19 @@ public class DirectionDocument {
     )
     private String name;
 
-    @Field(type = FieldType.Text)
-    private String address;
+    @Field(type = FieldType.Object)
+    private EsAddress esAddress;
 
     @Builder
-    public DirectionDocument(String name, String address) {
+    public DirectionDocument(String name, EsAddress esAddress) {
         this.name = name;
-        this.address = address;
+        this.esAddress = esAddress;
     }
 
-    public static DirectionDocument of(String name, String address) {
+    public static DirectionDocument from(Place place) {
         return DirectionDocument.builder()
-                .name(name)
-                .address(address)
+                .name(place.getName())
+                .esAddress(EsAddress.from(place.getAddress()))
                 .build();
     }
 }
