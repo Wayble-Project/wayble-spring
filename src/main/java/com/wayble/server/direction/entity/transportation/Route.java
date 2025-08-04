@@ -1,7 +1,7 @@
 package com.wayble.server.direction.entity.transportation;
 
 import com.wayble.server.direction.entity.DirectionType;
-import com.wayble.server.direction.entity.Node;
+import com.wayble.server.direction.entity.transportation.*;
 
 import jakarta.persistence.*;
 import lombok.*;

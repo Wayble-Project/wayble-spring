@@ -1,6 +1,6 @@
 package com.wayble.server.direction.repository;
 
-import com.wayble.server.direction.entity.Node;
+import com.wayble.server.direction.entity.transportation.Node;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NodeRepository extends JpaRepository<Node, Long> {

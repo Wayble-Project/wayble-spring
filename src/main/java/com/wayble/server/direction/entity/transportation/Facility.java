@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
-import com.wayble.server.direction.entity.Node;
+import com.wayble.server.direction.entity.transportation.*;
 
 import java.util.List;
 

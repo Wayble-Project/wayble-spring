@@ -3,7 +3,7 @@ package com.wayble.server.direction.service;
 import com.wayble.server.direction.dto.TransportationResponseDto;
 import com.wayble.server.direction.dto.toilet.KricToiletRawItem;
 import com.wayble.server.direction.dto.toilet.KricToiletRawResponse;
-import com.wayble.server.direction.entity.Facility;
+import com.wayble.server.direction.entity.transportation.Facility;
 import com.wayble.server.direction.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

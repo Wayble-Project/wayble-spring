@@ -4,8 +4,8 @@ import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.direction.dto.TransportationRequestDto;
 import com.wayble.server.direction.dto.TransportationResponseDto;
 import com.wayble.server.direction.entity.DirectionType;
-import com.wayble.server.direction.entity.Edge;
-import com.wayble.server.direction.entity.Node;
+import com.wayble.server.direction.entity.transportation.Edge;
+import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.repository.EdgeRepository;
 import com.wayble.server.direction.repository.NodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +70,7 @@ public class TransportationService {
                 .min(Comparator.comparingDouble(n ->
                         haversine(startTmp.getLatitude(), startTmp.getLongitude(),
                                 n.getLatitude(), n.getLongitude())))
-                .orElseThrow(() -> new NoSuchElementException("시작 기준 가장 가까운 노드 없음"));
+                .orElseThrow(() -> new ApplicationException(PATH_NOT_FOUND));
 
         // 도착지는 출발지와 다른 정류장을 선택
         Node nearestToEnd = nodes.stream()
@@ -79,6 +79,13 @@ public class TransportationService {
                         haversine(endTmp.getLatitude(), endTmp.getLongitude(),
                                 n.getLatitude(), n.getLongitude())))
                 .orElse(nearestToStart); // fallback to same station if no other option
+
+        // 도착지에서 가장 가까운 정류장까지의 거리 체크 (5km 이상이면 경로 찾기 불가)
+        double distanceToEndStation = haversine(endTmp.getLatitude(), endTmp.getLongitude(),
+                nearestToEnd.getLatitude(), nearestToEnd.getLongitude());
+        if (distanceToEndStation > 5.0) {
+            throw new ApplicationException(PATH_NOT_FOUND);
+        }
 
         System.out.println("📍 디버깅: 출발 가장 가까운 역=" + nearestToStart.getStationName());
         System.out.println("📍 디버깅: 도착 가장 가까운 역=" + nearestToEnd.getStationName());

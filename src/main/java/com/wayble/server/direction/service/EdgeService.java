@@ -1,8 +1,7 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.direction.entity.DirectionType;
-import com.wayble.server.direction.entity.Edge;
-import com.wayble.server.direction.entity.Node;
+import com.wayble.server.direction.entity.transportation.*;
 import org.springframework.stereotype.Service;
 
 @Service
