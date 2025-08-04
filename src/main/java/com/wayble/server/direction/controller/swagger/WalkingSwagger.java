@@ -2,7 +2,7 @@ package com.wayble.server.direction.controller.swagger;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.direction.dto.response.WayblePathResponse;
-import com.wayble.server.direction.external.tmap.dto.response.TMapParsingResponse;
+import com.wayble.server.common.client.tmap.dto.response.TMapParsingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
