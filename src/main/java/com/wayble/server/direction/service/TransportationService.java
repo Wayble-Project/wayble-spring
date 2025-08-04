@@ -62,9 +62,6 @@ public class TransportationService {
         nodes = new ArrayList<>(nodeRepository.findAll());
         edges = new ArrayList<>(edgeRepository.findAll());
 
-        System.out.println("📍 디버깅: 출발지=" + startTmp.getStationName() + ", 도착지=" + endTmp.getStationName());
-        System.out.println("📍 디버깅: 전체 노드 수=" + nodes.size() + ", 전체 엣지 수=" + edges.size());
-
         // 가장 가까운 실제 정류장 찾기 (임시 노드 추가 전에)
         Node nearestToStart = nodes.stream()
                 .min(Comparator.comparingDouble(n ->
@@ -79,16 +76,6 @@ public class TransportationService {
                         haversine(endTmp.getLatitude(), endTmp.getLongitude(),
                                 n.getLatitude(), n.getLongitude())))
                 .orElse(nearestToStart); // fallback to same station if no other option
-
-        // 도착지에서 가장 가까운 정류장까지의 거리 체크 (5km 이상이면 경로 찾기 불가)
-        double distanceToEndStation = haversine(endTmp.getLatitude(), endTmp.getLongitude(),
-                nearestToEnd.getLatitude(), nearestToEnd.getLongitude());
-        if (distanceToEndStation > 5.0) {
-            throw new ApplicationException(PATH_NOT_FOUND);
-        }
-
-        System.out.println("📍 디버깅: 출발 가장 가까운 역=" + nearestToStart.getStationName());
-        System.out.println("📍 디버깅: 도착 가장 가까운 역=" + nearestToEnd.getStationName());
 
         // 임시 노드를 리스트에 추가
         nodes.add(startTmp);
@@ -213,7 +200,6 @@ public class TransportationService {
         Node current = end;
         Set<Long> backtrackVisited = new HashSet<>();
 
-        System.out.println("📍 디버깅: 도착지 거리=" + distance.get(end.getId()));
         if (distance.get(end.getId()) == Integer.MAX_VALUE) {
             System.out.println("⚠️ 경로를 찾을 수 없음: 도착지에 도달할 수 없음");
             return steps; // 빈 리스트 반환
