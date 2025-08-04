@@ -1,8 +1,37 @@
 {
   "analysis": {
+    "tokenizer": {
+      "custom-nori-tokenizer": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "mixed"
+      },
+      "custom-ngram-tokenizer": {
+        "type": "ngram",
+        "min_gram": 2,
+        "max_gram": 3,
+        "token_chars": [
+          "letter",
+          "digit"
+        ]
+      }
+    },
     "analyzer": {
-      "korean": {
-        "type": "nori"
+      "custom-nori-analyzer": {
+        "type": "custom",
+        "tokenizer": "custom-nori-tokenizer",
+        "filter": [
+          "lowercase",
+          "trim",
+          "nori_part_of_speech"
+        ]
+      },
+      "custom-ngram-analyzer": {
+        "type": "custom",
+        "tokenizer": "custom-ngram-tokenizer",
+        "filter": [
+          "lowercase",
+          "trim"
+        ]
       }
     }
   }

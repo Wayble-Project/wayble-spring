@@ -5,7 +5,13 @@
     },
     "name": {
       "type": "text",
-      "analyzer": "korean"
+      "analyzer": "custom-nori-analyzer",
+      "fields": {
+        "ngram": {
+          "type": "text",
+          "analyzer": "custom-ngram-analyzer"
+        }
+      }
     },
     "address": {
       "type": "text",
