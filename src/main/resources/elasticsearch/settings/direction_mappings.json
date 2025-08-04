@@ -1,0 +1,15 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+    "address": {
+      "type": "text",
+      "analyzer": "korean"
+    }
+  }
+}
