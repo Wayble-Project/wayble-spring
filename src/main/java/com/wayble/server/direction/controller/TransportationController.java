@@ -41,11 +41,13 @@ public class TransportationController {
                     ),
                     @ApiResponse(
                             responseCode = "4001",
-                            description = "경로를 찾을 수 없습니다."
+                            description = "경로를 찾을 수 없습니다.",
+                            content = @Content()
                     ),
                     @ApiResponse(
                             responseCode = "500",
-                            description = "서버 내부 오류입니다."
+                            description = "서버 내부 오류입니다.",
+                            content = @Content()
                     )
             }
     )
