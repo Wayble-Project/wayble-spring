@@ -3,6 +3,7 @@ package com.wayble.server.user.service;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
+import com.wayble.server.user.dto.UserInfoResponseDto;
 import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
@@ -26,7 +27,7 @@ public class UserInfoService {
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
         // 이미 등록된 정보가 있으면 에러 처리
-        if (user.getNickname() != null) {
+        if (user.getNickname() != null || user.getBirthDate() != null || user.getGender() != null) {
             throw new ApplicationException(UserErrorCase.USER_INFO_ALREADY_EXISTS);
         }
 
@@ -38,6 +39,7 @@ public class UserInfoService {
         }
         user.setGender(dto.getGender());
         user.setUserType(dto.getUserType());
+        // (추후 사용 가능) user.updateProfileImageUrl(dto.getProfileImageUrl());
 
         if (dto.getUserType() == UserType.DISABLED) {
             // 장애 유형,이동보조수단 설정
@@ -79,6 +81,12 @@ public class UserInfoService {
             user.setUserType(dto.getUserType());
         }
 
+        /* 유저 프로필 이미지 수정
+        if (dto.getProfileImageUrl() != null) {
+            user.updateProfileImageUrl(dto.getProfileImageUrl());
+        }
+         */
+
         UserType finalUserType = dto.getUserType() != null ? dto.getUserType() : user.getUserType();
         if (finalUserType == UserType.DISABLED) {
             if (dto.getDisabilityType() != null) {
@@ -94,5 +102,29 @@ public class UserInfoService {
         }
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public UserInfoResponseDto getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
+        if (user.getNickname() == null || user.getBirthDate() == null || user.getGender() == null) {
+            throw new ApplicationException(UserErrorCase.USER_INFO_NOT_EXISTS);
+        }
+        return UserInfoResponseDto.builder()
+                .nickname(user.getNickname())
+                .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : null)
+                .gender(user.getGender())
+                .userType(user.getUserType())
+                .disabilityType(user.getDisabilityType())
+                .mobilityAid(user.getMobilityAid())
+                // (추후 사용 가능) .profileImageUrl(user.getProfileImageUrl())
+                .build();
+    }
+
+    @Transactional
+    public boolean isNicknameAvailable(String nickname) {
+        // DB에 동일 닉네임 존재 여부 확인
+        return !userRepository.existsByNickname(nickname);
     }
 }
