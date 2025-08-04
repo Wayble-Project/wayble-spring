@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "zoneName": {
+      "type":           "text",
+      "analyzer":       "korean_edge_ngram_analyzer",
+      "search_analyzer":"korean_search_analyzer"
+    },
+    "address.location": {
+      "type": "geo_point"
+    },
+    "facility": {
+      "type": "object",
+      "properties": {
+        "hasSlope": {
+          "type": "boolean"
+        },
+        "hasNoDoorStep": {
+          "type": "boolean"
+        },
+        "hasElevator": {
+          "type": "boolean"
+        },
+        "hasTableSeat": {
+          "type": "boolean"
+        },
+        "hasDisabledToilet": {
+          "type": "boolean"
+        },
+        "floorInfo": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

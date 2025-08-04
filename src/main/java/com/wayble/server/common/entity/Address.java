@@ -2,10 +2,14 @@ package com.wayble.server.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
+import lombok.*;
 
+@ToString
 @Getter
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Address {
     /** 시·도 */
     @Column(name = "state", length = 100, nullable = false)
@@ -34,4 +38,14 @@ public class Address {
     /** 경도 */
     @Column(name = "longitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
     private Double longitude;
+
+    public String toFullAddress() {
+        StringBuilder sb = new StringBuilder();
+        if (state != null) sb.append(state).append(" ");
+        if (city != null) sb.append(city).append(" ");
+        if (district != null) sb.append(district).append(" ");
+        if (streetAddress != null) sb.append(streetAddress).append(" ");
+        if (detailAddress != null) sb.append(detailAddress);
+        return sb.toString().trim();
+    }
 }

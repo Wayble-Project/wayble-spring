@@ -1,0 +1,33 @@
+services:
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: Dockerfile.elasticsearch
+    container_name: elasticsearch
+    image: es-with-nori:9.0.2
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - es-network
+
+networks:
+  es-network:
+    driver: bridge
+    external: false
+    attachable: true
+
+volumes:
+  esdata:
+    driver: local
+
+# docker compose -f docker-els.yml build
+# docker compose -f docker-els.yml up -d
+
