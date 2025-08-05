@@ -108,9 +108,7 @@ public class UserInfoService {
     public UserInfoResponseDto getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
-        if (user.getNickname() == null || user.getBirthDate() == null || user.getGender() == null) {
-            throw new ApplicationException(UserErrorCase.USER_INFO_NOT_EXISTS);
-        }
+
         return UserInfoResponseDto.builder()
                 .nickname(user.getNickname())
                 .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : null)
