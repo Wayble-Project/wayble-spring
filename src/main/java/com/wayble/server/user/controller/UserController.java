@@ -2,7 +2,11 @@ package com.wayble.server.user.controller;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
-import com.wayble.server.user.dto.*;
+import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
+import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
+import com.wayble.server.user.dto.UserInfoResponseDto;
+import com.wayble.server.user.dto.NicknameCheckResponse;
+import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserInfoService;
 import com.wayble.server.user.service.UserService;

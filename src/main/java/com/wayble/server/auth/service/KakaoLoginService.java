@@ -60,7 +60,10 @@ public class KakaoLoginService {
         }
 
         // JWT 토큰 발급
-        String accessToken = jwtProvider.generateToken(user.getId(), user.getUserType().name());
+        String accessToken = jwtProvider.generateToken(
+                user.getId(),
+                user.getUserType() != null ? user.getUserType().name() : null
+        );
         String refreshToken = jwtProvider.generateRefreshToken(user.getId());
 
 

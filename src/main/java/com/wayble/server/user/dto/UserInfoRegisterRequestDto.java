@@ -7,7 +7,6 @@ import com.wayble.server.user.entity.MobilityAid;
 import com.wayble.server.user.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
