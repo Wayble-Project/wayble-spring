@@ -6,8 +6,6 @@ import lombok.Builder;
 @Builder
 public record PlaceSaveRequest(
         String name,
-        Address address,
-        long latitude,
-        long longitude
+        Address address
 ) {
 }
