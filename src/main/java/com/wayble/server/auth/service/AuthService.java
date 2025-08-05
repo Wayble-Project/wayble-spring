@@ -29,7 +29,7 @@ public class AuthService {
         if (!encoder.matches(req.password(), user.getPassword())) {
             throw new ApplicationException(UserErrorCase.INVALID_CREDENTIALS);
         }
-        String accessToken = jwtProvider.generateToken(user.getId(), user.getUserType().name());
+        String accessToken = jwtProvider.generateToken(user.getId(),user.getUserType() != null ? user.getUserType().name() : null);
         String refreshToken = jwtProvider.generateRefreshToken(user.getId());
         Long expiry = jwtProvider.getTokenExpiry(refreshToken);
 
@@ -72,7 +72,7 @@ public class AuthService {
         saved.setExpiry(newExpiry);
         refreshTokenRepository.save(saved);
 
-        String newAccessToken = jwtProvider.generateToken(userId, user.getUserType().name());
+        String newAccessToken = jwtProvider.generateToken(userId, user.getUserType() != null ? user.getUserType().name() : null);
         return new TokenResponseDto(newAccessToken, newRefreshToken);
     }
 
