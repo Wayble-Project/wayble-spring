@@ -3,7 +3,6 @@ package com.wayble.server.user.exception;
 import com.wayble.server.common.exception.ErrorCase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor

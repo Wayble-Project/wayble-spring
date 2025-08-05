@@ -4,7 +4,6 @@ import com.wayble.server.user.entity.DisabilityType;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.MobilityAid;
 import com.wayble.server.user.entity.UserType;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 import java.util.List;

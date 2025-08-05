@@ -59,13 +59,13 @@ public class User extends BaseEntity {
     private String profileImageUrl;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "user_disability_type", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "user_disability_type_mapping", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "disability_type")
     private List<DisabilityType> disabilityType = new ArrayList<>(); // 장애 유형 (발달장애,시각장애,지체장애,청각장애)
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "user_mobility_aid", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "user_mobility_aid_mapping", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "mobility_aid")
     private List<MobilityAid> mobilityAid = new ArrayList<>(); // 이동보조수단 (안내견,지팡이,휠체어,없음)
