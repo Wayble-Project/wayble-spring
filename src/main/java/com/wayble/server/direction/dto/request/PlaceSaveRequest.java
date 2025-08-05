@@ -1,11 +1,12 @@
 package com.wayble.server.direction.dto.request;
 
+import com.wayble.server.common.entity.Address;
 import lombok.Builder;
 
 @Builder
 public record PlaceSaveRequest(
         String name,
-        String address,
+        Address address,
         long latitude,
         long longitude
 ) {

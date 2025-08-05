@@ -2,10 +2,13 @@ package com.wayble.server.direction.controller;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.direction.dto.request.PlaceSaveRequest;
+import com.wayble.server.direction.dto.response.DirectionSearchResponse;
 import com.wayble.server.direction.service.DirectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,8 +18,13 @@ public class DirectionController {
     private final DirectionService directionService;
 
     @PostMapping("/place")
-    public CommonResponse<String> savePlace(@RequestBody @Valid PlaceSaveRequest request) {
-        directionService.savePlace(request);
+    public CommonResponse<String> savePlace(@RequestBody @Valid List<PlaceSaveRequest> requests) {
+        directionService.savePlaceAndIndexDocument(requests);
         return CommonResponse.success("Place Save successful");
+    }
+
+    @GetMapping("/keywords")
+    public CommonResponse<List<DirectionSearchResponse>> getDirectionKeywords(@RequestParam String keyword) {
+        return CommonResponse.success(directionService.searchDirection(keyword));
     }
 }

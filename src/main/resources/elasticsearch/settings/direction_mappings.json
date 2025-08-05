@@ -5,17 +5,19 @@
     },
     "name": {
       "type": "text",
-      "analyzer": "custom-nori-analyzer",
-      "fields": {
-        "ngram": {
+      "analyzer": "korean_edge_ngram_analyzer",
+      "search_analyzer": "korean_search_analyzer"
+    },
+    "esAddress": {
+      "properties": {
+        "streetAddress": {
           "type": "text",
-          "analyzer": "custom-ngram-analyzer"
+          "analyzer": "korean_search_analyzer"
+        },
+        "location": {
+          "type": "geo_point"
         }
       }
-    },
-    "address": {
-      "type": "text",
-      "analyzer": "korean"
     }
   }
 }
