@@ -23,7 +23,6 @@ import static com.wayble.server.direction.exception.DirectionErrorCase.PATH_NOT_
 public class TransportationService {
     private final NodeRepository nodeRepository;
     private final EdgeRepository edgeRepository;
-    private final EdgeService edgeService;
     private final FacilityService facilityService;
 
     private List<Node> nodes;
@@ -85,11 +84,11 @@ public class TransportationService {
         Map<Pair<Long,Long>, Integer> weightMap = new HashMap<>();
 
         // 출발지 -> 가장 가까운 정류장 (도보)
-        Edge startToStation = edgeService.createEdge(-1L, startTmp, nearestToStart, DirectionType.WALK);
+        Edge startToStation = Edge.createEdge(-1L, startTmp, nearestToStart, DirectionType.WALK);
         edges.add(startToStation);
 
         // 가장 가까운 정류장 -> 도착지 (도보)
-        Edge stationToEnd = edgeService.createEdge(-2L, nearestToEnd, endTmp, DirectionType.WALK);
+        Edge stationToEnd = Edge.createEdge(-2L, nearestToEnd, endTmp, DirectionType.WALK);
         edges.add(stationToEnd);
 
         // 모든 엣지의 가중치 계산
