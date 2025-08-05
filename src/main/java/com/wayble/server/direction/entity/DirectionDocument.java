@@ -1,6 +1,5 @@
 package com.wayble.server.direction.entity;
 
-import com.wayble.server.direction.dto.request.DirectionDocumentRequest;
 import com.wayble.server.explore.entity.EsAddress;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,14 +41,6 @@ public class DirectionDocument {
                 .id(place.getId())
                 .name(place.getName())
                 .esAddress(EsAddress.from(place.getAddress()))
-                .build();
-    }
-
-    public static DirectionDocument fromDto(DirectionDocumentRequest request) {
-        return DirectionDocument.builder()
-                .id(request.placeId())
-                .name(request.name())
-                .esAddress(EsAddress.from(request.address()))
                 .build();
     }
 }
