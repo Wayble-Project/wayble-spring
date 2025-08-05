@@ -52,7 +52,7 @@ public class User extends BaseEntity {
     private LoginType loginType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type", nullable = false)
+    @Column(name = "user_type", nullable = true)
     private UserType userType; // DISABLED,COMPANION,GENERAL
 
     @Column(name = "profile_image_url")
@@ -89,7 +89,6 @@ public class User extends BaseEntity {
                 .email(email)
                 .password(password)
                 .loginType(loginType)
-                .userType(UserType.GENERAL) // 기본값
                 .build();
     }
 
