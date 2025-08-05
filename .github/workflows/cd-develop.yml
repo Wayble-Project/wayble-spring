@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
 #  push:
-#    branches: [ "develop" ]
+#    branches: [ "feature/seungmin" ]
   pull_request:
     branches: [ "main" ]
 

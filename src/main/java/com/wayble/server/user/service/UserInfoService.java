@@ -108,9 +108,7 @@ public class UserInfoService {
     public UserInfoResponseDto getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
-        if (user.getNickname() == null || user.getBirthDate() == null || user.getGender() == null) {
-            throw new ApplicationException(UserErrorCase.USER_INFO_NOT_EXISTS);
-        }
+
         return UserInfoResponseDto.builder()
                 .nickname(user.getNickname())
                 .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : null)
@@ -120,5 +118,11 @@ public class UserInfoService {
                 .mobilityAid(user.getMobilityAid())
                 // (추후 사용 가능) .profileImageUrl(user.getProfileImageUrl())
                 .build();
+    }
+
+    @Transactional
+    public boolean isNicknameAvailable(String nickname) {
+        // DB에 동일 닉네임 존재 여부 확인
+        return !userRepository.existsByNickname(nickname);
     }
 }

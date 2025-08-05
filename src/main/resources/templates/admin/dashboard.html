@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wayble 관리자 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wayble-blue': '#3B82F6',
+                        'wayble-dark': '#1E293B',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="h-8 w-8 bg-wayble-blue rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-xl font-semibold text-gray-900">Wayble 관리자 페이지</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-700">
+                        안녕하세요, <span th:text="${adminUsername}" class="font-medium"></span>님
+                    </span>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" 
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- 대시보드 헤더 -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">대시보드</h2>
+            <p class="mt-1 text-sm text-gray-600">Wayble 서비스 현황</p>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- 전체 사용자 수 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">전체 사용자</dt>
+                                <dd class="text-lg font-medium text-gray-900" th:text="${totalUserCount} + '명'">0명</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 전체 웨이블존 수 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">전체 웨이블존</dt>
+                                <dd class="text-lg font-medium text-gray-900" th:text="${totalWaybleZoneCount} + '개'">0개</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오늘 방문자 수 -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-8 w-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">오늘 방문자</dt>
+                                <dd class="text-lg font-medium text-gray-900">892명</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 관리 메뉴 -->
+        <div class="mt-12">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-gray-900 mb-2">관리 메뉴</h3>
+                <p class="text-lg text-gray-600">Wayble 서비스 관리 도구</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+                <!-- 유저 관리 -->
+                <a href="/admin/users" class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-green-500 h-full flex flex-col">
+                        <div class="p-8 text-center flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="mx-auto w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition-colors duration-300">유저 관리</h4>
+                                <p class="text-gray-600 text-lg mb-6">사용자 계정 조회, 수정, 삭제 및 권한 관리</p>
+                            </div>
+                            <div class="inline-flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                                관리하기 
+                                <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 웨이블존 관리 - 메인 기능 -->
+                <a href="/admin/wayble-zones" class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-wayble-blue h-full flex flex-col">
+                        <div class="p-8 text-center flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="mx-auto w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mb-6 group-hover:bg-wayble-blue transition-colors duration-300">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-wayble-blue transition-colors duration-300">웨이블존 관리</h4>
+                                <p class="text-gray-600 text-lg mb-6">웨이블존 조회, 수정, 삭제 및 상세 정보 관리</p>
+                            </div>
+                            <div class="inline-flex items-center text-wayble-blue font-semibold group-hover:text-blue-700">
+                                관리하기 
+                                <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 삭제된 사용자 관리 -->
+                <a href="/admin/users/deleted" class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-red-500 h-full flex flex-col">
+                        <div class="p-8 text-center flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="mx-auto w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mb-6 group-hover:bg-red-600 transition-colors duration-300">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors duration-300">삭제된 사용자</h4>
+                                <p class="text-gray-600 text-lg mb-6">soft delete된 사용자 계정 조회 및 관리</p>
+                                <div class="text-3xl font-bold text-red-600 mb-2" th:text="${totalDeletedUserCount} + '명'">0명</div>
+                            </div>
+                            <div class="inline-flex items-center text-red-600 font-semibold group-hover:text-red-700">
+                                관리하기 
+                                <svg class="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 시스템 상태 -->
+                <div class="group block h-full">
+                    <div class="bg-white rounded-xl shadow-lg border-2 border-gray-100 h-full flex flex-col">
+                        <div class="p-8 flex-1 flex flex-col">
+                            <div class="text-center mb-6">
+                                <div class="mx-auto w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center mb-6">
+                                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-900">시스템 상태</h4>
+                            </div>
+                            <div class="space-y-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg text-gray-700">API 서버</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                          th:classappend="${systemStatus.apiServerStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                          th:text="${systemStatus.apiServerStatus} ? '정상' : '오류'">
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg text-gray-700">데이터베이스</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                          th:classappend="${systemStatus.databaseStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                          th:text="${systemStatus.databaseStatus} ? '정상' : '오류'">
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg text-gray-700">Elasticsearch</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                          th:classappend="${systemStatus.elasticsearchStatus} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                          th:text="${systemStatus.elasticsearchStatus} ? '정상' : '오류'">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

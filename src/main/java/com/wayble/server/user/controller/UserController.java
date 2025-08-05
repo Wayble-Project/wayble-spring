@@ -3,8 +3,9 @@ package com.wayble.server.user.controller;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserInfoRegisterRequestDto;
-import com.wayble.server.user.dto.UserInfoResponseDto;
 import com.wayble.server.user.dto.UserInfoUpdateRequestDto;
+import com.wayble.server.user.dto.UserInfoResponseDto;
+import com.wayble.server.user.dto.NicknameCheckResponse;
 import com.wayble.server.user.dto.UserRegisterRequestDto;
 import com.wayble.server.user.exception.UserErrorCase;
 import com.wayble.server.user.service.UserInfoService;
@@ -102,5 +103,22 @@ public class UserController {
         }
         UserInfoResponseDto info = userInfoService.getUserInfo(userId);
         return CommonResponse.success(info);
+    }
+
+    @GetMapping("/check-nickname")
+    @Operation(summary = "닉네임 중복 확인", description = "유저가 등록하려고 하는 닉네임이 이미 사용 중인지 확인합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "중복 여부 반환"),
+            @ApiResponse(responseCode = "400", description = "파라미터 누락 등 잘못된 요청"),
+            @ApiResponse(responseCode = "409", description = "닉네임 중복")
+    })
+    public CommonResponse<NicknameCheckResponse> checkNickname(@RequestParam(value = "nickname", required = false) String nickname) {
+        if (nickname == null || nickname.trim().isEmpty()) {
+            throw new ApplicationException(UserErrorCase.NICKNAME_REQUIRED); // 파라미터 누락
+        }
+        if (!userInfoService.isNicknameAvailable(nickname.trim())) {
+            throw new ApplicationException(UserErrorCase.NICKNAME_DUPLICATED); // 닉네임 중복
+        }
+        return CommonResponse.success(new NicknameCheckResponse(true, "사용 가능한 닉네임입니다."));
     }
 }
