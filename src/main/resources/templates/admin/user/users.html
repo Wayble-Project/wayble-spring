@@ -99,12 +99,12 @@
                                 <div class="flex items-center space-x-3 mb-2">
                                     <h3 class="text-lg font-medium text-gray-900" th:text="${user.nickname ?: '닉네임 없음'}"></h3>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                          th:classappend="${user.userType.name() == 'GENERAL'} ? 'bg-blue-100 text-blue-800' : (${user.userType.name() == 'DISABLED'} ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800')"
-                                          th:text="${user.userType.name()}">
+                                          th:classappend="${user.userType != null and user.userType.name() == 'GENERAL'} ? 'bg-blue-100 text-blue-800' : (${user.userType != null and user.userType.name() == 'DISABLED'} ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800')"
+                                          th:text="${user.userType != null ? user.userType.name() : '미설정'}">
                                     </span>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                          th:classappend="${user.loginType.name() == 'WAYBLE'} ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'"
-                                          th:text="${user.loginType.name()}">
+                                          th:classappend="${user.loginType != null and user.loginType.name() == 'WAYBLE'} ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'"
+                                          th:text="${user.loginType != null ? user.loginType.name() : '미설정'}">
                                     </span>
                                 </div>
                                 
@@ -128,7 +128,7 @@
                                             <svg class="h-4 w-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                             </svg>
-                                            <span th:text="${user.gender.name()}"></span>
+                                            <span th:text="${user.gender != null ? user.gender.name() : '미설정'}"></span>
                                         </span>
                                     </div>
                                 </div>
