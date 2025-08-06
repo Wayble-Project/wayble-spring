@@ -42,7 +42,7 @@ public class TransportationService {
         // 거리 검증 (30km 제한)
         double distance = haversine(origin.latitude(), origin.longitude(), 
                                   destination.latitude(), destination.longitude());
-        if (distance >= METER_CONVERSION) {
+        if (distance >= DISTANCE_CONSTRAINT) {
             throw new ApplicationException(DISTANCE_TOO_FAR);
         }
 
