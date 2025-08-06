@@ -99,7 +99,7 @@ public class FacilityService {
             try {
                 toiletCount = Integer.parseInt(item.toltNum());
             } catch (NumberFormatException e) {
-                log.debug("지하철 역에 대해 잘못된 숫자 형식. 지하철역 번호 {}: {}", stinCd, item.toltNum());
+                log.warn("지하철 역 토이렛 개수 파싱 실패. 지하철역 번호 {}: {}", stinCd, item.toltNum(), e);
             }
             stationToiletMap.put(stinCd, stationToiletMap.getOrDefault(stinCd, false) || toiletCount > 0);
         }
