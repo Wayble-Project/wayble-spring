@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import static com.wayble.server.direction.exception.DirectionErrorCase.PATH_NOT_FOUND;
+import static com.wayble.server.direction.exception.DirectionErrorCase.DISTANCE_TOO_FAR;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,11 +32,19 @@ public class TransportationService {
     private static final int TRANSFER_PENALTY = 2000;
     private static final int STEP_PENALTY = 500;
     private static final int METER_CONVERSION = 1000;
+    private static final double DISTANCE_CONSTRAINT = 30;
 
     public TransportationResponseDto findRoutes(TransportationRequestDto request){
 
         TransportationRequestDto.Location origin = request.origin();
         TransportationRequestDto.Location destination = request.destination();
+
+        // 거리 검증 (30km 제한)
+        double distance = haversine(origin.latitude(), origin.longitude(), 
+                                  destination.latitude(), destination.longitude());
+        if (distance >= METER_CONVERSION) {
+            throw new ApplicationException(DISTANCE_TOO_FAR);
+        }
 
         Node start = new Node(-1L, origin.name(), DirectionType.FROM_WAYPOINT ,origin.latitude(), origin.longitude());
         Node end = new Node(-2L, destination.name(), DirectionType.TO_WAYPOINT,destination.latitude(), destination.longitude());
@@ -248,8 +257,10 @@ public class TransportationService {
 
             
             // 시작 노드
-            String fromName = (currentEdge.getStartNode() != null) ? currentEdge.getStartNode().getStationName() : "Unknown";
-            String toName = (currentEdge.getEndNode() != null) ? currentEdge.getEndNode().getStationName() : "Unknown";
+            String fromName = (currentEdge.getStartNode() != null && currentEdge.getStartNode().getStationName() != null) 
+                ? currentEdge.getStartNode().getStationName() : "Unknown";
+            String toName = (currentEdge.getEndNode() != null && currentEdge.getEndNode().getStationName() != null) 
+                ? currentEdge.getEndNode().getStationName() : "Unknown";
             
             // 도보인 경우 또는 연속된 같은 노선이 없는 경우 그대로 추가
             if (currentType == DirectionType.WALK || currentRouteName == null) {

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 public enum DirectionErrorCase implements ErrorCase {
 
     HISTORY_NOT_FOUND(400, 4004, "검색 기록이 없습니다."),
+    DISTANCE_TOO_FAR(400, 4002, "거리가 30km 이상입니다."),
     PATH_NOT_FOUND(400, 4001, "해당하는 경로를 찾을 수 없습니다.");
 
     private final Integer httpStatusCode;
