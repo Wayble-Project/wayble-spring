@@ -55,7 +55,12 @@ public class AmazonS3Manager{
 
         log.info("file url : " + imageUrl + " has removed from S3");
 
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        } catch (Exception e) {
+            log.error("Failed to delete image from S3: " + imageUrl, e);
+            throw new ApplicationException(AwsErrorCase.IMAGE_DELETE_ERROR);
+        }
     }
 
     private String createFileName(MultipartFile file) {
