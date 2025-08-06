@@ -2,6 +2,7 @@ package com.wayble.server.auth.service;
 
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
+import com.wayble.server.logging.service.UserActionLogService;
 import com.wayble.server.user.dto.UserLoginRequestDto;
 import com.wayble.server.auth.dto.TokenResponseDto;
 import com.wayble.server.auth.entity.RefreshToken;
@@ -22,6 +23,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder encoder;
     private final JwtTokenProvider jwtProvider;
+    private final UserActionLogService userActionLogService;
 
     public TokenResponseDto login(UserLoginRequestDto req) {
         User user = userRepository.findByEmailAndLoginType(req.email(), req.loginType())
@@ -41,6 +43,12 @@ public class AuthService {
                 .expiry(expiry)
                 .build();
         refreshTokenRepository.save(entity);
+
+        // 첫 로그인시에도 활성 유저 로그 저장 (비동기, 하루 1회만)
+        userActionLogService.logTokenRefresh(
+                user.getId(), 
+                user.getUserType() != null ? user.getUserType().name() : null
+        );
 
         return new TokenResponseDto(accessToken, refreshToken);
     }
@@ -73,6 +81,13 @@ public class AuthService {
         refreshTokenRepository.save(saved);
 
         String newAccessToken = jwtProvider.generateToken(userId, user.getUserType() != null ? user.getUserType().name() : null);
+        
+        // 토큰 갱신 로그 저장 (비동기, 하루 1회만)
+        userActionLogService.logTokenRefresh(
+                userId, 
+                user.getUserType() != null ? user.getUserType().name() : null
+        );
+        
         return new TokenResponseDto(newAccessToken, newRefreshToken);
     }
 
