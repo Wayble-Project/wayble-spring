@@ -68,14 +68,21 @@ public class KakaoLoginService {
         );
         String refreshToken = jwtProvider.generateRefreshToken(user.getId());
 
-        // 신규 가입시에만 로그 저장 (비동기)
+        // 로그 저장 (비동기)
         if (isNewUser) {
+            // 신규 가입 로그
             userActionLogService.logUserRegister(
                     user.getId(), 
                     LoginType.KAKAO.name(), 
                     user.getUserType() != null ? user.getUserType().name() : null
             );
         }
+        
+        // 모든 카카오 로그인시 활성 유저 로그 저장 (하루 1회만)
+        userActionLogService.logTokenRefresh(
+                user.getId(), 
+                user.getUserType() != null ? user.getUserType().name() : null
+        );
 
         return KakaoLoginResponseDto.builder()
                 .accessToken(accessToken)
