@@ -26,7 +26,7 @@ public class DirectionService {
     private final ElasticsearchOperations elasticsearchOperations;
 
     @Transactional
-    public void savePlaceAndIndexDocument(List<PlaceSaveRequest> requests) {
+    public void savePlaceAndIndexDocument(List<PlaceSaveRequest.PlaceDetailRequest> requests) {
         List<Place> places = requests.stream()
                 .map(request ->
                     Place.of(request.name(), request.address())

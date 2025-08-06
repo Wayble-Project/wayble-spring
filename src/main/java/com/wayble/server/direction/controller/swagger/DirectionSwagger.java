@@ -26,7 +26,7 @@ public interface DirectionSwagger {
             )
     })
     CommonResponse<String> savePlace(
-            @RequestBody @Valid List<PlaceSaveRequest> requests
+            @RequestBody @Valid PlaceSaveRequest request
     );
 
     @Operation(

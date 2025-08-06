@@ -20,8 +20,8 @@ public class DirectionController implements DirectionSwagger {
 
     @Override
     @PostMapping("/place")
-    public CommonResponse<String> savePlace(@RequestBody @Valid List<PlaceSaveRequest> requests) {
-        directionService.savePlaceAndIndexDocument(requests);
+    public CommonResponse<String> savePlace(@RequestBody @Valid PlaceSaveRequest request) {
+        directionService.savePlaceAndIndexDocument(request.requests());
         return CommonResponse.success("Place Save successful");
     }
 
