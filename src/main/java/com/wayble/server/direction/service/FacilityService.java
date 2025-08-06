@@ -1,20 +1,17 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.direction.dto.TransportationResponseDto;
-import com.wayble.server.direction.dto.toilet.KricToiletRawItem;
-import com.wayble.server.direction.dto.toilet.KricToiletRawResponse;
 import com.wayble.server.direction.entity.transportation.Facility;
+import com.wayble.server.direction.external.kric.dto.KricToiletRawItem;
+import com.wayble.server.direction.external.kric.dto.KricToiletRawResponse;
 import com.wayble.server.direction.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import com.wayble.server.direction.external.kric.KricProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,10 +25,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FacilityService {
     private final FacilityRepository facilityRepository;
-    private final RestTemplate restTemplate;
-
-    @Value("${kric.api.key}")
-    private String kricApiKey;
+    private final WebClient kricWebClient;
+    private final KricProperties kricProperties;
 
     public TransportationResponseDto.NodeInfo getNodeInfo(Long nodeId){
         Facility facility = facilityRepository.findByNodeId(nodeId).orElse(null);
@@ -72,8 +67,8 @@ public class FacilityService {
     }
 
     private Map<String, Boolean> getToiletInfo(Facility facility){
-        String url = UriComponentsBuilder.fromHttpUrl("https://data.kric.go.kr/api/vulnerableUserInfo/stationDisabledToilet")
-                .queryParam("serviceKey", kricApiKey)
+        String uri = UriComponentsBuilder.fromPath("/api/vulnerableUserInfo/stationDisabledToilet")
+                .queryParam("serviceKey", kricProperties.key())
                 .queryParam("format", "json")
                 .queryParam("railOprLsttCd", facility.getRailOprLsttCd())
                 .queryParam("lnCd", facility.getLnCd())
@@ -82,17 +77,17 @@ public class FacilityService {
         
         List<KricToiletRawItem> items;
         try{
-            ResponseEntity<KricToiletRawResponse> response = restTemplate.exchange(
-            url,
-            HttpMethod.GET,
-            null,
-            new ParameterizedTypeReference<KricToiletRawResponse>() {}
-            );
+            KricToiletRawResponse response = kricWebClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(KricToiletRawResponse.class)
+                    .block();
 
-            items = response.getBody().body().item();
+            items = response.body().item();
 
         } catch(Exception e){
-            log.info("역사 화장실 api 호출 중 에러 발생: {}: {}", url, e.getCause());
+            log.info("역사 화장실 api 호출 중 에러 발생: {}: {}", uri, e.getCause());
             return new HashMap<>();
         }
 

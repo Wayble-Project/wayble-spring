@@ -1,6 +1,7 @@
 package com.wayble.server.common.config;
 
 import com.wayble.server.direction.external.tmap.TMapProperties;
+import com.wayble.server.direction.external.kric.KricProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     private final TMapProperties tMapProperties;
+    private final KricProperties kricProperties;
 
     @Bean
     public WebClient webClient() {
@@ -22,6 +24,13 @@ public class WebClientConfig {
     public WebClient tMapWebClient() {
         return WebClient.builder()
                 .baseUrl(tMapProperties.baseUrl())
+                .build();
+    }
+
+    @Bean
+    public WebClient kricWebClient() {
+        return WebClient.builder()
+                .baseUrl(kricProperties.baseUrl())
                 .build();
     }
 }
