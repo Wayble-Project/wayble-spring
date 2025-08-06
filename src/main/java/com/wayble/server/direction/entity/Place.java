@@ -20,7 +20,7 @@ public class Place extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "address", nullable = false)
+    @Embedded
     private Address address;
 
     @Builder

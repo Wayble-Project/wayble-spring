@@ -20,6 +20,8 @@ public class DirectionElasticSearchCustomRepositoryImpl implements DirectionElas
 
     @Override
     public List<DirectionSearchResponse> searchDirection(DirectionSearchRequest request) {
+        if (request.name() == null || request.name().trim().isEmpty()) return List.of();
+        
         Criteria criteria = new Criteria("name").matches(request.name());
 
         CriteriaQuery query = new CriteriaQuery(criteria);
