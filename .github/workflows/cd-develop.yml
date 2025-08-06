@@ -3,6 +3,9 @@ name: CI/CD
 on:
 #  push:
 #    branches: [ "feature/seungmin" ]
+
+#push:
+#  branches: [ "feature/seungin" ]
   pull_request:
     branches: [ "main" ]
 
