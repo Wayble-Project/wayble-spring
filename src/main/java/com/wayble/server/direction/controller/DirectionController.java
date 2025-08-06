@@ -26,7 +26,7 @@ public class DirectionController implements DirectionSwagger {
     }
 
     @Override
-    @GetMapping("/keywords")
+    @GetMapping("/auto-complete")
     public CommonResponse<List<DirectionSearchResponse>> getDirectionKeywords(@RequestParam String keyword) {
         return CommonResponse.success(directionService.searchDirection(keyword));
     }
