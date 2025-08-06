@@ -1,8 +1,8 @@
 name: CI/CD
 
 on:
-#  push:
-#    branches: [ "feature/seungmin" ]
+  push:
+    branches: [ "feature/seungmin" ]
 
 #push:
 #  branches: [ "feature/seungin" ]
