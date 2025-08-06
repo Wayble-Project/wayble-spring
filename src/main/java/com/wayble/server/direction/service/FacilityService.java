@@ -6,6 +6,8 @@ import com.wayble.server.direction.dto.toilet.KricToiletRawResponse;
 import com.wayble.server.direction.entity.transportation.Facility;
 import com.wayble.server.direction.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -20,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FacilityService {
     private final FacilityRepository facilityRepository;
@@ -29,8 +33,8 @@ public class FacilityService {
     @Value("${kric.api.key}")
     private String kricApiKey;
 
-    public TransportationResponseDto.NodeInfo getNodeInfo(Long NodeId){
-        Facility facility = facilityRepository.findById(NodeId).orElse(null);
+    public TransportationResponseDto.NodeInfo getNodeInfo(Long nodeId){
+        Facility facility = facilityRepository.findByNodeId(nodeId).orElse(null);
         List<TransportationResponseDto.LocationInfo> wheelchair = new ArrayList<>();
         List<TransportationResponseDto.LocationInfo> elevator = new ArrayList<>();
         Boolean accessibleRestroom = false;
@@ -71,18 +75,26 @@ public class FacilityService {
         String url = UriComponentsBuilder.fromHttpUrl("https://data.kric.go.kr/api/vulnerableUserInfo/stationDisabledToilet")
                 .queryParam("serviceKey", kricApiKey)
                 .queryParam("format", "json")
-                .queryParam("railOprIsttCd", facility.getRailOprLsttCd())
+                .queryParam("railOprLsttCd", facility.getRailOprLsttCd())
                 .queryParam("lnCd", facility.getLnCd())
                 .queryParam("stinCd", facility.getStinCd())
                 .toUriString();
-        ResponseEntity<KricToiletRawResponse> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<KricToiletRawResponse>() {}
-        );
+        
+        List<KricToiletRawItem> items;
+        try{
+            ResponseEntity<KricToiletRawResponse> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<KricToiletRawResponse>() {}
+            );
 
-        List<KricToiletRawItem> items = response.getBody().body().item();
+            items = response.getBody().body().item();
+
+        } catch(Exception e){
+            log.info("역사 화장실 api 호출 중 에러 발생: {}: {}", url, e.getCause());
+            return new HashMap<>();
+        }
 
         // 역별로 화장실 존재 여부 추출 (중복 제거)
         Map<String, Boolean> stationToiletMap = new HashMap<>();
@@ -91,7 +103,9 @@ public class FacilityService {
             int toiletCount = 0;
             try {
                 toiletCount = Integer.parseInt(item.toltNum());
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException e) {
+                log.debug("지하철 역에 대해 잘못된 숫자 형식. 지하철역 번호 {}: {}", stinCd, item.toltNum());
+            }
             stationToiletMap.put(stinCd, stationToiletMap.getOrDefault(stinCd, false) || toiletCount > 0);
         }
 
