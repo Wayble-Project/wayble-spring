@@ -1,9 +1,11 @@
 package com.wayble.server.admin.controller;
 
+import com.wayble.server.admin.dto.DailyStatsDto;
 import com.wayble.server.admin.dto.SystemStatusDto;
 import com.wayble.server.admin.service.AdminSystemService;
 import com.wayble.server.admin.service.AdminUserService;
 import com.wayble.server.admin.service.AdminWaybleZoneService;
+import com.wayble.server.common.response.CommonResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Slf4j
 @Controller
@@ -74,13 +77,17 @@ public class AdminController {
             adminSystemService.isFileStorageHealthy()
         );
         
-        // 통계 데이터 조회
+        // 일일 통계 데이터 조회
+        DailyStatsDto dailyStats = adminSystemService.getDailyStats();
+        
+        // 기존 통계 데이터 조회 (원래대로 복구)
         long totalUserCount = adminUserService.getTotalUserCount();
         long totalDeletedUserCount = adminUserService.getTotalDeletedUserCount();
         long totalWaybleZoneCount = adminWaybleZoneService.getTotalWaybleZoneCounts();
         
         model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
         model.addAttribute("systemStatus", systemStatus);
+        model.addAttribute("dailyStats", dailyStats);
         model.addAttribute("totalUserCount", totalUserCount);
         model.addAttribute("totalDeletedUserCount", totalDeletedUserCount);
         model.addAttribute("totalWaybleZoneCount", totalWaybleZoneCount);
@@ -92,5 +99,17 @@ public class AdminController {
         session.invalidate();
         log.info("관리자 로그아웃");
         return "redirect:/admin";
+    }
+    
+    @GetMapping("/api/daily-stats")
+    @ResponseBody
+    public CommonResponse<DailyStatsDto> getDailyStats(HttpSession session) {
+        // 로그인 확인 (API용)
+        if (session.getAttribute("adminLoggedIn") == null) {
+            return CommonResponse.error(401, "관리자 인증이 필요합니다.");
+        }
+        
+        DailyStatsDto dailyStats = adminSystemService.getDailyStats();
+        return CommonResponse.success(dailyStats);
     }
 }
