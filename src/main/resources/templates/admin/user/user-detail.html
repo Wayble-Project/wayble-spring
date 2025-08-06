@@ -67,12 +67,12 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                          th:classappend="${user.userType.name() == 'GENERAL'} ? 'bg-blue-100 text-blue-800' : (${user.userType.name() == 'DISABLED'} ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800')"
-                          th:text="${user.userType.name()}">
+                          th:classappend="${user.userType != null and user.userType.name() == 'GENERAL'} ? 'bg-blue-100 text-blue-800' : (${user.userType != null and user.userType.name() == 'DISABLED'} ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800')"
+                          th:text="${user.userType != null ? user.userType.name() : '미설정'}">
                     </span>
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                          th:classappend="${user.loginType.name() == 'WAYBLE'} ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'"
-                          th:text="${user.loginType.name()}">
+                          th:classappend="${user.loginType != null and user.loginType.name() == 'WAYBLE'} ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'"
+                          th:text="${user.loginType != null ? user.loginType.name() : '미설정'}">
                     </span>
                 </div>
             </div>
@@ -113,11 +113,11 @@
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">로그인 타입</dt>
-                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.loginType.name()}"></dd>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.loginType != null ? user.loginType.name() : '미설정'}"></dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">사용자 타입</dt>
-                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.userType.name()}"></dd>
+                                <dd class="mt-1 text-sm text-gray-900" th:text="${user.userType != null ? user.userType.name() : '미설정'}"></dd>
                             </div>
                             <div class="sm:col-span-2">
                                 <dt class="text-sm font-medium text-gray-500">프로필 이미지</dt>

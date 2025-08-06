@@ -165,8 +165,8 @@ public class AdminUserService {
         String email = (String) row[2];
         LocalDate birthDate = row[3] != null ? ((Date) row[3]).toLocalDate() : null;
         Gender gender = row[4] != null ? Gender.valueOf((String) row[4]) : null;
-        LoginType loginType = LoginType.valueOf((String) row[5]);
-        UserType userType = UserType.valueOf((String) row[6]);
+        LoginType loginType = row[5] != null ? LoginType.valueOf((String) row[5]) : null;
+        UserType userType = row[6] != null ? UserType.valueOf((String) row[6]) : null;
         String disabilityType = (String) row[7];
         String mobilityAid = (String) row[8];
         
@@ -181,8 +181,8 @@ public class AdminUserService {
         String email = (String) row[3];
         LocalDate birthDate = row[4] != null ? ((Date) row[4]).toLocalDate() : null;
         Gender gender = row[5] != null ? Gender.valueOf((String) row[5]) : null;
-        LoginType loginType = LoginType.valueOf((String) row[6]);
-        UserType userType = UserType.valueOf((String) row[7]);
+        LoginType loginType = row[6] != null ? LoginType.valueOf((String) row[6]) : null;
+        UserType userType = row[7] != null ? UserType.valueOf((String) row[7]) : null;
         String profileImageUrl = (String) row[8];
         String disabilityType = (String) row[9];
         String mobilityAid = (String) row[10];
@@ -203,8 +203,8 @@ public class AdminUserService {
         String email = (String) row[3];
         LocalDate birthDate = row[4] != null ? ((Date) row[4]).toLocalDate() : null;
         Gender gender = row[5] != null ? Gender.valueOf((String) row[5]) : null;
-        LoginType loginType = LoginType.valueOf((String) row[6]);
-        UserType userType = UserType.valueOf((String) row[7]);
+        LoginType loginType = row[6] != null ? LoginType.valueOf((String) row[6]) : null;
+        UserType userType = row[7] != null ? UserType.valueOf((String) row[7]) : null;
         String profileImageUrl = (String) row[8];
         String disabilityType = (String) row[9];
         String mobilityAid = (String) row[10];
