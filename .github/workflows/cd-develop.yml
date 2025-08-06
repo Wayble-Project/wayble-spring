@@ -186,7 +186,7 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"content\": \"✅ EC2 배포 성공! (브랜치: develop)\"}" \
+               -d "{\"content\": \"✅ EC2 배포 성공! (브랜치: main)\"}" \
                ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # ❌ 배포 실패 알림 (Discord)
