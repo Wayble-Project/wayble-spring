@@ -52,7 +52,7 @@ public class TransportationController {
             }
     )
     @PostMapping("/")
-    public CommonResponse<TransportationResponseDto> getDirections(
+    public CommonResponse<TransportationResponseDto> findDirections(
             @RequestBody TransportationRequestDto request
     ){
         TransportationResponseDto data = transportationService.findRoutes(request);
