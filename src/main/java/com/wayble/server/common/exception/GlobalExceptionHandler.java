@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
         String timestamp = Instant.now().toString();
 
         if (!env.acceptsProfiles(Profiles.of("develop"))) {
-            log.debug("현재 active 프로파일이 develop가 아니므로 Discord 알림을 보내지 않습니다.");
+            log.info("현재 active 프로파일이 develop가 아니므로 Discord 알림을 보내지 않습니다.");
             return;
         }
 
