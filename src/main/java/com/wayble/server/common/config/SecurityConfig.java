@@ -51,7 +51,8 @@ public class SecurityConfig {
                                 "/",
                                 "/index",
                                 "/index.html",
-                                "/admin/**"
+                                "/admin/**",
+                                "/api/v1/files/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
