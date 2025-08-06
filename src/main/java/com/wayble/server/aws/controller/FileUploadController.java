@@ -26,11 +26,4 @@ public class FileUploadController {
         return CommonResponse.success(imageUrls);
     }
 
-    @DeleteMapping("/images")
-    public CommonResponse<String> deleteImageFiles(
-            @RequestBody List<String> imageUrls
-    ) {
-        imageUrls.forEach(amazonS3Manager::deleteImageFileFromS3);
-        return CommonResponse.success("이미지 삭제가 완료되었습니다.");
-    }
 }
