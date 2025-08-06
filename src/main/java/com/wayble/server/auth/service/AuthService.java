@@ -44,6 +44,12 @@ public class AuthService {
                 .build();
         refreshTokenRepository.save(entity);
 
+        // 첫 로그인시에도 활성 유저 로그 저장 (비동기, 하루 1회만)
+        userActionLogService.logTokenRefresh(
+                user.getId(), 
+                user.getUserType() != null ? user.getUserType().name() : null
+        );
+
         return new TokenResponseDto(accessToken, refreshToken);
     }
 
