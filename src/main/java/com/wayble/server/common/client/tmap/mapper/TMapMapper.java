@@ -1,7 +1,7 @@
-package com.wayble.server.direction.external.tmap.mapper;
+package com.wayble.server.common.client.tmap.mapper;
 
-import com.wayble.server.direction.external.tmap.dto.response.TMapParsingResponse;
-import com.wayble.server.direction.external.tmap.dto.response.TMapResponse;
+import com.wayble.server.common.client.tmap.dto.response.TMapResponse;
+import com.wayble.server.common.client.tmap.dto.response.TMapParsingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

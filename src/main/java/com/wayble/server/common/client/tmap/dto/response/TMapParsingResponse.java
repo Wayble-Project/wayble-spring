@@ -1,4 +1,4 @@
-package com.wayble.server.direction.external.tmap.dto.response;
+package com.wayble.server.common.client.tmap.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

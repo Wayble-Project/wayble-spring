@@ -2,14 +2,14 @@ package com.wayble.server.direction.controller.swagger;
 
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.direction.dto.response.WayblePathResponse;
-import com.wayble.server.direction.external.tmap.dto.response.TMapParsingResponse;
+import com.wayble.server.common.client.tmap.dto.response.TMapParsingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Tag(name = "[도보]", description = "도보 길찾기 관련 API")
+@Tag(name = "[길찾기 - 도보]", description = "도보 길찾기 관련 API")
 public interface WalkingSwagger {
     @Operation(
             summary = "도보 최적 경로 길찾기 API",
