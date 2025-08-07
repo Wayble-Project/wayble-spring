@@ -1,4 +1,4 @@
-package com.wayble.server.direction.dto.toilet;
+package com.wayble.server.direction.external.kric.dto;
 
 import lombok.Getter;
 
