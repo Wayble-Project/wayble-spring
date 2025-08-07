@@ -41,9 +41,10 @@ public record ErrorLogDto(
             // 메시지 추출
             String fullMessage = logLine.substring(loggerEnd + 3);
             
-            // HTTP Method와 Path 추출
+            // HTTP Method, Path, Location 추출
             String method = "";
             String path = "";
+            String location = "";
             if (fullMessage.contains("Method:") && fullMessage.contains("Path:")) {
                 String[] parts = fullMessage.split(", ");
                 for (String part : parts) {
@@ -51,6 +52,8 @@ public record ErrorLogDto(
                         method = part.substring(part.indexOf("Method:") + 8).trim();
                     } else if (part.contains("Path:")) {
                         path = part.substring(part.indexOf("Path:") + 6).trim();
+                    } else if (part.contains("Location:")) {
+                        location = part.substring(part.indexOf("Location:") + 10).trim();
                     }
                 }
             }
@@ -61,7 +64,7 @@ public record ErrorLogDto(
                 exception = fullMessage;
             }
             
-            return new ErrorLogDto(timestamp, level, logger, fullMessage, exception, method, path, "");
+            return new ErrorLogDto(timestamp, level, logger, fullMessage, exception, method, path, location);
             
         } catch (Exception e) {
             // 파싱 실패시 null 반환

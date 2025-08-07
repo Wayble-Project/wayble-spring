@@ -43,8 +43,11 @@ public class GlobalExceptionHandler {
         String method = ((ServletWebRequest) request).getRequest().getMethod();
         String userAgent = ((ServletWebRequest) request).getRequest().getHeader("User-Agent");
         
-        log.error("ApplicationException 발생 - Method: {}, Path: {}, ErrorCode: {}, Message: {}, UserAgent: {}", 
-                  method, path, e.getErrorCase(), e.getMessage(), userAgent, e);
+        // 스택트레이스에서 실제 에러 발생 위치 추출
+        String errorLocation = getErrorLocation(e);
+        
+        log.error("ApplicationException 발생 - Method: {}, Path: {}, ErrorCode: {}, Message: {}, Location: {}, UserAgent: {}", 
+                  method, path, e.getErrorCase(), e.getMessage(), errorLocation, userAgent, e);
         
         CommonResponse commonResponse = CommonResponse.error(e.getErrorCase());
 
@@ -64,7 +67,11 @@ public class GlobalExceptionHandler {
         
         // 에러 로그 기록
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        log.error("Validation Exception 발생 - Path: {}, Message: {}", path, message, ex);
+        String method = ((ServletWebRequest) request).getRequest().getMethod();
+        String errorLocation = getErrorLocation(ex);
+        
+        log.error("Validation Exception 발생 - Method: {}, Path: {}, Message: {}, Location: {}", 
+                  method, path, message, errorLocation, ex);
         
         CommonResponse commonResponse = CommonResponse.error(400, message);
 
@@ -80,8 +87,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponse> handleGeneralException(Exception ex, WebRequest request) {
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        log.error("Unexpected Exception 발생 - Path: {}, Exception: {}, Message: {}", 
-                  path, ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        String method = ((ServletWebRequest) request).getRequest().getMethod();
+        String errorLocation = getErrorLocation(ex);
+        
+        log.error("Unexpected Exception 발생 - Method: {}, Path: {}, Exception: {}, Message: {}, Location: {}", 
+                  method, path, ex.getClass().getSimpleName(), ex.getMessage(), errorLocation, ex);
         
         CommonResponse commonResponse = CommonResponse.error(500, "서버 내부 오류가 발생했습니다.");
         
@@ -128,5 +138,43 @@ public class GlobalExceptionHandler {
         } catch (Exception e){
             log.error(e.getMessage());
         }
+    }
+
+    /**
+     * 예외의 스택트레이스에서 실제 에러 발생 위치를 추출
+     */
+    private String getErrorLocation(Exception ex) {
+        StackTraceElement[] stackTrace = ex.getStackTrace();
+        if (stackTrace == null || stackTrace.length == 0) {
+            return "Unknown location";
+        }
+        
+        // com.wayble.server 패키지 내의 첫 번째 스택트레이스를 찾음
+        for (StackTraceElement element : stackTrace) {
+            if (element.getClassName().startsWith("com.wayble.server")) {
+                String className = element.getClassName();
+                String fileName = element.getFileName();
+                int lineNumber = element.getLineNumber();
+                
+                // 클래스명에서 패키지 제거 (간결하게 표시)
+                String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+                
+                return String.format("%s.%s(%s:%d)", 
+                    simpleClassName, 
+                    element.getMethodName(), 
+                    fileName, 
+                    lineNumber);
+            }
+        }
+        
+        // wayble 패키지 내 코드가 없으면 첫 번째 스택트레이스 반환
+        StackTraceElement first = stackTrace[0];
+        String className = first.getClassName();
+        String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+        return String.format("%s.%s(%s:%d)", 
+            simpleClassName, 
+            first.getMethodName(), 
+            first.getFileName(), 
+            first.getLineNumber());
     }
 }
