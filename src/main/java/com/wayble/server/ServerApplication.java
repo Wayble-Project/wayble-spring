@@ -16,8 +16,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 )
 @EnableJpaAuditing
 @EnableScheduling
-@EnableElasticsearchRepositories(basePackages = "com.wayble.server.explore.repository")
-@EnableConfigurationProperties(TMapProperties.class)
+@EnableConfigurationProperties({TMapProperties.class, KricProperties.class})
+@EnableElasticsearchRepositories(basePackages = {"com.wayble.server.explore.repository", "com.wayble.server.logging.repository"})
 @EntityScan(basePackages = "com.wayble.server")
 public class ServerApplication {
 
