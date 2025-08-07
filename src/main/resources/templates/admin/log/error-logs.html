@@ -104,9 +104,9 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors duration-200">
                             <span class="text-white font-bold text-sm">W</span>
-                        </div>
+                        </a>
                     </div>
                     <div class="ml-4">
                         <h1 class="text-xl font-semibold text-gray-900">Wayble 관리자 페이지</h1>
@@ -155,17 +155,15 @@
                 </div>
 
                 <!-- 컨트롤 -->
-                <div class="log-controls">
-                    <div>
-                        <label for="limitSelect">표시할 로그 수:</label>
-                        <select id="limitSelect" class="limit-select" th:value="${limit}">
-                            <option value="50">50개</option>
-                            <option value="100" selected>100개</option>
-                            <option value="200">200개</option>
-                            <option value="500">500개</option>
-                        </select>
-                    </div>
-                    <button id="refreshBtn" class="refresh-btn" onclick="refreshLogs()">새로고침</button>
+                <div class="mb-5">
+                    <label for="limitSelect" class="text-sm font-medium text-gray-700">표시할 로그 수:</label>
+                    <select id="limitSelect" class="limit-select ml-2" th:value="${limit}">
+                        <option value="50">50개</option>
+                        <option value="100" selected>100개</option>
+                        <option value="200">200개</option>
+                        <option value="500">500개</option>
+                    </select>
+                    <span class="ml-4 text-xs text-gray-500">5분마다 자동 새로고침됩니다</span>
                 </div>
 
                 <!-- 로그 컨테이너 -->
@@ -179,6 +177,13 @@
                                 <span class="log-timestamp" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
                                 <span class="log-level" th:text="${log.level}"></span>
                             </div>
+                            
+                            <!-- HTTP Method와 Path 정보 -->
+                            <div th:if="${log.method != null && !#strings.isEmpty(log.method)}" class="flex items-center space-x-4 mb-2">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium" th:text="${log.method}">GET</span>
+                                <span class="text-blue-600 font-mono text-sm" th:text="${log.path}">/api/v1/example</span>
+                            </div>
+                            
                             <div class="log-logger" th:text="${log.logger}"></div>
                             <div class="log-message" th:text="${log.message}"></div>
                         </div>
@@ -189,10 +194,6 @@
 <script>
     function refreshLogs() {
         const limit = document.getElementById('limitSelect').value;
-        const refreshBtn = document.getElementById('refreshBtn');
-        
-        refreshBtn.disabled = true;
-        refreshBtn.textContent = '새로고침 중...';
         
         // 통계 새로고침
         fetch('/admin/logs/error/stats')
@@ -229,19 +230,20 @@
                                 <span class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</span>
                                 <span class="log-level">${log.level}</span>
                             </div>
+                            ${log.method && log.method.trim() ? `
+                            <div class="flex items-center space-x-4 mb-2">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">${log.method}</span>
+                                <span class="text-blue-600 font-mono text-sm">${log.path || ''}</span>
+                            </div>
+                            ` : ''}
                             <div class="log-logger">${log.logger}</div>
                             <div class="log-message">${log.message}</div>
                         </div>
                     `).join('');
                 }
-                
-                refreshBtn.disabled = false;
-                refreshBtn.textContent = '새로고침';
             })
             .catch(error => {
                 console.error('로그 새로고침 실패:', error);
-                refreshBtn.disabled = false;
-                refreshBtn.textContent = '새로고침';
             });
     }
     

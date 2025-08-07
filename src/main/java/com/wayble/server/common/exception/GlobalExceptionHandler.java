@@ -38,10 +38,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<CommonResponse> handleApplicationException(ApplicationException e, WebRequest request) {
-        // 에러 로그 기록
+        // 에러 로그 기록 (상세 정보 포함)
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        log.error("ApplicationException 발생 - Path: {}, ErrorCode: {}, Message: {}", 
-                  path, e.getErrorCase(), e.getMessage(), e);
+        String method = ((ServletWebRequest) request).getRequest().getMethod();
+        String userAgent = ((ServletWebRequest) request).getRequest().getHeader("User-Agent");
+        
+        log.error("ApplicationException 발생 - Method: {}, Path: {}, ErrorCode: {}, Message: {}, UserAgent: {}", 
+                  method, path, e.getErrorCase(), e.getMessage(), userAgent, e);
         
         CommonResponse commonResponse = CommonResponse.error(e.getErrorCase());
 
