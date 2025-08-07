@@ -38,6 +38,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<CommonResponse> handleApplicationException(ApplicationException e, WebRequest request) {
+        // 에러 로그 기록
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("ApplicationException 발생 - Path: {}, ErrorCode: {}, Message: {}", 
+                  path, e.getErrorCase(), e.getMessage(), e);
+        
         CommonResponse commonResponse = CommonResponse.error(e.getErrorCase());
 
         HttpStatus status = HttpStatus.valueOf(e.getErrorCase().getHttpStatusCode());
@@ -53,11 +58,34 @@ public class GlobalExceptionHandler {
                                                                MethodArgumentNotValidException ex,
                                                                WebRequest request) {
         String message = bindingResult.getAllErrors().get(0).getDefaultMessage();
+        
+        // 에러 로그 기록
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("Validation Exception 발생 - Path: {}, Message: {}", path, message, ex);
+        
         CommonResponse commonResponse = CommonResponse.error(400, message);
 
         sendToDiscord(ex, request, HttpStatus.BAD_REQUEST);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(commonResponse);
+    }
+
+    /**
+     * 모든 예상하지 못한 예외 처리
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CommonResponse> handleGeneralException(Exception ex, WebRequest request) {
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("Unexpected Exception 발생 - Path: {}, Exception: {}, Message: {}", 
+                  path, ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        
+        CommonResponse commonResponse = CommonResponse.error(500, "서버 내부 오류가 발생했습니다.");
+        
+        sendToDiscord(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(commonResponse);
     }
 
