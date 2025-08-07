@@ -1,4 +1,4 @@
-package com.wayble.server.direction.external.tmap.dto.request;
+package com.wayble.server.common.client.tmap.dto.request;
 
 import lombok.Builder;
 

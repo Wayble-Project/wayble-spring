@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.common.exception.ApplicationException;
+import com.wayble.server.logging.service.UserActionLogService;
 import com.wayble.server.user.dto.KakaoLoginRequestDto;
 import com.wayble.server.user.dto.KakaoLoginResponseDto;
 import com.wayble.server.user.dto.KakaoUserInfoDto;
@@ -26,6 +27,7 @@ public class KakaoLoginService {
     private final JwtTokenProvider jwtProvider;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final UserActionLogService userActionLogService;
 
     private static final String KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -66,6 +68,21 @@ public class KakaoLoginService {
         );
         String refreshToken = jwtProvider.generateRefreshToken(user.getId());
 
+        // 로그 저장 (비동기)
+        if (isNewUser) {
+            // 신규 가입 로그
+            userActionLogService.logUserRegister(
+                    user.getId(), 
+                    LoginType.KAKAO.name(), 
+                    user.getUserType() != null ? user.getUserType().name() : null
+            );
+        }
+        
+        // 모든 카카오 로그인시 활성 유저 로그 저장 (하루 1회만)
+        userActionLogService.logTokenRefresh(
+                user.getId(), 
+                user.getUserType() != null ? user.getUserType().name() : null
+        );
 
         return KakaoLoginResponseDto.builder()
                 .accessToken(accessToken)
