@@ -175,7 +175,7 @@ public class WaybleZone extends BaseEntity {
                 .contactNumber(dto.contactNumber())
                 .zoneType(dto.zoneType())
                 .address(dtoAddress)
-                .mainImageUrl(null)
+                .mainImageUrl(dto.mainImageUrl())
                 .rating(0.0)
                 .reviewCount(0)
                 .likes(0)
