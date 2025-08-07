@@ -7,7 +7,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder(access = AccessLevel.PUBLIC)
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "edge")
@@ -34,4 +34,14 @@ public class Edge {
     @ManyToOne
     @JoinColumn(name = "route_id")
     private Route route;
+
+    public static Edge createEdge(Long id, Node startNode, Node endNode, DirectionType edgeType) {
+        return Edge.builder()
+                .id(id)
+                .edgeType(edgeType)
+                .startNode(startNode)
+                .endNode(endNode)
+                .route(null)
+                .build();
+    }
 }

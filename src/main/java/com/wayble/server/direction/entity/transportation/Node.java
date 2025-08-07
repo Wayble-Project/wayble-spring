@@ -49,9 +49,10 @@ public class Node {
     @OneToOne(mappedBy = "node")
     private Facility facility_id;
 
-    public Node(Long id, String stationName, double latitude, double longitude) {
+    public Node(Long id, String stationName, DirectionType nodeType, double latitude, double longitude) {
         this.id = id;
         this.stationName = stationName;
+        this.nodeType = nodeType;
         this.latitude = latitude;
         this.longitude = longitude;
     }

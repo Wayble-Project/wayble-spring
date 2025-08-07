@@ -1,0 +1,23 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "korean_edge_ngram_analyzer",
+      "search_analyzer": "korean_search_analyzer"
+    },
+    "esAddress": {
+      "properties": {
+        "streetAddress": {
+          "type": "text",
+          "analyzer": "korean_search_analyzer"
+        },
+        "location": {
+          "type": "geo_point"
+        }
+      }
+    }
+  }
+}

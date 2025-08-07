@@ -1,4 +1,4 @@
-package com.wayble.server.direction.external.tmap;
+package com.wayble.server.common.client.tmap;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

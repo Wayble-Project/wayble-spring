@@ -109,6 +109,9 @@ public class UserInfoService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
+        user.getDisabilityType().size();
+        user.getMobilityAid().size();
+
         return UserInfoResponseDto.builder()
                 .nickname(user.getNickname())
                 .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : null)

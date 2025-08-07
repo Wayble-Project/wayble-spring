@@ -1,18 +1,17 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.direction.dto.TransportationResponseDto;
-import com.wayble.server.direction.dto.toilet.KricToiletRawItem;
-import com.wayble.server.direction.dto.toilet.KricToiletRawResponse;
 import com.wayble.server.direction.entity.transportation.Facility;
+import com.wayble.server.direction.external.kric.dto.KricToiletRawItem;
+import com.wayble.server.direction.external.kric.dto.KricToiletRawResponse;
 import com.wayble.server.direction.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import com.wayble.server.direction.external.kric.KricProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,17 +19,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FacilityService {
     private final FacilityRepository facilityRepository;
-    private final RestTemplate restTemplate;
+    private final WebClient kricWebClient;
+    private final KricProperties kricProperties;
 
-    @Value("${kric.api.key}")
-    private String kricApiKey;
-
-    public TransportationResponseDto.NodeInfo getNodeInfo(Long NodeId){
-        Facility facility = facilityRepository.findById(NodeId).orElse(null);
+    public TransportationResponseDto.NodeInfo getNodeInfo(Long nodeId){
+        Facility facility = facilityRepository.findByNodeId(nodeId).orElse(null);
         List<TransportationResponseDto.LocationInfo> wheelchair = new ArrayList<>();
         List<TransportationResponseDto.LocationInfo> elevator = new ArrayList<>();
         Boolean accessibleRestroom = false;
@@ -68,21 +67,29 @@ public class FacilityService {
     }
 
     private Map<String, Boolean> getToiletInfo(Facility facility){
-        String url = UriComponentsBuilder.fromHttpUrl("https://data.kric.go.kr/api/vulnerableUserInfo/stationDisabledToilet")
-                .queryParam("serviceKey", kricApiKey)
+        String uri = UriComponentsBuilder.fromPath("/api/vulnerableUserInfo/stationDisabledToilet")
+                .queryParam("serviceKey", kricProperties.key())
                 .queryParam("format", "json")
-                .queryParam("railOprIsttCd", facility.getRailOprLsttCd())
+                .queryParam("railOprLsttCd", facility.getRailOprLsttCd())
                 .queryParam("lnCd", facility.getLnCd())
                 .queryParam("stinCd", facility.getStinCd())
                 .toUriString();
-        ResponseEntity<KricToiletRawResponse> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<KricToiletRawResponse>() {}
-        );
+        
+        List<KricToiletRawItem> items;
+        try{
+            KricToiletRawResponse response = kricWebClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(KricToiletRawResponse.class)
+                    .block();
 
-        List<KricToiletRawItem> items = response.getBody().body().item();
+            items = response.body().item();
+
+        } catch(Exception e){
+            log.info("역사 화장실 api 호출 중 에러 발생: {}: {}", uri, e.getCause());
+            return new HashMap<>();
+        }
 
         // 역별로 화장실 존재 여부 추출 (중복 제거)
         Map<String, Boolean> stationToiletMap = new HashMap<>();
@@ -91,7 +98,9 @@ public class FacilityService {
             int toiletCount = 0;
             try {
                 toiletCount = Integer.parseInt(item.toltNum());
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException e) {
+                log.warn("지하철 역 토이렛 개수 파싱 실패. 지하철역 번호 {}: {}", stinCd, item.toltNum(), e);
+            }
             stationToiletMap.put(stinCd, stationToiletMap.getOrDefault(stinCd, false) || toiletCount > 0);
         }
 
