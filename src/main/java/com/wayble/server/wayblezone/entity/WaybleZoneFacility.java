@@ -23,21 +23,21 @@ public class WaybleZoneFacility extends BaseEntity {
     private WaybleZone waybleZone;
 
     // 시설 정보 (있음/없음 여부)
-    @Column(nullable = false)
+    @Column(name = "has_slope", nullable = false)
     private boolean hasSlope; // 경사로
 
-    @Column(nullable = false)
+    @Column(name = "has_no_door_step", nullable = false)
     private boolean hasNoDoorStep; // 문턱
 
-    @Column(nullable = false)
+    @Column(name = "has_no_door_step", nullable = false)
     private boolean hasElevator; // 엘리베이터
 
-    @Column(nullable = false)
+    @Column(name = "has_no_door_step", nullable = false)
     private boolean hasTableSeat; // 테이블석
 
-    @Column(nullable = false)
+    @Column(name = "has_disabled_toilet", nullable = false)
     private boolean hasDisabledToilet; // 장애인 화장실
 
-    @Column(length = 20)
+    @Column(name = "floor_info", length = 20)
     private String floorInfo; // 층수 정보 (ex: "1층", "B1", "2층")
 }
