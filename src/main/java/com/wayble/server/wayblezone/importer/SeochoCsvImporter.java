@@ -145,7 +145,8 @@ public class SeochoCsvImporter implements CommandLineRunner {
                     log.warn("[Wayble Import] row {} failed: {}", idx, e.toString());
                 }
             }
-            log.info("[Wayble Import] done. total={}, ok={}, skip(type)={}, fail={}", idx-1, ok, skip, fail);
+            int total = skipHeader ? idx-1 : idx;
+            log.info("[Wayble Import] done. total={}, ok={}, skip(type)={}, fail={}", total, ok, skip, fail);
         }
     }
 
