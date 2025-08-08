@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Access(AccessType.FIELD)
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,10 +30,10 @@ public class Review extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "rating", nullable = false)
+    @Column(nullable = false)
     private double rating = 0.0;
 
-    @Column(name = "rating", nullable = false)
+    @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
