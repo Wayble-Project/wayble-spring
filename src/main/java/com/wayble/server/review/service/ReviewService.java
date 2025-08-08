@@ -54,6 +54,7 @@ public class ReviewService {
         // visitDate 및 facilities 저장은 필요시 추가 구현
     }
 
+    @Transactional(readOnly = true)
     public List<ReviewResponseDto> getReviews(Long zoneId, String sort) {
         WaybleZone zone = waybleZoneRepository.findById(zoneId)
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
