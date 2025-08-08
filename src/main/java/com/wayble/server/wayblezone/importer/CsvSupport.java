@@ -12,8 +12,11 @@ public final class CsvSupport {
         return s == null ? "" : s.trim();
     }
 
-    public static boolean ynToBool(String s) {
-        return "Y".equalsIgnoreCase(nz(s));
+    public static boolean ynToBool(String v) {
+        if (v == null) return false;
+        v = v.trim();
+        if (v.isEmpty()) return false;
+        return "Y".equalsIgnoreCase(v);
     }
 
     public static Double toDouble(String s) {
