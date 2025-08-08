@@ -22,7 +22,7 @@ public interface WaybleZoneRepository extends JpaRepository<WaybleZone, Long>, W
     List<WaybleZone> findSummaryByCityAndType(String city, WaybleZoneType category);
 
     // 상세 조회용: 시설 + 이미지 + 운영시간
-    @EntityGraph(attributePaths = {"facility", "waybleZoneImageList", "operatingHours"})
+    @EntityGraph(attributePaths = {"facility", "waybleZoneImageList"})
     @Query("""
            select distinct z
            from WaybleZone z
