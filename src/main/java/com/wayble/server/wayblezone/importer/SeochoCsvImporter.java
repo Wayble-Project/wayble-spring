@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -66,55 +65,64 @@ public class SeochoCsvImporter implements CommandLineRunner {
                 if (skipHeader && r.getRecordNumber() == 1) continue;
 
                 try {
-                    // --- CSV 컬럼 인덱스 매핑  ---
-                    String name = nz(r.get(0));          // 상호명
-                    String branch = nz(r.get(1));        // 지점명
-                    String mid = nz(r.get(4));           // 상권업종중분류명
-                    String small = nz(r.get(6));         // 상권업종소분류명
-                    String state = nz(r.get(9-1));       // 시도명
-                    String city  = nz(r.get(11-1));      // 시군구명
-                    String district = nz(r.get(13-1));   // 법정동명
-                    String street = nz(r.get(15-1));     // 도로명주소
-                    String phone = nz(r.get(16-1));      // 전화번호
-                    String openHourRaw = nz(r.get(17-1));// 영업시간
-                    String lat = nz(r.get(18-1));        // 위도
-                    String lon = nz(r.get(19-1));        // 경도
-                    String firstFloor = nz(r.get(20-1)); // 일층 (Y/N)
-                    String slope = nz(r.get(21-1));      // 경사로 (Y/N)
-                    String doorStep = nz(r.get(23-1));   // 입구문턱 (Y/N)
-                    String table = nz(r.get(25-1));      // 테이블석 (Y/N)
-                    String toilet = nz(r.get(28-1));     // 장애인화장실 (Y/N)
-                    String elevator = nz(r.get(29-1));   // 엘리베이터 (Y/N)
+                    // --- CSV 컬럼 인덱스 매핑 ---
+                    String name        = nz(r.get(0));   // 상호명
+                    String branch      = nz(r.get(1));   // 지점명
+                    String mid         = nz(r.get(4));   // 상권업종중분류명
+                    String small       = nz(r.get(6));   // 상권업종소분류명
+                    String state       = nz(r.get(8));   // 시도명
+                    String city        = nz(r.get(10));  // 시군구명
+                    String district    = nz(r.get(12));  // 법정동명
+                    String street      = nz(r.get(13));  // 도로명주소
+                    String phone       = nz(r.get(14));  // 전화번호
+                    String openHourRaw = nz(r.get(15));  // 영업시간
+                    String lat         = nz(r.get(16));  // 위도
+                    String lon         = nz(r.get(17));  // 경도
+                    String firstFloor  = nz(r.get(18));  // 일층 (Y/N)
+                    String slope       = nz(r.get(19));  // 경사로 (Y/N)
+                    String entranceStep= nz(r.get(20));  // 입구턱 (Y/N)
+                    String entranceDoorStep = nz(r.get(21)); // 입구문턱 (Y/N)
+                    String table       = nz(r.get(22));  // 테이블석 (Y/N)
+                    String disabledToilet = nz(r.get(25)); // 장애인화장실 (Y/N)
+                    String elevator    = nz(r.get(26));  // 엘리베이터 (Y/N)
 
+                    // 현재 웨이블존 서비스에서 지원하는 ZoneType만 가져오기
                     WaybleZoneType type = toZoneType(small, mid);
                     if (type == null) {
                         skip++;
-                        continue; // 우리 타입 외는 스킵
+                        continue;
                     }
 
-                    String zoneName = (branch.isEmpty() ? name : name + " " + branch);
+                    // 가게명 조합
+                    String zoneName = branch.isEmpty() ? name : name + " " + branch;
                     Address addr = toAddress(state, city, district, street, lat, lon);
 
-                    WaybleZone zone = WaybleZone.fromImporter(zoneName,
+                    // 웨이블존 저장
+                    WaybleZone zone = WaybleZone.fromImporter(
+                            zoneName,
                             phone.isBlank() ? null : phone,
                             type,
-                            addr);
-
+                            addr
+                    );
                     zone = zoneRepo.save(zone);
 
-                    // 시설
+                    // 문턱 여부 판단
+                    boolean hasDoorStep = ynToBool(entranceStep) || ynToBool(entranceDoorStep);
+                    boolean hasNoDoorStep = !hasDoorStep;
+
+                    // 시설 저장
                     WaybleZoneFacility fac = WaybleZoneFacility.builder()
                             .waybleZone(zone)
                             .hasSlope(ynToBool(slope))
-                            .hasNoDoorStep(ynToBool(doorStep))      // 문턱 없음 여부로 저장
+                            .hasNoDoorStep(hasNoDoorStep)
                             .hasElevator(ynToBool(elevator))
                             .hasTableSeat(ynToBool(table))
-                            .hasDisabledToilet(ynToBool(toilet))
+                            .hasDisabledToilet(ynToBool(disabledToilet))
                             .floorInfo(ynToBool(firstFloor) ? "1층" : null)
                             .build();
                     facilityRepo.save(fac);
 
-                    // 영업시간
+                    // 영업시간 저장
                     Map<DayOfWeek, BusinessHourParser.TimeRange> hours =
                             new EnumMap<>(BusinessHourParser.parse(openHourRaw));
                     for (Map.Entry<DayOfWeek, BusinessHourParser.TimeRange> e : hours.entrySet()) {
