@@ -10,23 +10,22 @@ import java.util.regex.Pattern;
 
 public class BusinessHourParser {
 
-    private static final Pattern RANGE = Pattern.compile("(\\d{1,2}):(\\d{2})\\s*[-~]\\s*(\\d{1,2}):(\\d{2})");
-    private static final Pattern DAILY = Pattern.compile("매일\\s*" + RANGE.pattern());
-    private static final Pattern WEEKDAY = Pattern.compile("평일\\s*" + RANGE.pattern());
-    private static final Pattern WEEKEND = Pattern.compile("주말\\s*" + RANGE.pattern());
-    private static final Pattern DAY_KO = Pattern.compile("(월|화|수|목|금|토|일)\\s*" + RANGE.pattern());
+    private static final String RANGE = "(\\d{1,2})[:시](\\d{2})\\s*[-~]\\s*(\\d{1,2})[:시](\\d{2})";
+    private static final Pattern P_DAILY   = Pattern.compile("매일\\s*" + RANGE);
+    private static final Pattern P_WEEKDAY = Pattern.compile("평일\\s*" + RANGE);
+    private static final Pattern P_WEEKEND = Pattern.compile("(주말(?:,\\s*공휴일)?)\\s*" + RANGE);
+    private static final Pattern P_SAT     = Pattern.compile("(토|토요일)\\s*" + RANGE);
+    private static final Pattern P_SUN     = Pattern.compile("(일|일요일)\\s*" + RANGE);
+    private static final Pattern P_DAY_KO  = Pattern.compile("(월|화|수|목|금|토|일)(?:요일)?\\s*" + RANGE);
 
     public record TimeRange(LocalTime open, LocalTime close) {}
 
     public static Map<DayOfWeek, TimeRange> parse(String raw) {
         Map<DayOfWeek, TimeRange> map = new EnumMap<>(DayOfWeek.class);
-        if (raw == null) { return map; }
+        if (raw == null) return map;
 
         String s = raw.replaceAll("\\s+", " ").trim();
-        if (s.isEmpty()) { return map; }
-
-        // 예외 or 무시하는 케이스
-        if (s.contains("점포별") || s.contains("상이") || s.contains("휴무")) { return map; }
+        if (s.isEmpty() || s.contains("점포별") || s.contains("상이") || s.contains("휴무")) return map;
 
         if (s.contains("24시간") || s.contains("24시")) {
             TimeRange tr = new TimeRange(LocalTime.MIDNIGHT, LocalTime.of(23,59));
@@ -35,49 +34,53 @@ public class BusinessHourParser {
         }
 
         // 매일
-        Matcher mDaily = DAILY.matcher(s);
-        if (mDaily.find()) {
-            TimeRange tr = toRange(mDaily);
-            for (DayOfWeek d : DayOfWeek.values()) map.put(d, tr);
-        }
+        matchAndFill(P_DAILY, s, map, List.of(DayOfWeek.values()));
 
-        // 평일/주말
-        Matcher mWeek = WEEKDAY.matcher(s);
-        if (mWeek.find()) {
-            TimeRange tr = toRange(mWeek);
-            for (DayOfWeek d : List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
-                    DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)) {
-                map.put(d, tr);
-            }
-        }
-        Matcher mWeekend = WEEKEND.matcher(s);
-        if (mWeekend.find()) {
-            TimeRange tr = toRange(mWeekend);
-            map.put(DayOfWeek.SATURDAY, tr);
-            map.put(DayOfWeek.SUNDAY, tr);
-        }
+        // 평일
+        matchAndFill(P_WEEKDAY, s, map, List.of(
+                DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
 
-        // 개별 요일 패턴도 있어야함 (예시: 토 10:00-21:00 | 일 11:00-20:00)
-        Matcher md = DAY_KO.matcher(s);
+        // 주말, 공휴일
+        matchAndFill(P_WEEKEND, s, map, List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+
+        // 토/일 개별
+        matchAndFill(P_SAT, s, map, List.of(DayOfWeek.SATURDAY));
+        matchAndFill(P_SUN, s, map, List.of(DayOfWeek.SUNDAY));
+
+        // 개별 요일 지정 혼합
+        Matcher md = P_DAY_KO.matcher(s);
         while (md.find()) {
             DayOfWeek d = toDay(md.group(1));
-            TimeRange tr = toRange(md);
+            TimeRange tr = toRange(md, md.groupCount()-3);
             if (d != null && tr != null) map.put(d, tr);
         }
 
         return map;
     }
 
-    private static TimeRange toRange(Matcher m) {
-        int sH = Integer.parseInt(m.group(m.groupCount()-3));
-        int sM = Integer.parseInt(m.group(m.groupCount()-2));
-        int eH = Integer.parseInt(m.group(m.groupCount()-1));
-        int eM = Integer.parseInt(m.group(m.groupCount()));
-        LocalTime open = LocalTime.of(sH, sM);
-        LocalTime close = LocalTime.of(eH, eM);
-        if (close.equals(LocalTime.MIDNIGHT)) close = LocalTime.of(23,59);
+    private static void matchAndFill(Pattern p, String s, Map<DayOfWeek, TimeRange> map, List<DayOfWeek> days) {
+        Matcher m = p.matcher(s);
+        if (m.find()) {
+            int base = m.groupCount() - 3;
+            TimeRange tr = toRange(m, base);
+            for (DayOfWeek d : days) map.put(d, tr);
+        }
+    }
+
+    private static TimeRange toRange(Matcher m, int base) {
+        int sH = toInt(m.group(base));
+        int sM = toInt(m.group(base+1));
+        int eH = toInt(m.group(base+2));
+        int eM = toInt(m.group(base+3));
+        LocalTime open = LocalTime.of(normalizeHour(sH), sM);
+        LocalTime close = LocalTime.of(normalizeHour(eH), eM);
+        if (eH == 24 && eM == 0) close = LocalTime.of(23,59); // 24:00 처리
         return new TimeRange(open, close);
     }
+
+    private static int toInt(String s) { return Integer.parseInt(s.replaceAll("[^0-9]", "")); }
+    private static int normalizeHour(int h) { return h == 24 ? 23 : h; }
 
     private static DayOfWeek toDay(String ko) {
         return switch (ko) {
@@ -86,8 +89,8 @@ public class BusinessHourParser {
             case "수" -> DayOfWeek.WEDNESDAY;
             case "목" -> DayOfWeek.THURSDAY;
             case "금" -> DayOfWeek.FRIDAY;
-            case "토" -> DayOfWeek.SATURDAY;
-            case "일" -> DayOfWeek.SUNDAY;
+            case "토", "토요일" -> DayOfWeek.SATURDAY;
+            case "일", "일요일" -> DayOfWeek.SUNDAY;
             default -> null;
         };
     }
