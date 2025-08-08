@@ -127,8 +127,7 @@ public class SeochoCsvImporter implements CommandLineRunner {
                     facilityRepo.save(fac);
 
                     // 영업시간 저장
-                    Map<DayOfWeek, BusinessHourParser.TimeRange> hours =
-                            new EnumMap<>(BusinessHourParser.parse(openHourRaw));
+                    var hours = BusinessHourParser.parse(openHourRaw);
                     for (Map.Entry<DayOfWeek, BusinessHourParser.TimeRange> e : hours.entrySet()) {
                         WaybleZoneOperatingHour oh = WaybleZoneOperatingHour.builder()
                                 .waybleZone(zone)
