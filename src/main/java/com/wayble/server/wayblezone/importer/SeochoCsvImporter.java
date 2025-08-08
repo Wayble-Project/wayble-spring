@@ -13,11 +13,15 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.time.DayOfWeek;
 import java.util.EnumMap;
 import java.util.Map;
@@ -52,7 +56,7 @@ public class SeochoCsvImporter implements CommandLineRunner {
         }
         log.info("[Wayble Import] start: {}", csvPath);
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvPath));
+        try (BufferedReader reader = openCsv(csvPath);
              CSVParser parser = CSVFormat.DEFAULT
                      .withDelimiter(',')
                      .withIgnoreEmptyLines()
@@ -143,6 +147,26 @@ public class SeochoCsvImporter implements CommandLineRunner {
                 }
             }
             log.info("[Wayble Import] done. total={}, ok={}, skip(type)={}, fail={}", idx-1, ok, skip, fail);
+        }
+    }
+
+    private BufferedReader openCsv(String path) throws Exception {
+        if (path == null || path.isBlank()) {
+            throw new IllegalArgumentException("csv-path 가 비어있습니다.");
+        }
+        if (path.startsWith("classpath:")) {
+            String p = path.substring("classpath:".length());
+            Resource resource = new ClassPathResource(p);
+            if (!resource.exists()) {
+                throw new java.io.FileNotFoundException("클래스패스 리소스 없음: " + p);
+            }
+            return new BufferedReader(
+                    new InputStreamReader(resource.getInputStream(), java.nio.charset.StandardCharsets.UTF_8)
+            );
+        } else {
+            return new BufferedReader(
+                    new InputStreamReader(new FileInputStream(path), java.nio.charset.StandardCharsets.UTF_8)
+            );
         }
     }
 }
