@@ -15,6 +15,7 @@ import com.wayble.server.wayblezone.exception.WaybleZoneErrorCase;
 import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ public class ReviewService {
     private final WaybleZoneRepository waybleZoneRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public void registerReview(Long zoneId, ReviewRegisterDto dto, String token) {
         WaybleZone zone = waybleZoneRepository.findById(zoneId)
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
