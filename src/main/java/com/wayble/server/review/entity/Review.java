@@ -29,10 +29,10 @@ public class Review extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = "rating", nullable = false)
     private double rating = 0.0;
 
-    @Column(nullable = false)
+    @Column(name = "rating", nullable = false)
     private Integer likeCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)

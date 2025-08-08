@@ -7,6 +7,8 @@ import com.wayble.server.wayblezone.dto.WaybleZoneListResponseDto;
 import com.wayble.server.wayblezone.entity.*;
 import com.wayble.server.wayblezone.exception.WaybleZoneErrorCase;
 import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,19 +23,20 @@ public class WaybleZoneService {
 
     private final WaybleZoneRepository waybleZoneRepository;
 
+    @Transactional(readOnly = true)
     public List<WaybleZoneListResponseDto> getWaybleZones(String city, String category) {
         WaybleZoneType zoneType = resolveType(category);
 
         // fetch graph로 시설/이미지를 미리 로딩 (웨이블존 목록 조회)
-        List<WaybleZone> zones = waybleZoneRepository.findSummaryByCityAndType(city, zoneType);
+        var zones = waybleZoneRepository.findSummaryByCityAndType(city, zoneType);
 
         return zones.stream().map(zone -> {
-            WaybleZoneFacility f = zone.getFacility();
+            var f = zone.getFacility();
             if (f == null) {
                 throw new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_FACILITY_NOT_FOUND);
             }
 
-            WaybleZoneImage image = zone.getWaybleZoneImageList().stream().findFirst().orElse(null);
+            var image = zone.getWaybleZoneImageList().stream().findFirst().orElse(null);
 
             return WaybleZoneListResponseDto.builder()
                     .waybleZoneId(zone.getId())
@@ -56,15 +59,16 @@ public class WaybleZoneService {
         }).toList();
     }
 
+    @Transactional(readOnly = true)
     public WaybleZoneDetailResponseDto getWaybleZoneDetail(Long waybleZoneId) {
         // fetch graph로 시설/이미지/운영시간을 미리 로딩 (웨이블존 상세 조회)
-        WaybleZone zone = waybleZoneRepository.findDetailById(waybleZoneId)
+        var zone = waybleZoneRepository.findDetailById(waybleZoneId)
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
-        WaybleZoneFacility f = zone.getFacility();
+        var f = zone.getFacility();
         if (f == null) throw new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_FACILITY_NOT_FOUND);
 
-        List<WaybleZoneImage> images = zone.getWaybleZoneImageList();
+        var images = zone.getWaybleZoneImageList();
         String imageUrl = images.stream().findFirst().map(WaybleZoneImage::getImageUrl).orElse(null);
         List<String> photoUrls = images.stream().map(WaybleZoneImage::getImageUrl).toList();
 
