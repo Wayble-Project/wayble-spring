@@ -47,17 +47,19 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImageList = new ArrayList<>();
 
-    public static Review of(User user, WaybleZone waybleZone, String content, double rating) {
+    @PrePersist
+    private void prePersist() {
+        if (likeCount == null) { likeCount = 0; }
+        if (Double.isNaN(rating)) { rating = 0.0; }
+    }
+
+    public static Review of(User user, WaybleZone waybleZone, String content, Double rating) {
         return Review.builder()
                 .user(user)
                 .waybleZone(waybleZone)
                 .content(content)
-                .rating(rating)
+                .rating(rating != null ? rating : 0.0)
                 .likeCount(0)
                 .build();
     }
-
-    /**
-     * TODO: 접근성 정보 관련 구현 필요
-     */
 }
