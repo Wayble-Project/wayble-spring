@@ -11,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "wayble_zone_facility") // 웨이블존 편의 시설 정보
+@Access(AccessType.FIELD)
 public class WaybleZoneFacility extends BaseEntity {
 
     @Id
@@ -29,10 +30,10 @@ public class WaybleZoneFacility extends BaseEntity {
     @Column(name = "has_no_door_step", nullable = false)
     private boolean hasNoDoorStep; // 문턱
 
-    @Column(name = "has_no_door_step", nullable = false)
+    @Column(name = "has_elevator", nullable = false)
     private boolean hasElevator; // 엘리베이터
 
-    @Column(name = "has_no_door_step", nullable = false)
+    @Column(name = "has_table_seat", nullable = false)
     private boolean hasTableSeat; // 테이블석
 
     @Column(name = "has_disabled_toilet", nullable = false)
