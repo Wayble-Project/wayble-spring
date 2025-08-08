@@ -13,9 +13,9 @@ import com.wayble.server.user.repository.UserPlaceWaybleZoneMappingRepository;
 import com.wayble.server.user.repository.UserRepository;
 import com.wayble.server.wayblezone.entity.WaybleZone;
 import com.wayble.server.wayblezone.repository.WaybleZoneRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -62,6 +62,7 @@ public class UserPlaceService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<UserPlaceListResponseDto> getUserPlaces(Long userId) {
         // 유저 존재 여부 확인
         User user = userRepository.findById(userId)
