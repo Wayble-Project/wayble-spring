@@ -183,4 +183,19 @@ public class WaybleZone extends BaseEntity {
                 .syncedAt(null)
                 .build();
     }
+
+    public static WaybleZone fromImporter(String zoneName, String phone, WaybleZoneType type, Address address) {
+        return WaybleZone.builder()
+                .zoneName(zoneName)
+                .contactNumber(phone)
+                .zoneType(type)
+                .address(address)
+                .rating(0.0)
+                .reviewCount(0)
+                .likes(0)
+                .mainImageUrl(null)
+                .lastModifiedAt(LocalDateTime.now())
+                .syncedAt(null)
+                .build();
+    }
 }

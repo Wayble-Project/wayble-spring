@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -94,16 +95,10 @@ public class SeochoCsvImporter implements CommandLineRunner {
                     String zoneName = (branch.isEmpty() ? name : name + " " + branch);
                     Address addr = toAddress(state, city, district, street, lat, lon);
 
-                    WaybleZone zone = WaybleZone.builder()
-                            .zoneName(zoneName)
-                            .contactNumber(phone.isBlank() ? null : phone)
-                            .zoneType(type)
-                            .address(addr)
-                            .rating(0.0)
-                            .reviewCount(0)
-                            .likes(0)
-                            .mainImageUrl(null)
-                            .build();
+                    WaybleZone zone = WaybleZone.fromImporter(zoneName,
+                            phone.isBlank() ? null : phone,
+                            type,
+                            addr);
 
                     zone = zoneRepo.save(zone);
 
