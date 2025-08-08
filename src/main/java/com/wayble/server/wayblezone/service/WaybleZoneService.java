@@ -22,15 +22,10 @@ public class WaybleZoneService {
     private final WaybleZoneRepository waybleZoneRepository;
 
     public List<WaybleZoneListResponseDto> getWaybleZones(String city, String category) {
-        WaybleZoneType zoneType;
+        WaybleZoneType zoneType = resolveType(category);
 
-        try {
-            zoneType = WaybleZoneType.valueOf(category.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ApplicationException(WaybleZoneErrorCase.INVALID_CATEGORY);
-        }
-
-        List<WaybleZone> zones = waybleZoneRepository.findByAddress_CityContainingAndZoneType(city, zoneType);
+        // fetch graph로 시설/이미지를 미리 로딩 (웨이블존 목록 조회)
+        List<WaybleZone> zones = waybleZoneRepository.findSummaryByCityAndType(city, zoneType);
 
         return zones.stream().map(zone -> {
             WaybleZoneFacility f = zone.getFacility();
@@ -62,7 +57,8 @@ public class WaybleZoneService {
     }
 
     public WaybleZoneDetailResponseDto getWaybleZoneDetail(Long waybleZoneId) {
-        WaybleZone zone = waybleZoneRepository.findById(waybleZoneId)
+        // fetch graph로 시설/이미지/운영시간을 미리 로딩 (웨이블존 상세 조회)
+        WaybleZone zone = waybleZoneRepository.findDetailById(waybleZoneId)
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
         WaybleZoneFacility f = zone.getFacility();
@@ -103,5 +99,24 @@ public class WaybleZoneService {
                         .build())
                 .businessHours(businessHours)
                 .build();
+    }
+
+    private WaybleZoneType resolveType(String category) {
+        if (category == null) {
+            throw new ApplicationException(WaybleZoneErrorCase.INVALID_CATEGORY);
+        }
+        String v = category.trim().toLowerCase();
+        // 한글도 가능하도록
+        switch (v) {
+            case "카페": return WaybleZoneType.CAFE;
+            case "음식점": return WaybleZoneType.RESTAURANT;
+            case "편의점": return WaybleZoneType.CONVENIENCE;
+        }
+        // enum이 직접 들어오는 경우
+        try {
+            return WaybleZoneType.valueOf(category.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ApplicationException(WaybleZoneErrorCase.INVALID_CATEGORY);
+        }
     }
 }
