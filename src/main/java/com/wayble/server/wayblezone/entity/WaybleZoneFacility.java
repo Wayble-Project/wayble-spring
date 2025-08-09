@@ -41,4 +41,17 @@ public class WaybleZoneFacility extends BaseEntity {
 
     @Column(name = "floor_info", length = 20)
     private String floorInfo; // 층수 정보 (ex: "1층", "B1", "2층")
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (hasSlope) sb.append("경사로 ");
+        if (hasNoDoorStep) sb.append("문턱없음 ");
+        if (hasElevator) sb.append("엘리베이터 ");
+        if (hasTableSeat) sb.append("테이블석 ");
+        if (hasDisabledToilet) sb.append("장애인화장실 ");
+        if (floorInfo != null) sb.append(floorInfo).append(" ");
+        
+        return sb.length() > 0 ? sb.toString().trim() : "시설정보 없음";
+    }
 }
