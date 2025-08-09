@@ -145,7 +145,7 @@ jobs:
             --name github-actions-demo \
             --network wayble-network \
             -p 8080:8080 \
-            -v /home/ubuntu/logs:/app/logs \
+            -v /var/log/wayble:/app/logs \
             -e "SPRING_PROFILES_ACTIVE=develop" \
             -e "TZ=Asia/Seoul" \
             ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
