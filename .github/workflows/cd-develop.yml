@@ -147,6 +147,7 @@ jobs:
             -p 8080:8080 \
             -v /home/ubuntu/logs:/app/logs \
             -e "SPRING_PROFILES_ACTIVE=develop" \
+            -e "TZ=Asia/Seoul" \
             ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
       - name: Test application health
