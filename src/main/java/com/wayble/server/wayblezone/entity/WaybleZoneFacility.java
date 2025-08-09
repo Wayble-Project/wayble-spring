@@ -24,20 +24,20 @@ public class WaybleZoneFacility extends BaseEntity {
     private WaybleZone waybleZone;
 
     // 시설 정보 (있음/없음 여부)
-    @Column(name = "has_slope", nullable = false)
-    private boolean hasSlope; // 경사로
+    @Column(name = "has_slope", nullable = false, columnDefinition = "boolean default false")
+    private boolean hasSlope = false; // 경사로
 
-    @Column(name = "has_no_door_step", nullable = false)
-    private boolean hasNoDoorStep; // 문턱
+    @Column(name = "has_no_door_step", nullable = false, columnDefinition = "boolean default false")
+    private boolean hasNoDoorStep = false; // 문턱
 
-    @Column(name = "has_elevator", nullable = false)
-    private boolean hasElevator; // 엘리베이터
+    @Column(name = "has_elevator", nullable = false, columnDefinition = "boolean default false")
+    private boolean hasElevator = false; // 엘리베이터
 
-    @Column(name = "has_table_seat", nullable = false)
-    private boolean hasTableSeat; // 테이블석
+    @Column(name = "has_table_seat", nullable = false, columnDefinition = "boolean default false")
+    private boolean hasTableSeat = false; // 테이블석
 
-    @Column(name = "has_disabled_toilet", nullable = false)
-    private boolean hasDisabledToilet; // 장애인 화장실
+    @Column(name = "has_disabled_toilet", nullable = false, columnDefinition = "boolean default false")
+    private boolean hasDisabledToilet = false; // 장애인 화장실
 
     @Column(name = "floor_info", length = 20)
     private String floorInfo; // 층수 정보 (ex: "1층", "B1", "2층")
