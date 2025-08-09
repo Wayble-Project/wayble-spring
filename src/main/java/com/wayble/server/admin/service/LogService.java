@@ -36,11 +36,13 @@ public class LogService {
             List<String> lines = Files.readAllLines(logPath);
             List<ErrorLogDto> errorLogs = new ArrayList<>();
             
-            // 마지막 라인부터 역순으로 처리 (최신 로그가 아래쪽)
-            int startIndex = Math.max(0, lines.size() - MAX_LINES);
-            for (int i = lines.size() - 1; i >= startIndex && errorLogs.size() < limit; i--) {
-                String line = lines.get(i);
-                ErrorLogDto errorLog = ErrorLogDto.from(line);
+            // 멀티라인 로그 엔트리를 파싱하기 위해 전체 내용을 처리
+            List<String> logEntries = parseMultiLineLogEntries(lines);
+            
+            // 최신 로그부터 처리
+            for (int i = logEntries.size() - 1; i >= 0 && errorLogs.size() < limit; i--) {
+                String logEntry = logEntries.get(i);
+                ErrorLogDto errorLog = ErrorLogDto.from(logEntry);
                 if (errorLog != null) {
                     errorLogs.add(errorLog);
                 }
@@ -58,6 +60,38 @@ public class LogService {
     }
     
     /**
+     * 멀티라인 로그 엔트리를 파싱합니다
+     */
+    private List<String> parseMultiLineLogEntries(List<String> lines) {
+        List<String> logEntries = new ArrayList<>();
+        StringBuilder currentEntry = new StringBuilder();
+        
+        for (String line : lines) {
+            // 새로운 로그 엔트리 시작을 감지 ([yyyy-MM-dd HH:mm:ss] 패턴)
+            if (line.matches("^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\].*")) {
+                // 이전 엔트리가 있으면 리스트에 추가
+                if (currentEntry.length() > 0) {
+                    logEntries.add(currentEntry.toString().trim());
+                    currentEntry = new StringBuilder();
+                }
+                currentEntry.append(line);
+            } else {
+                // 스택트레이스나 멀티라인 메시지의 연속 라인
+                if (currentEntry.length() > 0) {
+                    currentEntry.append("\n").append(line);
+                }
+            }
+        }
+        
+        // 마지막 엔트리 추가
+        if (currentEntry.length() > 0) {
+            logEntries.add(currentEntry.toString().trim());
+        }
+        
+        return logEntries;
+    }
+    
+    /**
      * 에러 로그 통계를 조회합니다
      */
     public ErrorLogStats getErrorLogStats() {
@@ -68,27 +102,28 @@ public class LogService {
                 return new ErrorLogStats(0, 0, 0, LocalDateTime.now());
             }
             
-            try (Stream<String> lines = Files.lines(logPath)) {
-                List<ErrorLogDto> errorLogs = lines
-                        .map(ErrorLogDto::from)
-                        .filter(log -> log != null)
-                        .toList();
-                
-                long totalErrors = errorLogs.size();
-                long todayErrors = errorLogs.stream()
-                        .filter(log -> log.timestamp().toLocalDate().equals(LocalDateTime.now().toLocalDate()))
-                        .count();
-                long lastHourErrors = errorLogs.stream()
-                        .filter(log -> log.timestamp().isAfter(LocalDateTime.now().minusHours(1)))
-                        .count();
-                        
-                LocalDateTime lastErrorTime = errorLogs.stream()
-                        .map(ErrorLogDto::timestamp)
-                        .max(Comparator.naturalOrder())
-                        .orElse(null);
-                        
-                return new ErrorLogStats(totalErrors, todayErrors, lastHourErrors, lastErrorTime);
-            }
+            List<String> lines = Files.readAllLines(logPath);
+            List<String> logEntries = parseMultiLineLogEntries(lines);
+            
+            List<ErrorLogDto> errorLogs = logEntries.stream()
+                    .map(ErrorLogDto::from)
+                    .filter(log -> log != null)
+                    .toList();
+            
+            long totalErrors = errorLogs.size();
+            long todayErrors = errorLogs.stream()
+                    .filter(log -> log.timestamp().toLocalDate().equals(LocalDateTime.now().toLocalDate()))
+                    .count();
+            long lastHourErrors = errorLogs.stream()
+                    .filter(log -> log.timestamp().isAfter(LocalDateTime.now().minusHours(1)))
+                    .count();
+                    
+            LocalDateTime lastErrorTime = errorLogs.stream()
+                    .map(ErrorLogDto::timestamp)
+                    .max(Comparator.naturalOrder())
+                    .orElse(null);
+                    
+            return new ErrorLogStats(totalErrors, todayErrors, lastHourErrors, lastErrorTime);
             
         } catch (IOException e) {
             log.error("에러 로그 통계 조회 실패", e);

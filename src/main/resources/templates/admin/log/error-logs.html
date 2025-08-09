@@ -71,6 +71,27 @@
             margin-top: 10px;
             color: #856404;
             white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .log-stack-trace {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+        .log-exception-detail {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 8px 0;
+            color: #495057;
+            font-size: 11px;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-height: none;
+            white-space: pre-wrap;
         }
         .log-controls {
             display: flex;
@@ -187,7 +208,12 @@
                             <!-- 에러 발생 위치 정보 -->
                             <div th:if="${log.stackTrace != null && !#strings.isEmpty(log.stackTrace)}" class="mb-2">
                                 <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">📍</span>
-                                <span class="text-red-600 font-mono text-sm ml-2" th:text="${log.stackTrace}">UserService.findById(UserService.java:42)</span>
+                                <span class="text-red-600 font-mono text-sm ml-2 log-stack-trace" th:text="${log.stackTrace}">UserService.findById(UserService.java:42)</span>
+                            </div>
+                            
+                            <!-- 예외 상세 정보 -->
+                            <div th:if="${log.exception != null && !#strings.isEmpty(log.exception) && log.exception != log.message}" class="log-exception-detail" th:text="${log.exception}">
+                                Exception details
                             </div>
                             
                             <div class="log-logger" th:text="${log.logger}"></div>
@@ -245,8 +271,11 @@
                             ${log.stackTrace && log.stackTrace.trim() ? `
                             <div class="mb-2">
                                 <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">📍</span>
-                                <span class="text-red-600 font-mono text-sm ml-2">${log.stackTrace}</span>
+                                <span class="text-red-600 font-mono text-sm ml-2 log-stack-trace">${log.stackTrace}</span>
                             </div>
+                            ` : ''}
+                            ${log.exception && log.exception.trim() && log.exception !== log.message ? `
+                            <div class="log-exception-detail">${log.exception}</div>
                             ` : ''}
                             <div class="log-logger">${log.logger}</div>
                             <div class="log-message">${log.message}</div>
