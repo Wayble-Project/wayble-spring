@@ -38,21 +38,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<CommonResponse> handleApplicationException(ApplicationException e, WebRequest request) {
-        // 에러 로그 기록 (상세 정보 포함)
+        // 비즈니스 예외 로그 기록 (간결하게)
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         String method = ((ServletWebRequest) request).getRequest().getMethod();
-        String userAgent = ((ServletWebRequest) request).getRequest().getHeader("User-Agent");
         
-        // 스택트레이스에서 실제 에러 발생 위치 추출
-        String errorLocation = getErrorLocation(e);
-        
-        log.error("ApplicationException 발생 - Method: {}, Path: {}, ErrorCode: {}, Message: {}, Location: {}, UserAgent: {}", 
-                  method, path, e.getErrorCase(), e.getMessage(), errorLocation, userAgent, e);
+        log.warn("Application Exception - Method: {}, Path: {}, ErrorCode: {}, Message: {}",
+                  method, path, e.getErrorCase(), e.getMessage());
         
         CommonResponse commonResponse = CommonResponse.error(e.getErrorCase());
 
         HttpStatus status = HttpStatus.valueOf(e.getErrorCase().getHttpStatusCode());
-        sendToDiscord(e, request, status);
+        //sendToDiscord(e, request, status);
 
         return ResponseEntity
                 .status(e.getErrorCase().getHttpStatusCode())
