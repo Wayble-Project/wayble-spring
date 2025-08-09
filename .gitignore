@@ -42,5 +42,3 @@ application.yml
 
 ### Logs ###
 logs/
-*.log
-*.log.gz
