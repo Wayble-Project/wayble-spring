@@ -14,6 +14,11 @@ services:
       - SPRING_PROFILES_ACTIVE=develop
       - ELASTICSEARCH_HOST=elasticsearch
       - ELASTICSEARCH_PORT=9200
+      - TZ=Asia/Seoul
+      - JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul
+      - LOG_DIR=/app/logs
+    volumes:
+      - ./logs:/app/logs  # 로그 파일 영속성을 위한 볼륨 마운트
     depends_on:
       - elasticsearch
     networks:
