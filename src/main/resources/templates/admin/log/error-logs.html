@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>에러 로그 관리 - Wayble 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .log-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        .stat-card .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .log-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .log-entry {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .log-entry .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .log-entry .log-timestamp {
+            color: #6c757d;
+        }
+        .log-entry .log-level {
+            color: #dc3545;
+        }
+        .log-entry .log-logger {
+            color: #007bff;
+            font-size: 11px;
+        }
+        .log-entry .log-message {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #856404;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .log-stack-trace {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+        .log-exception-detail {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 8px 0;
+            color: #495057;
+            font-size: 11px;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-height: none;
+            white-space: pre-wrap;
+        }
+        .log-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .refresh-btn:hover {
+            background: #218838;
+        }
+        .limit-select {
+            padding: 5px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/admin/dashboard" class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors duration-200">
+                            <span class="text-white font-bold text-sm">W</span>
+                        </a>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-xl font-semibold text-gray-900">Wayble 관리자 페이지</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/admin/dashboard" class="text-sm text-blue-600 hover:text-blue-800">대시보드로 돌아가기</a>
+                    <form th:action="@{/admin/logout}" method="post" class="inline">
+                        <button type="submit" 
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                            로그아웃
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">에러 로그 관리</h2>
+            <p class="mt-1 text-sm text-gray-600">시스템 에러 로그 조회 및 모니터링</p>
+        </div>
+
+                <!-- 통계 카드 -->
+                <div class="log-stats">
+                    <div class="stat-card">
+                        <h3>전체 에러</h3>
+                        <div class="stat-value" th:text="${stats.totalErrors}">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>오늘 에러</h3>
+                        <div class="stat-value" th:text="${stats.todayErrors}">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>최근 1시간</h3>
+                        <div class="stat-value" th:text="${stats.lastHourErrors}">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>마지막 에러</h3>
+                        <div class="stat-value" th:if="${stats.lastErrorTime}" 
+                             th:text="${#temporals.format(stats.lastErrorTime, 'MM-dd HH:mm')}">-</div>
+                        <div class="stat-value" th:unless="${stats.lastErrorTime}">-</div>
+                    </div>
+                </div>
+
+                <!-- 컨트롤 -->
+                <div class="mb-5">
+                    <label for="limitSelect" class="text-sm font-medium text-gray-700">표시할 로그 수:</label>
+                    <select id="limitSelect" class="limit-select ml-2" th:value="${limit}">
+                        <option value="50">50개</option>
+                        <option value="100" selected>100개</option>
+                        <option value="200">200개</option>
+                        <option value="500">500개</option>
+                    </select>
+                    <span class="ml-4 text-xs text-gray-500">5분마다 자동 새로고침됩니다</span>
+                </div>
+
+                <!-- 로그 컨테이너 -->
+                <div class="log-container">
+                    <div id="errorLogs">
+                        <div th:if="${#lists.isEmpty(errorLogs)}" class="text-center text-muted py-4">
+                            에러 로그가 없습니다.
+                        </div>
+                        <div th:each="log : ${errorLogs}" class="log-entry">
+                            <div class="log-header">
+                                <span class="log-timestamp" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                <span class="log-level" th:text="${log.level}"></span>
+                            </div>
+                            
+                            <!-- HTTP Method와 Path 정보 -->
+                            <div th:if="${log.method != null && !#strings.isEmpty(log.method)}" class="flex items-center space-x-4 mb-2">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium" th:text="${log.method}">GET</span>
+                                <span class="text-blue-600 font-mono text-sm" th:text="${log.path}">/api/v1/example</span>
+                            </div>
+                            
+                            <!-- 에러 발생 위치 정보 -->
+                            <div th:if="${log.stackTrace != null && !#strings.isEmpty(log.stackTrace)}" class="mb-2">
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">📍</span>
+                                <span class="text-red-600 font-mono text-sm ml-2 log-stack-trace" th:text="${log.stackTrace}">UserService.findById(UserService.java:42)</span>
+                            </div>
+                            
+                            <!-- 예외 상세 정보 -->
+                            <div th:if="${log.exception != null && !#strings.isEmpty(log.exception) && log.exception != log.message}" class="log-exception-detail" th:text="${log.exception}">
+                                Exception details
+                            </div>
+                            
+                            <div class="log-logger" th:text="${log.logger}"></div>
+                            <div class="log-message" th:text="${log.message}"></div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+
+<script>
+    function refreshLogs() {
+        const limit = document.getElementById('limitSelect').value;
+        
+        // 통계 새로고침
+        fetch('/admin/logs/error/stats')
+            .then(response => response.json())
+            .then(stats => {
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = stats.totalErrors;
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = stats.todayErrors;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = stats.lastHourErrors;
+                
+                const lastErrorElement = document.querySelector('.stat-card:nth-child(4) .stat-value');
+                if (stats.lastErrorTime) {
+                    const date = new Date(stats.lastErrorTime);
+                    lastErrorElement.textContent = (date.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                                                   date.getDate().toString().padStart(2, '0') + ' ' + 
+                                                   date.getHours().toString().padStart(2, '0') + ':' + 
+                                                   date.getMinutes().toString().padStart(2, '0');
+                } else {
+                    lastErrorElement.textContent = '-';
+                }
+            });
+        
+        // 로그 데이터 새로고침
+        fetch(`/admin/logs/error/data?limit=${limit}`)
+            .then(response => response.json())
+            .then(logs => {
+                const container = document.getElementById('errorLogs');
+                
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="text-center text-muted py-4">에러 로그가 없습니다.</div>';
+                } else {
+                    container.innerHTML = logs.map(log => `
+                        <div class="log-entry">
+                            <div class="log-header">
+                                <span class="log-timestamp">${new Date(log.timestamp).toLocaleString()}</span>
+                                <span class="log-level">${log.level}</span>
+                            </div>
+                            ${log.method && log.method.trim() ? `
+                            <div class="flex items-center space-x-4 mb-2">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">${log.method}</span>
+                                <span class="text-blue-600 font-mono text-sm">${log.path || ''}</span>
+                            </div>
+                            ` : ''}
+                            ${log.stackTrace && log.stackTrace.trim() ? `
+                            <div class="mb-2">
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">📍</span>
+                                <span class="text-red-600 font-mono text-sm ml-2 log-stack-trace">${log.stackTrace}</span>
+                            </div>
+                            ` : ''}
+                            ${log.exception && log.exception.trim() && log.exception !== log.message ? `
+                            <div class="log-exception-detail">${log.exception}</div>
+                            ` : ''}
+                            <div class="log-logger">${log.logger}</div>
+                            <div class="log-message">${log.message}</div>
+                        </div>
+                    `).join('');
+                }
+            })
+            .catch(error => {
+                console.error('로그 새로고침 실패:', error);
+            });
+    }
+    
+    // 로그 수 변경 시 새로고침
+    document.getElementById('limitSelect').addEventListener('change', refreshLogs);
+    
+    // 5분마다 자동 새로고침
+    setInterval(refreshLogs, 5 * 60 * 1000);
+</script>
+
+</body>
+</html>

@@ -12,7 +12,6 @@ on:
 permissions:
   contents: read
 
-
 jobs:
   # 1. 도커 이미지 빌드 및 푸시
   build-docker-image:
@@ -145,7 +144,9 @@ jobs:
             --name github-actions-demo \
             --network wayble-network \
             -p 8080:8080 \
+            -v /var/log/wayble:/app/logs \
             -e "SPRING_PROFILES_ACTIVE=develop" \
+            -e "TZ=Asia/Seoul" \
             ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
       - name: Test application health
