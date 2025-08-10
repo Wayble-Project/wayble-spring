@@ -332,12 +332,51 @@
                     <div class="space-y-6">
                         <div class="border-l-4 border-purple-500 pl-4">
                             <h4 class="text-base font-semibold text-gray-900">이미지 정보</h4>
-                            <p class="text-sm text-gray-600">웨이블존의 대표 이미지를 설정하세요</p>
+                            <p class="text-sm text-gray-600">웨이블존의 대표 이미지를 업로드하거나 URL을 직접 입력하세요</p>
+                        </div>
+                        
+                        <!-- 이미지 업로드 -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">이미지 업로드</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="imageUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-2 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                        </svg>
+                                        <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭</p>
+                                        <p class="text-xs text-gray-500">PNG, JPG, JPEG (최대 10MB)</p>
+                                    </div>
+                                    <input id="imageUpload" type="file" class="hidden" accept="image/*" onchange="handleImageUpload(event)" />
+                                </label>
+                            </div>
+                            <!-- 업로드된 이미지 미리보기 -->
+                            <div id="imagePreview" class="mt-4 hidden">
+                                <img id="previewImage" src="" alt="미리보기" class="max-w-xs h-auto rounded-lg shadow-md">
+                                <button type="button" onclick="removeImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">이미지 제거</button>
+                            </div>
+                            <!-- 업로드 진행률 -->
+                            <div id="uploadProgress" class="mt-2 hidden">
+                                <div class="bg-gray-200 rounded-full h-2.5">
+                                    <div id="progressBar" class="bg-wayble-blue h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <p id="uploadStatus" class="text-xs text-gray-600 mt-1">업로드 중...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 또는 구분선 -->
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-2 bg-white text-gray-500">또는</span>
+                            </div>
                         </div>
                         
                         <!-- 대표 이미지 URL -->
                         <div>
-                            <label for="mainImageUrl" class="block text-sm font-semibold text-gray-700 mb-2">대표 이미지 URL</label>
+                            <label for="mainImageUrl" class="block text-sm font-semibold text-gray-700 mb-2">대표 이미지 URL 직접 입력</label>
                             <div class="relative">
                                 <input type="url" 
                                        th:field="*{mainImageUrl}"
@@ -350,6 +389,7 @@
                                     </svg>
                                 </div>
                             </div>
+                            <p class="mt-1 text-xs text-gray-500">이미지를 업로드하면 URL 필드가 자동으로 채워집니다</p>
                             <p th:if="${#fields.hasErrors('mainImageUrl')}" th:errors="*{mainImageUrl}" class="mt-2 text-sm text-red-600 flex items-center">
                                 <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -384,5 +424,133 @@
             </form>
         </div>
     </div>
+    
+    <script>
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 파일 크기 체크 (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('파일 크기는 10MB를 초과할 수 없습니다.');
+                return;
+            }
+            
+            // 파일 타입 체크
+            if (!file.type.startsWith('image/')) {
+                alert('이미지 파일만 업로드 가능합니다.');
+                return;
+            }
+            
+            // 미리보기 표시
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImage').src = e.target.result;
+                document.getElementById('imagePreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+            
+            // 업로드 진행률 표시
+            document.getElementById('uploadProgress').classList.remove('hidden');
+            
+            try {
+                // FormData 생성
+                const formData = new FormData();
+                formData.append('images', file);
+                
+                console.log('업로드 시작:', file.name, file.size, file.type);
+                
+                // S3에 업로드
+                const response = await fetch('/api/v1/files/images', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('응답 상태:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('응답 오류:', errorText);
+                    throw new Error(`업로드 실패 (${response.status}): ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('응답 결과:', result);
+                
+                // 성공 시 URL 필드에 설정 (errorCode가 없으면 성공)
+                if (!result.errorCode && result.data && result.data.length > 0) {
+                    document.getElementById('mainImageUrl').value = result.data[0];
+                    document.getElementById('uploadStatus').textContent = '업로드 완료!';
+                    document.getElementById('progressBar').style.width = '100%';
+                    
+                    // 2초 후 진행률 바 숨기기
+                    setTimeout(() => {
+                        document.getElementById('uploadProgress').classList.add('hidden');
+                    }, 2000);
+                } else if (result.errorCode) {
+                    console.error('서버 에러:', result);
+                    throw new Error(`서버 오류 (${result.errorCode}): ${result.message}`);
+                } else {
+                    console.error('서버 응답 구조 오류:', result);
+                    throw new Error('서버 응답 오류: ' + JSON.stringify(result));
+                }
+                
+            } catch (error) {
+                console.error('업로드 오류:', error);
+                alert('이미지 업로드에 실패했습니다: ' + error.message);
+                
+                // 실패 시 미리보기 제거
+                removeImage();
+            }
+        }
+        
+        function removeImage() {
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('uploadProgress').classList.add('hidden');
+            document.getElementById('mainImageUrl').value = '';
+            document.getElementById('imageUpload').value = '';
+            document.getElementById('progressBar').style.width = '0%';
+        }
+        
+        // 드래그 앤 드롭 기능
+        const uploadArea = document.querySelector('label[for="imageUpload"]');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight(e) {
+            uploadArea.classList.add('border-wayble-blue', 'border-solid');
+        }
+        
+        function unhighlight(e) {
+            uploadArea.classList.remove('border-wayble-blue', 'border-solid');
+        }
+        
+        uploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                document.getElementById('imageUpload').files = files;
+                handleImageUpload({ target: { files } });
+            }
+        }
+    </script>
 </body>
 </html>

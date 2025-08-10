@@ -7,6 +7,7 @@ import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneUpdateDto;
 import com.wayble.server.admin.exception.AdminErrorCase;
 import com.wayble.server.admin.repository.AdminWaybleZoneRepository;
+import com.wayble.server.aws.AmazonS3Manager;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.explore.service.WaybleZoneDocumentService;
 import com.wayble.server.user.repository.UserPlaceWaybleZoneMappingRepository;
@@ -31,6 +32,7 @@ public class AdminWaybleZoneService {
     private final WaybleZoneRepository waybleZoneRepository;
     private final UserPlaceWaybleZoneMappingRepository userPlaceWaybleZoneMappingRepository;
     private final WaybleZoneVisitLogRepository waybleZoneVisitLogRepository;
+    private final AmazonS3Manager amazonS3Manager;
 
     public long getTotalWaybleZoneCounts() {
         return adminWaybleZoneRepository.count();
@@ -87,6 +89,18 @@ public class AdminWaybleZoneService {
             WaybleZone waybleZone = waybleZoneRepository.findById(updateDto.id())
                     .orElseThrow(() -> new ApplicationException(AdminErrorCase.WAYBLE_ZONE_NOT_FOUND));
             
+            // 메인 이미지 변경 시 기존 이미지 S3에서 삭제
+            String oldImageUrl = waybleZone.getMainImageUrl();
+            String newImageUrl = updateDto.mainImageUrl();
+            if (oldImageUrl != null && !oldImageUrl.equals(newImageUrl)) {
+                try {
+                    amazonS3Manager.deleteImageFileFromS3(oldImageUrl);
+                    log.info("기존 메인 이미지 삭제 완료 - URL: {}", oldImageUrl);
+                } catch (Exception e) {
+                    log.warn("기존 메인 이미지 삭제 실패 - URL: {}, 오류: {}", oldImageUrl, e.getMessage());
+                }
+            }
+            
             // 주소 정보 업데이트
             com.wayble.server.common.entity.Address updatedAddress = com.wayble.server.common.entity.Address
                     .builder()
@@ -134,6 +148,16 @@ public class AdminWaybleZoneService {
                     .orElseThrow(() -> new ApplicationException(AdminErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
             log.info("웨이블존 삭제 시작 - ID: {}, 이름: {}", waybleZoneId, waybleZone.getZoneName());
+
+            // 메인 이미지 S3에서 삭제
+            if (waybleZone.getMainImageUrl() != null) {
+                try {
+                    amazonS3Manager.deleteImageFileFromS3(waybleZone.getMainImageUrl());
+                    log.info("메인 이미지 삭제 완료 - URL: {}", waybleZone.getMainImageUrl());
+                } catch (Exception e) {
+                    log.warn("메인 이미지 삭제 실패 - URL: {}, 오류: {}", waybleZone.getMainImageUrl(), e.getMessage());
+                }
+            }
 
             // 연관된 리뷰들 soft delete
             waybleZone.getReviewList().forEach(review -> {
