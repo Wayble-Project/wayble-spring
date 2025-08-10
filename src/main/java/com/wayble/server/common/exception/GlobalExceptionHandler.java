@@ -38,10 +38,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<CommonResponse> handleApplicationException(ApplicationException e, WebRequest request) {
+        // 비즈니스 예외 로그 기록 (간결하게)
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        String method = ((ServletWebRequest) request).getRequest().getMethod();
+        
+        log.warn("Application Exception - Method: {}, Path: {}, ErrorCode: {}, Message: {}",
+                  method, path, e.getErrorCase(), e.getMessage());
+        
         CommonResponse commonResponse = CommonResponse.error(e.getErrorCase());
 
         HttpStatus status = HttpStatus.valueOf(e.getErrorCase().getHttpStatusCode());
-        sendToDiscord(e, request, status);
+        //sendToDiscord(e, request, status);
 
         return ResponseEntity
                 .status(e.getErrorCase().getHttpStatusCode())
@@ -53,11 +60,41 @@ public class GlobalExceptionHandler {
                                                                MethodArgumentNotValidException ex,
                                                                WebRequest request) {
         String message = bindingResult.getAllErrors().get(0).getDefaultMessage();
+        
+        // 에러 로그 기록
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        String method = ((ServletWebRequest) request).getRequest().getMethod();
+        String errorLocation = getErrorLocation(ex);
+        
+        log.error("Validation Exception 발생 - Method: {}, Path: {}, Message: {}, Location: {}", 
+                  method, path, message, errorLocation, ex);
+        
         CommonResponse commonResponse = CommonResponse.error(400, message);
 
         sendToDiscord(ex, request, HttpStatus.BAD_REQUEST);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(commonResponse);
+    }
+
+    /**
+     * 모든 예상하지 못한 예외 처리
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CommonResponse> handleGeneralException(Exception ex, WebRequest request) {
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        String method = ((ServletWebRequest) request).getRequest().getMethod();
+        String errorLocation = getErrorLocation(ex);
+        
+        log.error("Unexpected Exception 발생 - Method: {}, Path: {}, Exception: {}, Message: {}, Location: {}", 
+                  method, path, ex.getClass().getSimpleName(), ex.getMessage(), errorLocation, ex);
+        
+        CommonResponse commonResponse = CommonResponse.error(500, "서버 내부 오류가 발생했습니다.");
+        
+        sendToDiscord(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(commonResponse);
     }
 
@@ -97,5 +134,43 @@ public class GlobalExceptionHandler {
         } catch (Exception e){
             log.error(e.getMessage());
         }
+    }
+
+    /**
+     * 예외의 스택트레이스에서 실제 에러 발생 위치를 추출
+     */
+    private String getErrorLocation(Exception ex) {
+        StackTraceElement[] stackTrace = ex.getStackTrace();
+        if (stackTrace == null || stackTrace.length == 0) {
+            return "Unknown location";
+        }
+        
+        // com.wayble.server 패키지 내의 첫 번째 스택트레이스를 찾음
+        for (StackTraceElement element : stackTrace) {
+            if (element.getClassName().startsWith("com.wayble.server")) {
+                String className = element.getClassName();
+                String fileName = element.getFileName();
+                int lineNumber = element.getLineNumber();
+                
+                // 클래스명에서 패키지 제거 (간결하게 표시)
+                String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+                
+                return String.format("%s.%s(%s:%d)", 
+                    simpleClassName, 
+                    element.getMethodName(), 
+                    fileName, 
+                    lineNumber);
+            }
+        }
+        
+        // wayble 패키지 내 코드가 없으면 첫 번째 스택트레이스 반환
+        StackTraceElement first = stackTrace[0];
+        String className = first.getClassName();
+        String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+        return String.format("%s.%s(%s:%d)", 
+            simpleClassName, 
+            first.getMethodName(), 
+            first.getFileName(), 
+            first.getLineNumber());
     }
 }

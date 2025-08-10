@@ -69,7 +69,7 @@ public class WaybleZoneRepositoryImpl implements WaybleZoneRepositoryCustom {
                         waybleZoneVisitLog.count()
                 ))
                 .from(waybleZone)
-                .innerJoin(waybleZoneVisitLog).on(waybleZoneVisitLog.zoneId.eq(waybleZone.id))
+                .leftJoin(waybleZoneVisitLog).on(waybleZoneVisitLog.zoneId.eq(waybleZone.id))
                 .where(waybleZone.address.district.eq(district))
                 .groupBy(waybleZone.id)
                 .orderBy(waybleZoneVisitLog.count().desc())
