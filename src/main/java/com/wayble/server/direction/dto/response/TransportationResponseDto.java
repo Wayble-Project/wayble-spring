@@ -1,4 +1,4 @@
-package com.wayble.server.direction.dto;
+package com.wayble.server.direction.dto.response;
 
 import com.wayble.server.direction.entity.DirectionType;
 import org.springframework.lang.Nullable;

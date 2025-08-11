@@ -1,6 +1,6 @@
 package com.wayble.server.direction.service;
 
-import com.wayble.server.direction.dto.TransportationResponseDto;
+import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.entity.transportation.Facility;
 import com.wayble.server.direction.external.kric.dto.KricToiletRawItem;
 import com.wayble.server.direction.external.kric.dto.KricToiletRawResponse;
