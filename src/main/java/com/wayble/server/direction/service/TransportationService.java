@@ -249,25 +249,22 @@ public class TransportationService {
         while (i < pathEdges.size()) {
             Edge currentEdge = pathEdges.get(i);
             DirectionType currentType = currentEdge.getEdgeType();
-            String currentRouteName = (currentEdge.getRoute() != null) ? currentEdge.getRoute().getRouteName() : null;
-            TransportationResponseDto.NodeInfo currentInfo = null;
-            if (currentType == DirectionType.SUBWAY) {
-                currentInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId());
-            }
-
             
-            // 시작 노드
+            // 시작 노드 이름
             String fromName = (currentEdge.getStartNode() != null && currentEdge.getStartNode().getStationName() != null) 
                 ? currentEdge.getStartNode().getStationName() : "Unknown";
             String toName = (currentEdge.getEndNode() != null && currentEdge.getEndNode().getStationName() != null) 
                 ? currentEdge.getEndNode().getStationName() : "Unknown";
             
-            // 도보인 경우 또는 연속된 같은 노선이 없는 경우 그대로 추가
-            if (currentType == DirectionType.WALK || currentRouteName == null) {
+            // 도보 처리
+            if (currentType == DirectionType.WALK) {
                 mergedSteps.add(new TransportationResponseDto.Step(
                     currentType,
-                    currentRouteName,
-                    currentInfo,
+                    null, // moveInfo
+                    null, // routeName
+                    1,    // moveNumber
+                    null, // busInfo
+                    null, // subwayInfo
                     fromName,
                     toName
                 ));
@@ -275,30 +272,61 @@ public class TransportationService {
                 continue;
             }
             
-            // 연속된 같은 노선 찾기
+            // 동일 타입 + 동일 Route 객체 그룹화
             int j = i + 1;
             while (j < pathEdges.size()) {
                 Edge nextEdge = pathEdges.get(j);
-                String nextRouteName = (nextEdge.getRoute() != null) ? nextEdge.getRoute().getRouteName() : null;
-                
-                // 같은 노선이 아니면 중단
-                if (nextEdge.getEdgeType() != currentType || 
-                    !Objects.equals(currentRouteName, nextRouteName)) {
-                    break;
-                }
+                if (nextEdge.getEdgeType() != currentType) break;
+                if (!Objects.equals(currentEdge.getRoute(), nextEdge.getRoute())) break;
                 j++;
             }
             
-            // 마지막 엣지의 도착 노드를 최종 도착지로 설정
-            if (j > i + 1) {
-                Edge lastEdge = pathEdges.get(j - 1);
-                toName = (lastEdge.getEndNode() != null) ? lastEdge.getEndNode().getStationName() : "Unknown";
+            // 그룹 마지막 엣지 기준 toName
+            Edge lastEdgeInGroup = pathEdges.get(j - 1);
+            if (lastEdgeInGroup.getEndNode() != null && lastEdgeInGroup.getEndNode().getStationName() != null) {
+                toName = lastEdgeInGroup.getEndNode().getStationName();
             }
+            
+            // moveInfo: 중간 정류장만
+            List<TransportationResponseDto.MoveInfo> moveInfoList = new ArrayList<>();
+            for (int k = i + 1; k < j; k++) {
+                Edge e = pathEdges.get(k);
+                if (e.getStartNode() != null && e.getStartNode().getStationName() != null) {
+                    moveInfoList.add(new TransportationResponseDto.MoveInfo(e.getStartNode().getStationName()));
+                }
+            }
+            if (moveInfoList.isEmpty()) moveInfoList = null;
+            
+            // routeName
+            String routeName = null;
+            for (int k = i; k < j; k++) {
+                Edge e = pathEdges.get(k);
+                if (e.getRoute() != null && e.getRoute().getRouteName() != null) {
+                    routeName = e.getRoute().getRouteName();
+                    break;
+                }
+            }
+            
+            // busInfo / subwayInfo
+            TransportationResponseDto.BusInfo busInfo = null;
+            TransportationResponseDto.SubwayInfo subwayInfo = null;
+            if (currentType == DirectionType.BUS) {
+                boolean isLowFloor = routeName != null && routeName.contains("마포");
+                busInfo = new TransportationResponseDto.BusInfo(isLowFloor);
+            } else if (currentType == DirectionType.SUBWAY) {
+                // 필요 시 시설 정보 연동 가능: facilityService.getNodeInfo(nodeId) -> SubwayInfo 변환
+                subwayInfo = null;
+            }
+            
+            int moveNumber = j - i;
             
             mergedSteps.add(new TransportationResponseDto.Step(
                 currentType,
-                currentRouteName,
-                currentInfo,
+                moveInfoList,
+                routeName,
+                moveNumber,
+                busInfo,
+                subwayInfo,
                 fromName,
                 toName
             ));
