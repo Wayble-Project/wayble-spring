@@ -32,7 +32,9 @@ public record TransportationResponseDto(
     ){}
 
     public record BusInfo(
-            boolean isLowFloor // routeName에 "마포" 포함시 true, 그 외 버스는 false
+            boolean isShuttleBus, // routeName에 "마포" 포함시 true
+            @Nullable List<Boolean> isLowFloor, // Open API(busType1,busType2) 기반 저상 여부 리스트
+            @Nullable List<Integer> dispatchInterval // Open API(term) 기반 배차간격 리스트
     ){}
 
     public record SubwayInfo(
