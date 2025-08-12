@@ -29,7 +29,7 @@ public class GraphInit {
     private Map<Long, List<Edge>> adjacencyList;
     private Map<Long, Node> nodeMap;
     private Map<Long, Type> markerMap;
-    private final Set<Long> rampMakers;
+    private Set<Long> rampMarkers = Collections.emptySet();
 
     @PostConstruct
     public void init() {
@@ -67,7 +67,7 @@ public class GraphInit {
 
         for (Edge edge : edges) {
             boolean isWaybleMarker = markerMap.containsKey(edge.from()) || markerMap.containsKey(edge.to());
-            boolean isRamp = rampMakers.contains(edge.from()) || rampMakers.contains(edge.to());
+            boolean isRamp = rampMarkers.contains(edge.from()) || rampMarkers.contains(edge.to());
 
             double distance = isWaybleMarker ? edge.length() * 0.5 : edge.length();
             if (isRamp) distance *= 5;
@@ -109,9 +109,5 @@ public class GraphInit {
 
     public Map<Long, List<Edge>> getGraph() {
         return Collections.unmodifiableMap(adjacencyList);
-    }
-
-    public GraphInit(Set<Long> rampMakers) {
-        this.rampMakers = rampMakers;
     }
 }

@@ -53,7 +53,7 @@ public class WaybleDijkstraService {
                     .orElse(null);
 
             // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
-            if (edge != null && edge.geometry() != null) {
+            if (edge != null && edge.geometry() != null && !edge.geometry().isEmpty()) {
                 for (double[] coords : edge.geometry()) {
                     deleteDuplicateCoords(polyline, coords);
                 }
