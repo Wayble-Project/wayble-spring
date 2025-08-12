@@ -6,6 +6,7 @@ import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
 import com.wayble.server.explore.service.WaybleZoneRecommendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,9 @@ public class WaybleZoneRecommendController {
             @Valid @ModelAttribute WaybleZoneRecommendConditionDto conditionDto,
             @RequestParam(name = "size", defaultValue = "1") int size) {
 
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<WaybleZoneRecommendResponseDto> result = waybleZoneRecommendService.getWaybleZonePersonalRecommend(
-                conditionDto.userId(),
+                userId,
                 conditionDto.latitude(),
                 conditionDto.longitude(),
                 size
