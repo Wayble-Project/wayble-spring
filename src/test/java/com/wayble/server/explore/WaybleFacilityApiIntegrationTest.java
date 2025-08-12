@@ -144,9 +144,35 @@ public class WaybleFacilityApiIntegrationTest {
         );
 
         assertThat(dtoList).isNotEmpty();
-        for (int i = 0; i < dtoList.size(); i++) {
-            WaybleFacilityResponseDto dto = dtoList.get(i);
+        
+        // null 값 검증
+        for (WaybleFacilityResponseDto dto : dtoList) {
+            assertThat(dto.latitude()).isNotNull();
+            assertThat(dto.longitude()).isNotNull();
+            assertThat(dto.facilityType()).isNotNull();
+            assertThat(dto.facilityType()).isEqualTo(FacilityType.RAMP);
             System.out.println(dto);
+        }
+        
+        // 거리순 정렬 검증
+        if (dtoList.size() > 1) {
+            for (int i = 0; i < dtoList.size() - 1; i++) {
+                WaybleFacilityResponseDto current = dtoList.get(i);
+                WaybleFacilityResponseDto next = dtoList.get(i + 1);
+                
+                double currentDistance = haversine(LATITUDE, LONGITUDE, 
+                        current.latitude(), current.longitude());
+                double nextDistance = haversine(LATITUDE, LONGITUDE, 
+                        next.latitude(), next.longitude());
+                
+                assertThat(currentDistance).isLessThanOrEqualTo(nextDistance);
+                System.out.printf("Index %d: Distance = %.3f km%n", i, currentDistance);
+            }
+            // 마지막 요소의 거리도 출력
+            WaybleFacilityResponseDto last = dtoList.get(dtoList.size() - 1);
+            double lastDistance = haversine(LATITUDE, LONGITUDE, 
+                    last.latitude(), last.longitude());
+            System.out.printf("Index %d: Distance = %.3f km%n", dtoList.size() - 1, lastDistance);
         }
     }
 
@@ -176,9 +202,35 @@ public class WaybleFacilityApiIntegrationTest {
         );
 
         assertThat(dtoList).isNotEmpty();
-        for (int i = 0; i < dtoList.size(); i++) {
-            WaybleFacilityResponseDto dto = dtoList.get(i);
+        
+        // null 값 검증
+        for (WaybleFacilityResponseDto dto : dtoList) {
+            assertThat(dto.latitude()).isNotNull();
+            assertThat(dto.longitude()).isNotNull();
+            assertThat(dto.facilityType()).isNotNull();
+            assertThat(dto.facilityType()).isEqualTo(FacilityType.ELEVATOR);
             System.out.println(dto);
+        }
+        
+        // 거리순 정렬 검증
+        if (dtoList.size() > 1) {
+            for (int i = 0; i < dtoList.size() - 1; i++) {
+                WaybleFacilityResponseDto current = dtoList.get(i);
+                WaybleFacilityResponseDto next = dtoList.get(i + 1);
+                
+                double currentDistance = haversine(LATITUDE, LONGITUDE, 
+                        current.latitude(), current.longitude());
+                double nextDistance = haversine(LATITUDE, LONGITUDE, 
+                        next.latitude(), next.longitude());
+                
+                assertThat(currentDistance).isLessThanOrEqualTo(nextDistance);
+                System.out.printf("Index %d: Distance = %.3f km%n", i, currentDistance);
+            }
+            // 마지막 요소의 거리도 출력
+            WaybleFacilityResponseDto last = dtoList.get(dtoList.size() - 1);
+            double lastDistance = haversine(LATITUDE, LONGITUDE, 
+                    last.latitude(), last.longitude());
+            System.out.printf("Index %d: Distance = %.3f km%n", dtoList.size() - 1, lastDistance);
         }
     }
 
