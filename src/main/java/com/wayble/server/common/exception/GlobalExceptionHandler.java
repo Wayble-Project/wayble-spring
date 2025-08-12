@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         String timestamp = Instant.now().toString();
 
-        if (!env.acceptsProfiles(Profiles.of("local"))) {
+        if (!env.acceptsProfiles(Profiles.of("develop"))) {
             log.info("현재 active 프로파일이 develop가 아니므로 Discord 알림을 보내지 않습니다.");
             return;
         }
