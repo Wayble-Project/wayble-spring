@@ -1,9 +1,11 @@
 package com.wayble.server.direction.service;
 
+import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.direction.dto.response.WayblePathResponse;
 import com.wayble.server.direction.entity.Edge;
 import com.wayble.server.direction.entity.Node;
 import com.wayble.server.direction.entity.type.Type;
+import com.wayble.server.direction.exception.WalkingErrorCase;
 import com.wayble.server.direction.init.GraphInit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,16 @@ public class WaybleDijkstraService {
 
     // 11cm의 오차 허용
     private static final double TOLERANCE = 0.000001;
+    private static final double MAX_DISTANCE = 30000.0;
 
     public WayblePathResponse createWayblePath(long start, long end) {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
         int totalDistance = (int) Math.round(calculateDistance(path));
+        if (totalDistance >= MAX_DISTANCE) {
+            throw new ApplicationException(WalkingErrorCase.DISTANCE_LIMIT_EXCEEDED);
+        }
         // 노드 간 5초 대기 시간 추가 (횡단 보도, 보행자 상황 등 반영)
         int totalTime = (int) Math.round(calculateTime(path)) + path.size() * 5;
 
