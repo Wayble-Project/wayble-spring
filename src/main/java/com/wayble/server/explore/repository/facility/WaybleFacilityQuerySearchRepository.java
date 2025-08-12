@@ -31,7 +31,7 @@ public class WaybleFacilityQuerySearchRepository {
     public List<WaybleFacilityResponseDto> findNearbyFacilitiesByType(
             WaybleFacilityConditionDto condition) {
         
-        double radius = 5.0; // 기본 반경 5km
+        double radius = 10.0; // 기본 반경 5km
         String radiusWithUnit = radius + "km";
 
         // 시설 타입에 따른 쿼리 조건 생성
