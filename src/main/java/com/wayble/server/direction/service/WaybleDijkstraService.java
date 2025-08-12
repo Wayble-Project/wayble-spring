@@ -1,10 +1,13 @@
 package com.wayble.server.direction.service;
 
+import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.direction.dto.response.WayblePathResponse;
 import com.wayble.server.direction.entity.Edge;
 import com.wayble.server.direction.entity.Node;
 import com.wayble.server.direction.entity.type.Type;
+import com.wayble.server.direction.exception.WalkingErrorCase;
 import com.wayble.server.direction.init.GraphInit;
+import com.wayble.server.direction.service.util.HaversineUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +21,20 @@ public class WaybleDijkstraService {
 
     // 11cm의 오차 허용
     private static final double TOLERANCE = 0.000001;
+    private static final double MAX_DISTANCE = 30000.0;
 
     public WayblePathResponse createWayblePath(long start, long end) {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
-        int totalDistance = (int) Math.round(calculateDistance(path));
+        List<double[]> polyline = createPolyLine(path);
+        double totalDistanceMeters = calculateDistance(polyline);
+
+        if (totalDistanceMeters >= MAX_DISTANCE) {
+            throw new ApplicationException(WalkingErrorCase.DISTANCE_LIMIT_EXCEEDED);
+        }
+        int totalDistance = (int) Math.round(totalDistanceMeters);
+
         // 노드 간 5초 대기 시간 추가 (횡단 보도, 보행자 상황 등 반영)
         int totalTime = (int) Math.round(calculateTime(path)) + path.size() * 5;
 
@@ -34,15 +45,12 @@ public class WaybleDijkstraService {
                     return new WayblePathResponse.WayblePoint(node.lat(), node.lon(), type);
                 }).toList();
 
-        List<double[]> polyline = createPolyLine(path);
-
         return WayblePathResponse.of(totalDistance, totalTime, wayblePoints, polyline);
     }
 
     private List<double[]> createPolyLine(List<Long> path) {
         List<double[]> polyline = new ArrayList<>();
         Map<Long, List<Edge>> adjacencyList = graphInit.getGraph();
-        double[] last = null;
 
         for (int i = 0; i < path.size() - 1; i++) {
             long from = path.get(i);
@@ -54,12 +62,9 @@ public class WaybleDijkstraService {
                     .orElse(null);
 
             // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
-            if (edge != null && edge.geometry() != null) {
-                for (double[] coord : edge.geometry()) {
-                    if (last == null || isDifferent(last, coord)) {
-                        polyline.add(coord);
-                        last = coord;
-                    }
+            if (edge != null && edge.geometry() != null && !edge.geometry().isEmpty()) {
+                for (double[] coords : edge.geometry()) {
+                    deleteDuplicateCoords(polyline, coords);
                 }
             } else {
                 Node fromNode = graphInit.getNodeMap().get(from);
@@ -68,17 +73,27 @@ public class WaybleDijkstraService {
                 double[] fromCoord = new double[]{fromNode.lon(), fromNode.lat()};
                 double[] toCoord = new double[]{toNode.lon(), toNode.lat()};
 
-                // 중복 확인 후, 중복 X일 때만 추가
-                if (last == null || isDifferent(last, fromCoord)) {
-                    polyline.add(fromCoord);
-                }
-                if (last == null || isDifferent(last, toCoord)) {
-                    polyline.add(toCoord);
-                    last = toCoord;
-                }
+                deleteDuplicateCoords(polyline, fromCoord);
+                deleteDuplicateCoords(polyline, toCoord);
             }
         }
         return polyline;
+    }
+
+    private void deleteDuplicateCoords(List<double[]> polyline, double[] coords) {
+        int n = polyline.size();
+
+        // 연속 중복 좌표 제거
+        if (!polyline.isEmpty() && isClose(polyline.get(n - 1), coords)) return;
+
+        // 과거의 좌표로 돌아올 경우, 해당 좌표 제거
+        for (int i = n - 2; i >= 0; i--) {
+            if (isClose(polyline.get(i), coords)) {
+                polyline.subList(i + 1, n).clear();
+                return;
+            }
+        }
+        polyline.add(coords.clone());
     }
 
     private double calculateTime(List<Long> path) {
@@ -103,17 +118,14 @@ public class WaybleDijkstraService {
         return totalTime;
     }
 
-    private double calculateDistance(List<Long> path) {
+    private double calculateDistance(List<double[]> polyline) {
         double totalDistance = 0.0;
 
-        for (int i = 0; i < path.size() - 1; i++) {
-            long from = path.get(i);
-            long to = path.get(i + 1);
-            totalDistance += graphInit.getGraph().getOrDefault(from, List.of()).stream()
-                    .filter(edge -> edge.to() == to)
-                    .findFirst()
-                    .map(Edge::length)
-                    .orElse(0.0);
+        for (int i = 1; i <  polyline.size(); i++) {
+            totalDistance += HaversineUtil.haversine(
+                    polyline.get(i - 1)[1], polyline.get(i - 1)[0],
+                    polyline.get(i)[1],     polyline.get(i)[0]
+            );
         }
         return totalDistance;
     }
@@ -152,7 +164,7 @@ public class WaybleDijkstraService {
         return path;
     }
 
-    private boolean isDifferent(double[] a, double[] b) {
-        return Math.abs(a[0] - b[0]) > TOLERANCE || Math.abs(a[1] - b[1]) > TOLERANCE;
+    private boolean isClose(double[] a, double[] b) {
+        return Math.abs(a[0] - b[0]) <= TOLERANCE && Math.abs(a[1] - b[1]) <= TOLERANCE;
     }
 }

@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<CommonResponse> handleApplicationException(ApplicationException e, WebRequest request) {
-        // 비즈니스 예외 로그 기록 (간결하게)
+
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         String method = ((ServletWebRequest) request).getRequest().getMethod();
         
@@ -47,35 +47,30 @@ public class GlobalExceptionHandler {
         
         CommonResponse commonResponse = CommonResponse.error(e.getErrorCase());
 
-        HttpStatus status = HttpStatus.valueOf(e.getErrorCase().getHttpStatusCode());
-        //sendToDiscord(e, request, status);
-
         return ResponseEntity
                 .status(e.getErrorCase().getHttpStatusCode())
                 .body(commonResponse);
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<CommonResponse> handleValidException(BindingResult bindingResult,
-                                                               MethodArgumentNotValidException ex,
-                                                               WebRequest request) {
-        String message = bindingResult.getAllErrors().get(0).getDefaultMessage();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CommonResponse> handleValidException(MethodArgumentNotValidException ex, WebRequest request) {
+        String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         
         // 에러 로그 기록
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         String method = ((ServletWebRequest) request).getRequest().getMethod();
         String errorLocation = getErrorLocation(ex);
         
-        log.error("Validation Exception 발생 - Method: {}, Path: {}, Message: {}, Location: {}", 
-                  method, path, message, errorLocation, ex);
+        log.warn("Validation Exception - Method: {}, Path: {}, Message: {}, Location: {}", 
+                  method, path, message, errorLocation);
         
         CommonResponse commonResponse = CommonResponse.error(400, message);
-
-        sendToDiscord(ex, request, HttpStatus.BAD_REQUEST);
+        
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(commonResponse);
     }
+
 
     /**
      * 모든 예상하지 못한 예외 처리
@@ -107,6 +102,12 @@ public class GlobalExceptionHandler {
             return;
         }
 
+        // 특정 예외 타입 및 경로에 대한 Discord 알림 제외
+        if (shouldSkipDiscordNotification(ex, path)) {
+            log.debug("Discord 알림 제외 - Exception: {}, Path: {}", ex.getClass().getSimpleName(), path);
+            return;
+        }
+
         // Embed 필드 구성
         DiscordWebhookPayload.Embed embed = new DiscordWebhookPayload.Embed(
                 "🚨 서버 에러 발생",
@@ -134,6 +135,108 @@ public class GlobalExceptionHandler {
         } catch (Exception e){
             log.error(e.getMessage());
         }
+    }
+
+    /**
+     * Discord 알림을 보내지 않을 예외인지 판단
+     */
+    private boolean shouldSkipDiscordNotification(Exception ex, String path) {
+        String exceptionName = ex.getClass().getSimpleName();
+        String message = ex.getMessage();
+        
+        // 1. NoResourceFoundException 제외 (static resource 요청)
+        if ("NoResourceFoundException".equals(exceptionName)) {
+            return true;
+        }
+        
+        // 2. 특정 경로 패턴 제외
+        if (isIgnoredPath(path)) {
+            return true;
+        }
+        
+        // 3. 봇이나 크롤러 요청으로 인한 에러 제외
+        if (isBotOrCrawlerRequest(message)) {
+            return true;
+        }
+        
+        // 4. 기타 불필요한 예외들
+        if (isIgnoredException(exceptionName, message)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * 무시할 경로인지 확인
+     */
+    private boolean isIgnoredPath(String path) {
+        String[] ignoredPaths = {
+            "/favicon.ico",
+            "/index.html", 
+            "/robots.txt",
+            "/sitemap.xml",
+            "/apple-touch-icon",
+            "/.well-known/",
+            "/wp-admin/",
+            "/admin/",
+            "/phpmyadmin/",
+            "/xmlrpc.php",
+            "/.env",
+            "/config.php"
+        };
+        
+        for (String ignoredPath : ignoredPaths) {
+            if (path.contains(ignoredPath)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * 봇이나 크롤러 요청인지 확인
+     */
+    private boolean isBotOrCrawlerRequest(String message) {
+        if (message == null) return false;
+        
+        String[] botIndicators = {
+            "No static resource",
+            "Could not resolve view",
+            "favicon",
+            "robots.txt"
+        };
+        
+        for (String indicator : botIndicators) {
+            if (message.contains(indicator)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * 무시할 예외인지 확인
+     */
+    private boolean isIgnoredException(String exceptionName, String message) {
+        // 클라이언트 연결 종료 관련
+        if ("ClientAbortException".equals(exceptionName) || 
+            "BrokenPipeException".equals(exceptionName)) {
+            return true;
+        }
+        
+        // 타임아웃 관련 (너무 빈번한 경우)
+        if (message != null && (
+            message.contains("Connection timed out") ||
+            message.contains("Read timed out") ||
+            message.contains("Connection reset")
+        )) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**

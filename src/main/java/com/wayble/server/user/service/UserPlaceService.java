@@ -78,16 +78,16 @@ public class UserPlaceService {
             String imageUrl = waybleZone.getMainImageUrl();
 
             return UserPlaceListResponseDto.builder()
-                    .place_id(userPlace.getId())
+                    .placeId(userPlace.getId())
                     .title(userPlace.getTitle())
-                    .wayble_zone(
+                    .waybleZone(
                             UserPlaceListResponseDto.WaybleZoneDto.builder()
-                                    .wayble_zone_id(waybleZone.getId())
+                                    .waybleZoneId(waybleZone.getId())
                                     .name(waybleZone.getZoneName())
                                     .category(waybleZone.getZoneType().toString())
                                     .rating(waybleZone.getRating())
                                     .address(waybleZone.getAddress().toFullAddress())
-                                    .image_url(imageUrl)
+                                    .imageUrl(imageUrl)
                                     .build()
                     )
                     .build();
