@@ -7,6 +7,7 @@ import com.wayble.server.direction.entity.Node;
 import com.wayble.server.direction.entity.type.Type;
 import com.wayble.server.direction.exception.WalkingErrorCase;
 import com.wayble.server.direction.init.GraphInit;
+import com.wayble.server.direction.service.util.HaversineUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +27,13 @@ public class WaybleDijkstraService {
         List<Long> path = dijkstra(start, end);
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
-        int totalDistance = (int) Math.round(calculateDistance(path));
+        List<double[]> polyline = createPolyLine(path);
+        int totalDistance = (int) Math.round(calculateDistance(polyline));
+
         if (totalDistance >= MAX_DISTANCE) {
             throw new ApplicationException(WalkingErrorCase.DISTANCE_LIMIT_EXCEEDED);
         }
+
         // 노드 간 5초 대기 시간 추가 (횡단 보도, 보행자 상황 등 반영)
         int totalTime = (int) Math.round(calculateTime(path)) + path.size() * 5;
 
@@ -39,8 +43,6 @@ public class WaybleDijkstraService {
                     Type type = markerMap.getOrDefault(id, Type.NONE);
                     return new WayblePathResponse.WayblePoint(node.lat(), node.lon(), type);
                 }).toList();
-
-        List<double[]> polyline = createPolyLine(path);
 
         return WayblePathResponse.of(totalDistance, totalTime, wayblePoints, polyline);
     }
@@ -115,17 +117,14 @@ public class WaybleDijkstraService {
         return totalTime;
     }
 
-    private double calculateDistance(List<Long> path) {
+    private double calculateDistance(List<double[]> polyline) {
         double totalDistance = 0.0;
 
-        for (int i = 0; i < path.size() - 1; i++) {
-            long from = path.get(i);
-            long to = path.get(i + 1);
-            totalDistance += graphInit.getGraph().getOrDefault(from, List.of()).stream()
-                    .filter(edge -> edge.to() == to)
-                    .findFirst()
-                    .map(Edge::length)
-                    .orElse(0.0);
+        for (int i = 1; i <  polyline.size(); i++) {
+            totalDistance += HaversineUtil.haversine(
+                    polyline.get(i - 1)[1], polyline.get(i - 1)[0],
+                    polyline.get(i)[1],     polyline.get(i)[0]
+            );
         }
         return totalDistance;
     }
