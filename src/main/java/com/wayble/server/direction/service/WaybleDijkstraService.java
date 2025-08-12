@@ -42,7 +42,6 @@ public class WaybleDijkstraService {
     private List<double[]> createPolyLine(List<Long> path) {
         List<double[]> polyline = new ArrayList<>();
         Map<Long, List<Edge>> adjacencyList = graphInit.getGraph();
-        double[] last = null;
 
         for (int i = 0; i < path.size() - 1; i++) {
             long from = path.get(i);
@@ -54,12 +53,9 @@ public class WaybleDijkstraService {
                     .orElse(null);
 
             // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
-            if (edge != null && edge.geometry() != null) {
-                for (double[] coord : edge.geometry()) {
-                    if (last == null || isDifferent(last, coord)) {
-                        polyline.add(coord);
-                        last = coord;
-                    }
+            if (edge != null && edge.geometry() != null && !edge.geometry().isEmpty()) {
+                for (double[] coords : edge.geometry()) {
+                    deleteDuplicateCoords(polyline, coords);
                 }
             } else {
                 Node fromNode = graphInit.getNodeMap().get(from);
@@ -68,17 +64,27 @@ public class WaybleDijkstraService {
                 double[] fromCoord = new double[]{fromNode.lon(), fromNode.lat()};
                 double[] toCoord = new double[]{toNode.lon(), toNode.lat()};
 
-                // 중복 확인 후, 중복 X일 때만 추가
-                if (last == null || isDifferent(last, fromCoord)) {
-                    polyline.add(fromCoord);
-                }
-                if (last == null || isDifferent(last, toCoord)) {
-                    polyline.add(toCoord);
-                    last = toCoord;
-                }
+                deleteDuplicateCoords(polyline, fromCoord);
+                deleteDuplicateCoords(polyline, toCoord);
             }
         }
         return polyline;
+    }
+
+    private void deleteDuplicateCoords(List<double[]> polyline, double[] coords) {
+        int n = polyline.size();
+
+        // 연속 중복 좌표 제거
+        if (!polyline.isEmpty() && isClose(polyline.get(n - 1), coords)) return;
+
+        // 과거의 좌표로 돌아올 경우, 해당 좌표 제거
+        for (int i = n - 2; i >= 0; i--) {
+            if (isClose(polyline.get(i), coords)) {
+                polyline.subList(i + 1, n).clear();
+                return;
+            }
+        }
+        polyline.add(coords.clone());
     }
 
     private double calculateTime(List<Long> path) {
@@ -152,7 +158,7 @@ public class WaybleDijkstraService {
         return path;
     }
 
-    private boolean isDifferent(double[] a, double[] b) {
-        return Math.abs(a[0] - b[0]) > TOLERANCE || Math.abs(a[1] - b[1]) > TOLERANCE;
+    private boolean isClose(double[] a, double[] b) {
+        return Math.abs(a[0] - b[0]) <= TOLERANCE && Math.abs(a[1] - b[1]) <= TOLERANCE;
     }
 }
