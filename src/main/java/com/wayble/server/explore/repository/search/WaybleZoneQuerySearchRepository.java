@@ -123,4 +123,99 @@ public class WaybleZoneQuerySearchRepository{
 
         return new SliceImpl<>(dtos, pageable, hasNext);
     }
+
+    /**
+     * 30m 이내이고 이름이 유사한 WaybleZone 찾기
+     * @param cond 검색 조건 (위도, 경도, 이름 포함)
+     * @return 조건에 맞는 첫 번째 결과 또는 null
+     */
+    public WaybleZoneSearchResponseDto findSimilarWaybleZone(WaybleZoneSearchConditionDto cond) {
+        if (cond.zoneName() == null || cond.zoneName().isBlank()) {
+            return null;
+        }
+
+        // 30m 이내 검색
+        Query query = Query.of(q -> q
+                .bool(b -> {
+                    // 이름 유사도 검색 (fuzzy + match 조합)
+                    b.should(s -> s
+                            .match(m -> m
+                                    .field("zoneName")
+                                    .query(cond.zoneName())
+                                    .boost(2.0f) // 정확한 매치에 높은 점수
+                            )
+                    );
+                    b.should(s -> s
+                            .fuzzy(f -> f
+                                    .field("zoneName")
+                                    .value(cond.zoneName())
+                                    .fuzziness("AUTO") // 오타 허용
+                                    .boost(1.5f)
+                            )
+                    );
+                    // 부분 매치도 포함 (공백 제거 후 검색)
+                    String cleanedName = cond.zoneName().replaceAll("\\s+", "");
+                    b.should(s -> s
+                            .wildcard(w -> w
+                                    .field("zoneName")
+                                    .value("*" + cleanedName + "*")
+                                    .boost(1.0f)
+                            )
+                    );
+                    
+                    // 최소 하나의 should 조건은 만족해야 함
+                    b.minimumShouldMatch("1");
+                    
+                    // 30m 이내 필터
+                    b.filter(f -> f
+                            .geoDistance(gd -> gd
+                                    .field("address.location")
+                                    .location(loc -> loc
+                                            .latlon(ll -> ll
+                                                    .lat(cond.latitude())
+                                                    .lon(cond.longitude())
+                                            )
+                                    )
+                                    .distance("30m")
+                            )
+                    );
+                    return b;
+                })
+        );
+
+        // 정렬: 점수 + 거리 조합
+        SortOptions scoreSort = SortOptions.of(s -> s.score(sc -> sc.order(SortOrder.Desc)));
+        SortOptions geoSort = SortOptions.of(s -> s
+                .geoDistance(gds -> gds
+                        .field("address.location")
+                        .location(GeoLocation.of(gl -> gl
+                                .latlon(ll -> ll
+                                        .lat(cond.latitude())
+                                        .lon(cond.longitude())
+                                )
+                        ))
+                        .order(SortOrder.Asc)
+                )
+        );
+
+        NativeQuery nativeQuery = NativeQuery.builder()
+                .withQuery(query)
+                .withSort(scoreSort)
+                .withSort(geoSort)
+                .withPageable(PageRequest.of(0, 1)) // 첫 번째 결과만
+                .build();
+
+        SearchHits<WaybleZoneDocument> hits =
+                operations.search(nativeQuery, WaybleZoneDocument.class, INDEX);
+
+        if (hits.isEmpty()) {
+            return null;
+        }
+
+        WaybleZoneDocument doc = hits.getSearchHit(0).getContent();
+        Double distanceInMeters = (Double) hits.getSearchHit(0).getSortValues().get(1); // 거리는 두 번째 정렬값
+        Double distanceInKm = distanceInMeters / 1000.0;
+        
+        return WaybleZoneSearchResponseDto.from(doc, distanceInKm);
+    }
 }
