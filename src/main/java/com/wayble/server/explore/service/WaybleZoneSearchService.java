@@ -42,4 +42,8 @@ public class WaybleZoneSearchService {
 
         return waybleZoneRepository.findTop3likesWaybleZonesByDistrict(district);
     }
+
+    public WaybleZoneSearchResponseDto isValidWaybleZone(WaybleZoneSearchConditionDto condition) {
+        return waybleZoneQuerySearchRepository.findSimilarWaybleZone(condition);
+    }
 }
