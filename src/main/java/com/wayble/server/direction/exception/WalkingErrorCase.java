@@ -12,6 +12,7 @@ public enum WalkingErrorCase implements ErrorCase {
     GRAPH_FILE_NOT_FOUND(500, 8002, "그래프 파일을 찾을 수 없습니다."),
     GRAPH_INIT_FAILED(500, 8003, "그래프 초기화에 실패했습니다."),
     NODE_NOT_FOUND(400, 8004, "해당 위도, 경도 근처의 노드가 존재하지 않습니다."),
+    DISTANCE_LIMIT_EXCEEDED(400, 8005, "경로가 허용 최대 거리(30km)를 초과하였습니다."),
     ;
 
     private final Integer httpStatusCode;
