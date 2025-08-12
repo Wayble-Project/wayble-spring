@@ -219,7 +219,6 @@ jobs:
 
 
 
-
 # on:  #이 워크플로우가 언제 실행될지 트리거를 정의함.
 #   pull_request:
 #     types : [closed] #누군가가 Pull request를 닫았을 때 실행됨.
