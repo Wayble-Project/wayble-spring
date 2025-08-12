@@ -1,26 +1,28 @@
 package com.wayble.server.explore;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
+import com.wayble.server.explore.dto.facility.WaybleFacilityResponseDto;
 import com.wayble.server.explore.entity.FacilityType;
 import com.wayble.server.explore.entity.WaybleFacilityDocument;
-import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.repository.facility.WaybleFacilityDocumentRepository;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserType;
 import com.wayble.server.user.repository.UserRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,8 @@ import java.util.Random;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -57,7 +61,7 @@ public class WaybleFacilityApiIntegrationTest {
 
     private static final int SAMPLES = 100;
 
-    private static final String baseUrl = "/api/v1/wayble-zones/facilities";
+    private static final String baseUrl = "/api/v1/facilities/search";
 
     private Long userId;
 
@@ -110,6 +114,71 @@ public class WaybleFacilityApiIntegrationTest {
             assertThat(doc.getLocation()).isNotNull();
             assertThat(doc.getFacilityType()).isNotNull();
             System.out.println(doc);
+        }
+    }
+
+
+    @Test
+    @DisplayName("좌표를 전달받아 가까운 경사로 조회 테스트")
+    public void findNearbyRampFacilities() throws Exception {
+        MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("facilityType",  FacilityType.RAMP.name())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
+        List<WaybleFacilityResponseDto> dtoList = objectMapper.convertValue(
+                dataNode,
+                new TypeReference<>() {}
+        );
+
+        assertThat(dtoList).isNotEmpty();
+        for (int i = 0; i < dtoList.size(); i++) {
+            WaybleFacilityResponseDto dto = dtoList.get(i);
+            System.out.println(dto);
+        }
+    }
+
+    @Test
+    @DisplayName("좌표를 전달받아 가까운 엘리베이터 조회 테스트")
+    public void findNearbyElevatorFacilities() throws Exception {
+        MvcResult result = mockMvc.perform(get(baseUrl)
+                        .header("Authorization", "Bearer " + token)
+                        .param("latitude",  String.valueOf(LATITUDE))
+                        .param("longitude", String.valueOf(LONGITUDE))
+                        .param("facilityType",  FacilityType.ELEVATOR.name())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
+        List<WaybleFacilityResponseDto> dtoList = objectMapper.convertValue(
+                dataNode,
+                new TypeReference<>() {}
+        );
+
+        assertThat(dtoList).isNotEmpty();
+        for (int i = 0; i < dtoList.size(); i++) {
+            WaybleFacilityResponseDto dto = dtoList.get(i);
+            System.out.println(dto);
         }
     }
 
