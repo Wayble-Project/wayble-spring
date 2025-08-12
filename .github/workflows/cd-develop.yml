@@ -1,8 +1,8 @@
 name: CI/CD
 
 on:
-  push:
-    branches: [ "feature/seungmin" ]
+#  push:
+#    branches: [ "feature/seungmin" ]
 
 #push:
 #  branches: [ "feature/seungin" ]
@@ -200,22 +200,22 @@ jobs:
           fi
 
       # ✅ 배포 성공 알림 (Discord)
-#      - name: Send success webhook to Discord
-#        if: success()
-#        run: |
-#          curl -H "Content-Type: application/json" \
-#               -X POST \
-#               -d "{\"content\": \"✅ EC2 배포 성공!\"}" \
-#               ${{ secrets.DISCORD_WEBHOOK_URL }}
-#
-#      # ❌ 배포 실패 알림 (Discord)
-#      - name: Send failure webhook to Discord
-#        if: failure()
-#        run: |
-#          curl -H "Content-Type: application/json" \
-#               -X POST \
-#               -d "{\"content\": \"❌ EC2 배포 실패! 확인이 필요합니다.\"}" \
-#               ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Send success webhook to Discord
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"✅ EC2 배포 성공!\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # ❌ 배포 실패 알림 (Discord)
+      - name: Send failure webhook to Discord
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"❌ EC2 배포 실패! 확인이 필요합니다.\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
 
 
 
