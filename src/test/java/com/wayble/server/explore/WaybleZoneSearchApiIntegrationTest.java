@@ -530,6 +530,83 @@ public class WaybleZoneSearchApiIntegrationTest {
         }
     }
 
+    @Test
+    @DisplayName("위도, 경도, 이름 정보를 바탕으로 웨이블존이 맞는지 여부 반환 테스트")
+    public void findIsValidWaybleZoneTest () throws Exception{
+        List<WaybleZone> waybleZoneList = waybleZoneRepository.findAll();
+        WaybleZone waybleZone = waybleZoneList.get(0);
+        String zoneName = waybleZone.getZoneName();
+        MvcResult result = mockMvc.perform(get(baseUrl + "/validate")
+                        .header("Authorization", "Bearer " + token)
+                        .param("latitude",  String.valueOf(waybleZone.getAddress().getLatitude()))
+                        .param("longitude", String.valueOf(waybleZone.getAddress().getLongitude()))
+                        .param("zoneName", zoneName.substring(0, 2))
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        JsonNode root = objectMapper.readTree(json);
+        JsonNode dataNode = root.get("data");
+
+        System.out.println("==== 응답 결과 ====");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
+
+        WaybleZoneSearchResponseDto dto =
+                objectMapper.convertValue(
+                        dataNode,
+                        new TypeReference<>() {}
+                );
+
+        // 검증 로직
+        assertThat(dto).isNotNull();
+        
+        // 반환된 결과가 유효한 WaybleZoneSearchResponseDto인지 확인
+        WaybleZoneInfoResponseDto infoDto = dto.waybleZoneInfo();
+        assertThat(infoDto).isNotNull();
+        assertThat(infoDto.zoneId()).isNotNull();
+        assertThat(infoDto.zoneName()).isNotNull();
+        assertThat(infoDto.zoneType()).isNotNull();
+        assertThat(infoDto.latitude()).isNotNull();
+        assertThat(infoDto.longitude()).isNotNull();
+        
+        // 거리 검증 (30m 이내여야 함)
+        assertThat(dto.distance())
+                .withFailMessage("반환된 거리(%.5f km)가 30m(0.03 km)를 초과합니다", dto.distance())
+                .isLessThanOrEqualTo(0.03);
+        
+        // 이름 유사성 검증
+        String requestedName = zoneName.substring(0, 2);
+        String foundName = infoDto.zoneName();
+        assertThat(foundName)
+                .withFailMessage("반환된 이름(%s)이 요청한 이름(%s)과 유사하지 않습니다", foundName, requestedName)
+                .satisfiesAnyOf(
+                    name -> assertThat(name).contains(requestedName),
+                    name -> assertThat(name.replaceAll("\\s+", "")).contains(requestedName.replaceAll("\\s+", "")),
+                    name -> assertThat(requestedName).contains(name.substring(0, Math.min(2, name.length())))
+                );
+        
+        // 정확한 거리 계산 검증
+        double expectedDistance = haversine(
+                waybleZone.getAddress().getLatitude(), 
+                waybleZone.getAddress().getLongitude(),
+                infoDto.latitude(), 
+                infoDto.longitude()
+        );
+        
+        // 허용 오차: 0.05 km (≈50m)
+        assertThat(dto.distance())
+                .withFailMessage("계산된 거리(%.5f km)와 반환된 거리(%.5f km)가 다릅니다",
+                        expectedDistance, dto.distance())
+                .isCloseTo(expectedDistance, offset(0.05));
+
+        System.out.println("  요청한 이름: " + requestedName);
+        System.out.println("  찾은 이름: " + foundName);
+        System.out.println("  거리: " + String.format("%.3f km", dto.distance()));
+        System.out.println("  위치: " + infoDto.latitude() + ", " + infoDto.longitude());
+    }
+
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6_371; // 지구 반지름 (km)
         double dLat = Math.toRadians(lat2 - lat1);
