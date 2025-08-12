@@ -1,6 +1,6 @@
 package com.wayble.server.explore.dto.common;
 
-import com.wayble.server.explore.entity.EsWaybleZoneFacility;
+import com.wayble.server.explore.entity.EsWaybleFacility;
 import lombok.Builder;
 
 @Builder
@@ -12,7 +12,7 @@ public record FacilityResponseDto(
         Boolean hasDisabledToilet,
         String floorInfo
 ) {
-    public static FacilityResponseDto from(EsWaybleZoneFacility facility) {
+    public static FacilityResponseDto from(EsWaybleFacility facility) {
         if (facility == null) {
             return null;
         }
