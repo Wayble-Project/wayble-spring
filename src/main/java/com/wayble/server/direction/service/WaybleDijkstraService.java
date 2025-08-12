@@ -28,11 +28,12 @@ public class WaybleDijkstraService {
         Map<Long, Type> markerMap = graphInit.getMarkerMap();
 
         List<double[]> polyline = createPolyLine(path);
-        int totalDistance = (int) Math.round(calculateDistance(polyline));
+        double totalDistanceMeters = calculateDistance(polyline);
 
-        if (totalDistance >= MAX_DISTANCE) {
+        if (totalDistanceMeters >= MAX_DISTANCE) {
             throw new ApplicationException(WalkingErrorCase.DISTANCE_LIMIT_EXCEEDED);
         }
+        int totalDistance = (int) Math.round(totalDistanceMeters);
 
         // 노드 간 5초 대기 시간 추가 (횡단 보도, 보행자 상황 등 반영)
         int totalTime = (int) Math.round(calculateTime(path)) + path.size() * 5;
