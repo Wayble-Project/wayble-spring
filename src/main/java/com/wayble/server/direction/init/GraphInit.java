@@ -31,6 +31,9 @@ public class GraphInit {
     private Map<Long, Type> markerMap;
     private Set<Long> rampMarkers = Collections.emptySet();
 
+    private static final double RAMP_PENALTY = 5.0;
+    private static final double MARKER_DISCOUNT = 0.5;
+
     @PostConstruct
     public void init() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -69,8 +72,10 @@ public class GraphInit {
             boolean isWaybleMarker = markerMap.containsKey(edge.from()) || markerMap.containsKey(edge.to());
             boolean isRamp = rampMarkers.contains(edge.from()) || rampMarkers.contains(edge.to());
 
-            double distance = isWaybleMarker ? edge.length() * 0.5 : edge.length();
-            if (isRamp) distance *= 5;
+            double distance = edge.length();
+
+            if (isRamp) distance *= RAMP_PENALTY;
+            else if (isWaybleMarker) distance *= MARKER_DISCOUNT;
 
             // 양방향
             adjacencyList.computeIfAbsent(edge.from(), k -> new ArrayList<>())
