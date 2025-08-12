@@ -6,17 +6,17 @@ import lombok.Builder;
 
 @Builder
 public record UserPlaceListResponseDto(
-        Long place_id,
+        Long placeId,
         String title,
-        WaybleZoneDto wayble_zone
+        WaybleZoneDto waybleZone
 ) {
     @Builder
     public record WaybleZoneDto(
-            Long wayble_zone_id,
+            Long waybleZoneId,
             String name,
             String category,
             double rating,
             String address,
-            String image_url
+            String imageUrl
     ) {}
 }
