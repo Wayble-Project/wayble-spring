@@ -27,6 +27,8 @@ public class WalkingService {
     private final GraphInit graphInit;
     private final WaybleDijkstraService waybleDijkstraService;
 
+    private static final double NODE_SEARCH_RADIUS = 1000;
+
     public TMapParsingResponse callTMapApi(TMapRequest request) {
         try {
             TMapResponse response = tMapClient.response(request);
@@ -52,6 +54,7 @@ public class WalkingService {
 
     private long findNearestNode(double lat, double lon) {
         return graphInit.getNodeMap().values().stream()
+                .filter(node -> HaversineUtil.haversine(lat, lon, node.lat(), node.lon()) <= NODE_SEARCH_RADIUS)
                 .min(Comparator.comparingDouble(
                         node -> HaversineUtil.haversine(lat, lon, node.lat(), node.lon())
                 ))
