@@ -23,8 +23,8 @@ public class UserPlace extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "color", length = 16)
-    private String color; // 배지/아이콘 색 (정확히 무슨 색이 있는지 몰라서 일단 자유 문자열)
+    @Column(length = 20) @Builder.Default
+    private String color = "GRAY"; // 배지/아이콘 색 (정확히 무슨 색이 있는지 몰라서 일단 자유 문자열 + 기본: 회색)
 
     @Column(name = "saved_count", nullable = false, columnDefinition = "int default 0")
     @Builder.Default
