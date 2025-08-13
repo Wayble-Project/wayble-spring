@@ -45,7 +45,7 @@ public record TransportationResponseDto(
 
     public record LocationInfo(
             Double latitude,
-            Double Longitude
+            Double longitude
     ) {}
 
     // 지하철 시설 정보 묶음 (서비스 내부에서 사용)
