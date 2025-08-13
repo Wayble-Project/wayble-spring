@@ -1,13 +1,14 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.direction.dto.TransportationRequestDto;
-import com.wayble.server.direction.dto.TransportationResponseDto;
+import com.wayble.server.direction.dto.request.TransportationRequestDto;
+import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.entity.DirectionType;
 import com.wayble.server.direction.entity.transportation.Edge;
 import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.repository.EdgeRepository;
 import com.wayble.server.direction.repository.NodeRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class TransportationService {
     private final NodeRepository nodeRepository;
     private final EdgeRepository edgeRepository;
     private final FacilityService facilityService;
+    private final BusInfoService busInfoService;
 
     private List<Node> nodes;
     private List<Edge> edges;
@@ -195,7 +197,7 @@ public class TransportationService {
                 }
 
                 // 단계 수 패널티 (경로 단계가 많을수록 불이익)
-                weight += STEP_PENALTY; // 각 단계마다 추가 비용 대폭 증가
+                weight += STEP_PENALTY;
 
                 int alt = distance.get(curr.getId()) + weight;
                 if (alt < distance.get(neighbor.getId())) {
@@ -213,7 +215,7 @@ public class TransportationService {
         Set<Long> backtrackVisited = new HashSet<>();
 
         if (distance.get(end.getId()) == Integer.MAX_VALUE) {
-            log.warn("경로를 찾을 수 없음: 도착지에 도달할 수 없음");
+            log.info("경로를 찾을 수 없음: 도착지에 도달할 수 없음");
             return steps; // 빈 리스트 반환
         }
 
@@ -260,11 +262,11 @@ public class TransportationService {
             if (currentType == DirectionType.WALK) {
                 mergedSteps.add(new TransportationResponseDto.Step(
                     currentType,
-                    null, // moveInfo
-                    null, // routeName
-                    1,    // moveNumber
-                    null, // busInfo
-                    null, // subwayInfo
+                    null,
+                    null,
+                    0,
+                    null,
+                    null,
                     fromName,
                     toName
                 ));
@@ -307,18 +309,46 @@ public class TransportationService {
                 }
             }
             
-            // busInfo / subwayInfo
+            // busInfo / subwayInfo 설정
             TransportationResponseDto.BusInfo busInfo = null;
             TransportationResponseDto.SubwayInfo subwayInfo = null;
             if (currentType == DirectionType.BUS) {
-                boolean isLowFloor = routeName != null && routeName.contains("마포");
-                busInfo = new TransportationResponseDto.BusInfo(isLowFloor);
-            } else if (currentType == DirectionType.SUBWAY) {
-                // 필요 시 시설 정보 연동 가능: facilityService.getNodeInfo(nodeId) -> SubwayInfo 변환
-                subwayInfo = null;
+                boolean isShuttle = routeName != null && routeName.contains("마포"); // 마을버스 구분
+
+                Long stationId = currentEdge.getStartNode() != null ? currentEdge.getStartNode().getId() : null;
+                List<Boolean> lowFloors = null;
+                List<Integer> intervals = null;
+                try {
+                    if (stationId != null) {
+                        TransportationResponseDto.BusInfo busInfoData = busInfoService.getBusInfo(currentEdge.getStartNode().getStationName(), null, currentEdge.getStartNode().getLatitude(), currentEdge.getStartNode().getLongitude());
+                        busInfo = busInfoData;
+                    }
+                } catch (Exception e) {
+                    log.error("버스 정보 조회 실패: {}", e.getMessage(), e);
+                }
+            } 
+            else if (currentType == DirectionType.SUBWAY) {
+                Long stationId = currentEdge.getStartNode() != null ? currentEdge.getStartNode().getId() : null;
+                try {
+                    if (stationId != null) {
+                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(stationId);
+                        subwayInfo = new TransportationResponseDto.SubwayInfo(
+                            nodeInfo.wheelchair(),
+                            nodeInfo.elevator(),
+                            nodeInfo.accessibleRestroom()
+                        );
+                    }
+                } catch (Exception e) {
+                    log.warn("지하철역 시설 정보 조회 실패. 역 ID {}: {}", stationId, e.getMessage());
+                    subwayInfo = new TransportationResponseDto.SubwayInfo(
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        false
+                    );
+                }
             }
             
-            int moveNumber = j - i;
+            int moveNumber = j - i - 1;
             
             mergedSteps.add(new TransportationResponseDto.Step(
                 currentType,
