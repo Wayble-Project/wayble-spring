@@ -1,8 +1,8 @@
 package com.wayble.server.direction.controller;
 
 import com.wayble.server.common.response.CommonResponse;
-import com.wayble.server.direction.dto.TransportationRequestDto;
-import com.wayble.server.direction.dto.TransportationResponseDto;
+import com.wayble.server.direction.dto.request.TransportationRequestDto;
+import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.service.TransportationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

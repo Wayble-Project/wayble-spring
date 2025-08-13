@@ -21,17 +21,17 @@ public class Edge {
     private DirectionType edgeType;
 
     // 출발 노드
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "start_node_id")
     private Node startNode;
 
     // 도착 노드
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "end_node_id")
     private Node endNode;
 
     // 해당 연결이 속한 노선
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "route_id")
     private Route route;
 
