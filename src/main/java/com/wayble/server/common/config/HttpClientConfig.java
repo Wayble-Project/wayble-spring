@@ -23,4 +23,9 @@ public class HttpClientConfig {
                 .connectTimeout(Duration.ofSeconds(connectTimeout))
                 .build();
     }
+
+    @Bean
+    public Duration httpRequestTimeout() {
+    return Duration.ofSeconds(requestTimeout);
+    }
 }
