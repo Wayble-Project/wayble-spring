@@ -16,6 +16,8 @@ public interface UserPlaceWaybleZoneMappingRepository extends JpaRepository<User
 
     @EntityGraph(attributePaths = {"userPlace", "waybleZone"})
     List<UserPlaceWaybleZoneMapping> findAllByUserPlace_User_Id(Long userId);
+    boolean existsByUserPlace_IdAndWaybleZone_Id(Long placeId, Long zoneId);
+    void deleteByUserPlace_IdAndWaybleZone_Id(Long placeId, Long zoneId);
 
     // 리스트 내부 웨이블존 조회 (페이징 포함)
     @Query("""
@@ -27,9 +29,8 @@ public interface UserPlaceWaybleZoneMappingRepository extends JpaRepository<User
     Page<WaybleZone> findZonesByPlaceId(@Param("placeId") Long placeId, Pageable pageable);
 
 
-    long countByUserPlace_Id(Long placeId);
 
 
-    void deleteByUserPlace_IdAndWaybleZone_Id(Long placeId, Long zoneId);
-    boolean existsByUserPlace_IdAndWaybleZone_Id(Long placeId, Long zoneId);
+
+
 }

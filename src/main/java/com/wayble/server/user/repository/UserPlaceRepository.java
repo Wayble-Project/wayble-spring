@@ -10,4 +10,5 @@ public interface UserPlaceRepository extends JpaRepository<UserPlace, Long> {
     Optional<UserPlace> findByUser_IdAndTitle(Long userId, String title);
     List<UserPlace> findAllByUser_IdOrderByCreatedAtDesc(Long userId); // 사용자 리스트 전체(최신순)
     Optional<UserPlace> findByIdAndUser_Id(Long placeId, Long userId);
+    List<UserPlace> findAllByUser_IdOrderByTitleAsc(Long userId);
 }
