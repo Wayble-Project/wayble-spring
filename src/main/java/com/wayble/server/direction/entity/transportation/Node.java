@@ -6,6 +6,8 @@ import lombok.*;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.wayble.server.direction.entity.DirectionType;
 
 @Entity
@@ -33,22 +35,22 @@ public class Node {
 
     // 출발 edge 리스트 (정류장에서 출발)
     @OneToMany(mappedBy = "startNode", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     private List<Edge> outgoingEdges;
 
     // 도착 Edge 리스트 (정류장으로 도착)
     @OneToMany(mappedBy = "endNode", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     private List<Edge> incomingEdges;
 
     // 이 정류장이 기점/종점인 노선
     @OneToMany(mappedBy = "startNode", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     private List<Route> startRoutes;
 
     @OneToMany(mappedBy = "endNode", fetch = FetchType.LAZY)
+    @BatchSize(size = 100)
     private List<Route> endRoutes;
-
-    // facility_id 관계 제거 (N+1 문제 해결)
-    // @OneToOne(mappedBy = "node", fetch = FetchType.LAZY)
-    // private Facility facility_id;
 
     public Node(Long id, String stationName, DirectionType nodeType, double latitude, double longitude) {
         this.id = id;
@@ -56,6 +58,10 @@ public class Node {
         this.nodeType = nodeType;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public static Node createNode(Long id, String stationName, DirectionType nodeType, double latitude, double longitude) {
+        return new Node(id, stationName, nodeType, latitude, longitude);
     }
 
     @Override
