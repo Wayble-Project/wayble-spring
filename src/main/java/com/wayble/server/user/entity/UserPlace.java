@@ -23,7 +23,21 @@ public class UserPlace extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "color", length = 16)
+    private String color; // 배지/아이콘 색 (정확히 무슨 색이 있는지 몰라서 일단 자유 문자열)
+
+    @Column(name = "saved_count", nullable = false, columnDefinition = "int default 0")
+    @Builder.Default
+    private int savedCount = 0; // 리스트에 담긴 웨이블존 수
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public void increaseCount() { this.savedCount++; }
+    public void decreaseCount() { if (this.savedCount > 0) this.savedCount--; }
+
+    public void updateTitle(String title) { this.title = title; }
+    public void updateColor(String color) { this.color = color; }
 }
