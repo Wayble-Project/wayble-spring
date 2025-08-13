@@ -18,12 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users/{userId}/places")
+@RequestMapping("/api/v1/users/places")
 @RequiredArgsConstructor
 public class UserPlaceController {
 
     private final UserPlaceService userPlaceService;
-
 
     @PostMapping
     @Operation(summary = "유저 장소 저장", description = "유저가 웨이블존을 장소로 저장합니다.")
@@ -34,18 +33,9 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<String> saveUserPlace(
-            @PathVariable Long userId,
             @RequestBody @Valid UserPlaceRequestDto request
     ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication.getPrincipal() instanceof Long)) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
-        Long tokenUserId = (Long) authentication.getPrincipal();
-        if (!userId.equals(tokenUserId)) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
-
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         userPlaceService.saveUserPlace(userId, request); // userId 파라미터로 넘김
         return CommonResponse.success("장소가 저장되었습니다.");
     }
@@ -61,16 +51,8 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<List<UserPlaceListResponseDto>> getUserPlaces(
-            @PathVariable Long userId
     ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication.getPrincipal() instanceof Long)) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
-        Long tokenUserId = (Long) authentication.getPrincipal();
-        if (!userId.equals(tokenUserId)) {
-            throw new ApplicationException(UserErrorCase.FORBIDDEN);
-        }
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<UserPlaceListResponseDto> places = userPlaceService.getUserPlaces(userId);
         return CommonResponse.success(places);
     }

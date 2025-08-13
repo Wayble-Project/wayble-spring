@@ -69,16 +69,19 @@ jobs:
         run: |
           echo "🧹 Cleaning up all existing containers"
 
-          # Stop and remove specific containers
+          # Stop and remove specific containers (로그는 볼륨에 보존됨)
           sudo docker stop github-actions-demo || true
           sudo docker rm github-actions-demo || true
 
           sudo docker stop elasticsearch || true
           sudo docker rm elasticsearch || true
 
+          echo "📋 Ensuring log directory exists on host"
+          sudo mkdir -p /var/log/wayble
+          sudo chmod 755 /var/log/wayble
 
-          echo "🧯 Cleaning up unused Docker networks"
-          sudo docker system prune -f || true
+          echo "🧯 Cleaning up unused Docker networks (excluding volumes)"
+          sudo docker system prune -f --volumes=false || true
 
       - name: Create Docker network if not exists
         run: |
@@ -184,6 +187,18 @@ jobs:
             exit 1
           fi
 
+          # 로그 파일 상태 확인
+          echo "=== Log Directory Status ==="
+          ls -la /var/log/wayble/ || echo "Log directory not found"
+          
+          if [ -f "/var/log/wayble/wayble-error.log" ]; then
+            echo "✅ Error log file exists"
+            echo "📊 Error log file size: $(du -h /var/log/wayble/wayble-error.log | cut -f1)"
+            echo "📅 Last modified: $(stat -c %y /var/log/wayble/wayble-error.log)"
+          else
+            echo "ℹ️ No error log file yet (normal for new deployment)"
+          fi
+
       # ✅ 배포 성공 알림 (Discord)
       - name: Send success webhook to Discord
         if: success()
@@ -201,7 +216,6 @@ jobs:
                -X POST \
                -d "{\"content\": \"❌ EC2 배포 실패! 확인이 필요합니다.\"}" \
                ${{ secrets.DISCORD_WEBHOOK_URL }}
-
 
 
 
