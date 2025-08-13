@@ -20,7 +20,9 @@ public enum UserErrorCase implements ErrorCase {
     INVALID_BIRTH_DATE(400, 1010, "생년월일 형식이 올바르지 않습니다."),
     USER_INFO_NOT_EXISTS(404,1011, "유저 정보가 존재하지 않습니다."),
     NICKNAME_REQUIRED(400, 1012,"nickname 파라미터는 필수입니다."),
-    NICKNAME_DUPLICATED(409,1013, "이미 사용 중인 닉네임입니다.");
+    NICKNAME_DUPLICATED(409,1013, "이미 사용 중인 닉네임입니다."),
+    PLACE_NOT_FOUND(404, 1014, "저장된 장소를 찾을 수 없습니다."),
+    PLACE_MAPPING_NOT_FOUND(404, 1015, "해당 장소에 해당 웨이블존이 없습니다.");
 
     private final Integer httpStatusCode;
     private final Integer errorCode;
