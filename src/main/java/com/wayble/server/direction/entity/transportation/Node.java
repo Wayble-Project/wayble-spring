@@ -32,22 +32,23 @@ public class Node {
     private Double longitude;
 
     // 출발 edge 리스트 (정류장에서 출발)
-    @OneToMany(mappedBy = "startNode")
+    @OneToMany(mappedBy = "startNode", fetch = FetchType.LAZY)
     private List<Edge> outgoingEdges;
 
     // 도착 Edge 리스트 (정류장으로 도착)
-    @OneToMany(mappedBy = "endNode")
+    @OneToMany(mappedBy = "endNode", fetch = FetchType.LAZY)
     private List<Edge> incomingEdges;
 
     // 이 정류장이 기점/종점인 노선
-    @OneToMany(mappedBy = "startNode")
+    @OneToMany(mappedBy = "startNode", fetch = FetchType.LAZY)
     private List<Route> startRoutes;
 
-    @OneToMany(mappedBy = "endNode")
+    @OneToMany(mappedBy = "endNode", fetch = FetchType.LAZY)
     private List<Route> endRoutes;
 
-    @OneToOne(mappedBy = "node")
-    private Facility facility_id;
+    // facility_id 관계 제거 (N+1 문제 해결)
+    // @OneToOne(mappedBy = "node", fetch = FetchType.LAZY)
+    // private Facility facility_id;
 
     public Node(Long id, String stationName, DirectionType nodeType, double latitude, double longitude) {
         this.id = id;
