@@ -183,45 +183,6 @@ public class TransportationService {
         return new TransportationGraphDto(graph, weightMap);
     }
 
-    private void addNearbyWalkConnections(Map<Long, List<Edge>> graph, Map<Pair<Long, Long>, Integer> weightMap, List<Node> nodes) {
-        // 1. 각 노드별로 인근 정류장 찾기 (800m 이내, 최대 3개)
-        for (Node node1 : nodes) {
-            int connectionCount = 0;
-            List<Node> nearbyNodes = new ArrayList<>();
-            
-            for (Node node2 : nodes) {
-                if (node1.getId().equals(node2.getId())) continue;
-                if (connectionCount >= 3) break;
-                
-                double distance = haversine(
-                        node1.getLatitude(), node1.getLongitude(),
-                        node2.getLatitude(), node2.getLongitude()
-                ) * METER_CONVERSION;
-                
-                if (distance <= NEARBY_STATION_WALK_DISTANCE) {
-                    nearbyNodes.add(node2);
-                    connectionCount++;
-                }
-            }
-            
-            // 2. 거리순 정렬 후 도보 엣지 생성
-            nearbyNodes.sort(Comparator.comparingDouble(node -> 
-                    haversine(node1.getLatitude(), node1.getLongitude(), 
-                             node.getLatitude(), node.getLongitude())));
-            
-            for (Node node2 : nearbyNodes) {
-                double distance = haversine(
-                        node1.getLatitude(), node1.getLongitude(),
-                        node2.getLatitude(), node2.getLongitude()
-                ) * METER_CONVERSION;
-                
-                Edge walkEdge = Edge.createEdge(-3L, node1, node2, DirectionType.WALK);
-                graph.get(node1.getId()).add(walkEdge);
-                weightMap.put(Pair.of(node1.getId(), node2.getId()), (int)distance);
-            }
-        }
-    }
-
     private void addOriginDestinationWalkConnections(Map<Long, List<Edge>> graph, Map<Pair<Long, Long>, Integer> weightMap, List<Node> nodes, Node startTmp, Node endTmp) {
         // 1. 임시 노드 생성
         Node startNode = Node.createNode(-1L, startTmp.getStationName(), DirectionType.WALK, 
@@ -596,6 +557,7 @@ public class TransportationService {
             
             if (currentStep.mode() != DirectionType.WALK && nextStep.mode() != DirectionType.WALK) {
                 if (currentStep.mode() == nextStep.mode() && 
+                    currentStep.routeName() != null && nextStep.routeName() != null &&
                     !currentStep.routeName().equals(nextStep.routeName())) {
                     transferCount++;
                 } else if (currentStep.mode() != nextStep.mode()) {
