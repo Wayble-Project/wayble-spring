@@ -86,7 +86,7 @@ public class BusInfoService {
 
         } catch (Exception e) {
             log.error("버스 정보 조회 중 오류 발생: {}", e.getMessage());
-            return null;
+            return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
         }
 
         return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);

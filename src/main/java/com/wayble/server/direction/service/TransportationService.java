@@ -320,7 +320,7 @@ public class TransportationService {
                 List<Integer> intervals = null;
                 try {
                     if (stationId != null) {
-                        TransportationResponseDto.BusInfo busInfoData = busInfoService.getBusInfo(currentEdge.getStartNode().getStationName(), null, currentEdge.getStartNode().getLatitude(), currentEdge.getStartNode().getLongitude());
+                        TransportationResponseDto.BusInfo busInfoData = busInfoService.getBusInfo(currentEdge.getStartNode().getStationName(), currentEdge.getRoute().getRouteId(), currentEdge.getStartNode().getLatitude(), currentEdge.getStartNode().getLongitude());
                         busInfo = busInfoData;
                     }
                 } catch (Exception e) {
