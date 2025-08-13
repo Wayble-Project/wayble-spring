@@ -1,13 +1,14 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.direction.dto.TransportationRequestDto;
-import com.wayble.server.direction.dto.TransportationResponseDto;
+import com.wayble.server.direction.dto.request.TransportationRequestDto;
+import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.entity.DirectionType;
 import com.wayble.server.direction.entity.transportation.Edge;
 import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.repository.EdgeRepository;
 import com.wayble.server.direction.repository.NodeRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class TransportationService {
     private final NodeRepository nodeRepository;
     private final EdgeRepository edgeRepository;
     private final FacilityService facilityService;
+    private final BusInfoService busInfoService;
 
     private List<Node> nodes;
     private List<Edge> edges;
@@ -195,7 +197,7 @@ public class TransportationService {
                 }
 
                 // 단계 수 패널티 (경로 단계가 많을수록 불이익)
-                weight += STEP_PENALTY; // 각 단계마다 추가 비용 대폭 증가
+                weight += STEP_PENALTY;
 
                 int alt = distance.get(curr.getId()) + weight;
                 if (alt < distance.get(neighbor.getId())) {
@@ -213,7 +215,7 @@ public class TransportationService {
         Set<Long> backtrackVisited = new HashSet<>();
 
         if (distance.get(end.getId()) == Integer.MAX_VALUE) {
-            log.warn("경로를 찾을 수 없음: 도착지에 도달할 수 없음");
+            log.info("경로를 찾을 수 없음: 도착지에 도달할 수 없음");
             return steps; // 빈 리스트 반환
         }
 
@@ -249,25 +251,22 @@ public class TransportationService {
         while (i < pathEdges.size()) {
             Edge currentEdge = pathEdges.get(i);
             DirectionType currentType = currentEdge.getEdgeType();
-            String currentRouteName = (currentEdge.getRoute() != null) ? currentEdge.getRoute().getRouteName() : null;
-            TransportationResponseDto.NodeInfo currentInfo = null;
-            if (currentType == DirectionType.SUBWAY) {
-                currentInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId());
-            }
-
             
-            // 시작 노드
+            // 시작 노드 이름
             String fromName = (currentEdge.getStartNode() != null && currentEdge.getStartNode().getStationName() != null) 
                 ? currentEdge.getStartNode().getStationName() : "Unknown";
             String toName = (currentEdge.getEndNode() != null && currentEdge.getEndNode().getStationName() != null) 
                 ? currentEdge.getEndNode().getStationName() : "Unknown";
             
-            // 도보인 경우 또는 연속된 같은 노선이 없는 경우 그대로 추가
-            if (currentType == DirectionType.WALK || currentRouteName == null) {
+            // 도보 처리
+            if (currentType == DirectionType.WALK) {
                 mergedSteps.add(new TransportationResponseDto.Step(
                     currentType,
-                    currentRouteName,
-                    currentInfo,
+                    null,
+                    null,
+                    0,
+                    null,
+                    null,
                     fromName,
                     toName
                 ));
@@ -275,30 +274,89 @@ public class TransportationService {
                 continue;
             }
             
-            // 연속된 같은 노선 찾기
+            // 동일 타입 + 동일 Route 객체 그룹화
             int j = i + 1;
             while (j < pathEdges.size()) {
                 Edge nextEdge = pathEdges.get(j);
-                String nextRouteName = (nextEdge.getRoute() != null) ? nextEdge.getRoute().getRouteName() : null;
-                
-                // 같은 노선이 아니면 중단
-                if (nextEdge.getEdgeType() != currentType || 
-                    !Objects.equals(currentRouteName, nextRouteName)) {
-                    break;
-                }
+                if (nextEdge.getEdgeType() != currentType) break;
+                if (!Objects.equals(currentEdge.getRoute(), nextEdge.getRoute())) break;
                 j++;
             }
             
-            // 마지막 엣지의 도착 노드를 최종 도착지로 설정
-            if (j > i + 1) {
-                Edge lastEdge = pathEdges.get(j - 1);
-                toName = (lastEdge.getEndNode() != null) ? lastEdge.getEndNode().getStationName() : "Unknown";
+            // 그룹 마지막 엣지 기준 toName
+            Edge lastEdgeInGroup = pathEdges.get(j - 1);
+            if (lastEdgeInGroup.getEndNode() != null && lastEdgeInGroup.getEndNode().getStationName() != null) {
+                toName = lastEdgeInGroup.getEndNode().getStationName();
             }
+            
+            // moveInfo: 중간 정류장만
+            List<TransportationResponseDto.MoveInfo> moveInfoList = new ArrayList<>();
+            for (int k = i + 1; k < j; k++) {
+                Edge e = pathEdges.get(k);
+                if (e.getStartNode() != null && e.getStartNode().getStationName() != null) {
+                    moveInfoList.add(new TransportationResponseDto.MoveInfo(e.getStartNode().getStationName()));
+                }
+            }
+            if (moveInfoList.isEmpty()) moveInfoList = null;
+            
+            // routeName
+            String routeName = null;
+            for (int k = i; k < j; k++) {
+                Edge e = pathEdges.get(k);
+                if (e.getRoute() != null && e.getRoute().getRouteName() != null) {
+                    routeName = e.getRoute().getRouteName();
+                    break;
+                }
+            }
+            
+            // busInfo / subwayInfo 설정
+            TransportationResponseDto.BusInfo busInfo = null;
+            TransportationResponseDto.SubwayInfo subwayInfo = null;
+            if (currentType == DirectionType.BUS) {
+                boolean isShuttle = routeName != null && routeName.contains("마포"); // 마을버스 구분
+
+                Long stationId = currentEdge.getStartNode() != null ? currentEdge.getStartNode().getId() : null;
+                List<Boolean> lowFloors = null;
+                List<Integer> intervals = null;
+                try {
+                    if (stationId != null) {
+                        TransportationResponseDto.BusInfo busInfoData = busInfoService.getBusInfo(currentEdge.getStartNode().getStationName(), currentEdge.getRoute().getRouteId(), currentEdge.getStartNode().getLatitude(), currentEdge.getStartNode().getLongitude());
+                        busInfo = busInfoData;
+                    }
+                } catch (Exception e) {
+                    log.error("버스 정보 조회 실패: {}", e.getMessage(), e);
+                }
+            } 
+            else if (currentType == DirectionType.SUBWAY) {
+                Long stationId = currentEdge.getStartNode() != null ? currentEdge.getStartNode().getId() : null;
+                try {
+                    if (stationId != null) {
+                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(stationId);
+                        subwayInfo = new TransportationResponseDto.SubwayInfo(
+                            nodeInfo.wheelchair(),
+                            nodeInfo.elevator(),
+                            nodeInfo.accessibleRestroom()
+                        );
+                    }
+                } catch (Exception e) {
+                    log.warn("지하철역 시설 정보 조회 실패. 역 ID {}: {}", stationId, e.getMessage());
+                    subwayInfo = new TransportationResponseDto.SubwayInfo(
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        false
+                    );
+                }
+            }
+            
+            int moveNumber = j - i - 1;
             
             mergedSteps.add(new TransportationResponseDto.Step(
                 currentType,
-                currentRouteName,
-                currentInfo,
+                moveInfoList,
+                routeName,
+                moveNumber,
+                busInfo,
+                subwayInfo,
                 fromName,
                 toName
             ));

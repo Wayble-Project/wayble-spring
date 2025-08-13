@@ -2,6 +2,7 @@ package com.wayble.server;
 
 import com.wayble.server.common.client.tmap.TMapProperties;
 import com.wayble.server.direction.external.kric.KricProperties;
+import com.wayble.server.direction.external.opendata.OpenDataProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRepositoriesAutoConfiguration;
@@ -16,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 )
 @EnableJpaAuditing
 @EnableScheduling
-@EnableConfigurationProperties({TMapProperties.class, KricProperties.class})
+@EnableConfigurationProperties({TMapProperties.class, KricProperties.class, OpenDataProperties.class})
 @EnableElasticsearchRepositories(basePackages = {"com.wayble.server.explore.repository", "com.wayble.server.logging.repository", "com.wayble.server.direction.repository"})
 @EntityScan(basePackages = "com.wayble.server")
 public class ServerApplication {
