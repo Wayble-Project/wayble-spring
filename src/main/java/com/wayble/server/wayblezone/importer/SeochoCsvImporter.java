@@ -29,7 +29,7 @@ import java.util.Map;
 import static com.wayble.server.wayblezone.importer.CsvSupport.*;
 
 @Slf4j
-@Profile("develop")
+@Profile("local")
 @Component
 @RequiredArgsConstructor
 public class SeochoCsvImporter implements CommandLineRunner {
