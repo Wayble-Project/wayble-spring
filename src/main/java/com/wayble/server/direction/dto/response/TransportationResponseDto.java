@@ -8,9 +8,14 @@ import java.util.List;
 
 @Schema(description = "대중교통 길찾기 응답 DTO")
 public record TransportationResponseDto(
-        List<Step> routes,
+        List<Route> routes,
         PageInfo pageInfo
 ) {
+    public record Route(
+            Integer routeIndex, // 경로 인덱스
+            List<Step> steps // 해당 경로의 단계들
+    ) {}
+
     public record Step(
             DirectionType mode, // 예: START, WALK, SUBWAY, BUS, FINISH
             @Nullable List<MoveInfo> moveInfo, // 같은 Step으로 이동한 정류장(Node) 정보 (중간 정류장만)
