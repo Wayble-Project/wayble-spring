@@ -2,9 +2,11 @@ package com.wayble.server.wayblezone.importer;
 
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.wayblezone.entity.WaybleZoneType;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Locale;
 
+@Slf4j
 public final class CsvSupport {
     private CsvSupport() {}
 
