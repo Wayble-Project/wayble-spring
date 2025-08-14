@@ -1,4 +1,4 @@
-package com.wayble.server.direction.dto;
+package com.wayble.server.direction.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
