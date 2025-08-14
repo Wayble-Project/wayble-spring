@@ -67,6 +67,14 @@ public class WaybleZoneSearchController {
         ));
     }
 
+    @GetMapping("/validate")
+    public CommonResponse<WaybleZoneSearchResponseDto> findIsValidWaybleZone(
+            @Valid @ModelAttribute WaybleZoneSearchConditionDto conditionDto
+    )
+    {
+        return CommonResponse.success(waybleZoneSearchService.isValidWaybleZone(conditionDto));
+    }
+
     @PostMapping("")
     public CommonResponse<String> registerDocumentFromDto(@RequestBody WaybleZoneRegisterDto registerDto) {
         waybleZoneDocumentService.saveDocumentFromDto(registerDto);

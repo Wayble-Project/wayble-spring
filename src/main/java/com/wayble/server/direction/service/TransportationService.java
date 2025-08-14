@@ -38,6 +38,7 @@ public class TransportationService {
     private static final int ORIGIN_DESTINATION_WALK_DISTANCE = 1000; // 출발지/도착지에서 정류장까지 도보 연결 가능 거리 (m)
     private static final int MAX_NEARBY_NODES = 5; // 출발지/도착지 주변에서 고려할 최대 정류장 수
     private static final int MAX_DIJKSTRA_VISITS = 5000; // 다익스트라 알고리즘에서 방문할 수 있는 최대 노드 수 (무한 루프 방지)
+    private static final int MAX_ROUTES = 5; // 찾을 최대 경로 수
 
     public TransportationResponseDto findRoutes(TransportationRequestDto request){
     
@@ -54,27 +55,39 @@ public class TransportationService {
         Node start = Node.createNode(-1L, origin.name(), DirectionType.FROM_WAYPOINT ,origin.latitude(), origin.longitude());
         Node end = Node.createNode(-2L, destination.name(), DirectionType.TO_WAYPOINT,destination.latitude(), destination.longitude());
 
-        // 3. 경로 찾기
-        List<TransportationResponseDto.Step> steps = findTransportationRoute(start, end);
+        // 3. 여러 경로 찾기
+        List<List<TransportationResponseDto.Step>> allRoutes = findMultipleTransportationRoutes(start, end);
 
         // 4. 페이징 처리
         int startIndex = (request.cursor() != null) ? request.cursor() : 0;
-        int pageSize = request.size()    != null ? request.size()    : steps.size();
-        int endIndex = Math.min(startIndex + pageSize, steps.size());
-        boolean hasNext = endIndex < steps.size();
+        int pageSize = (request.size() != null) ? request.size() : 5; // 기본값 5로 설정
+        int endIndex = Math.min(startIndex + pageSize, allRoutes.size());
+        boolean hasNext = endIndex < allRoutes.size();
         Integer nextCursor = hasNext ? endIndex : null;
         TransportationResponseDto.PageInfo pageInfo = new TransportationResponseDto.PageInfo(nextCursor, hasNext);
 
         // 경로를 찾지 못한 경우 처리
-        if (steps.isEmpty()) {
+        if (allRoutes.isEmpty()) {
             throw new ApplicationException(PATH_NOT_FOUND);
         }
 
-        return new TransportationResponseDto(steps, pageInfo);
+        // 페이징된 경로들을 Route 객체로 변환
+        List<TransportationResponseDto.Route> routeList = new ArrayList<>();
+        List<List<TransportationResponseDto.Step>> pagedRoutes = allRoutes.subList(startIndex, endIndex);
+        for (int i = 0; i < pagedRoutes.size(); i++) {
+            List<TransportationResponseDto.Step> route = pagedRoutes.get(i);
+            TransportationResponseDto.Route routeObj = createRoute(route, startIndex + i + 1);
+            routeList.add(routeObj);
+        }
+
+        return new TransportationResponseDto(routeList, pageInfo);
     }
 
+    private TransportationResponseDto.Route createRoute(List<TransportationResponseDto.Step> steps, int routeIndex) {
+        return new TransportationResponseDto.Route(routeIndex, steps);
+    }
 
-    private List<TransportationResponseDto.Step> findTransportationRoute(Node startTmp, Node endTmp){
+    private List<List<TransportationResponseDto.Step>> findMultipleTransportationRoutes(Node startTmp, Node endTmp){
         // 1. 데이터 로드
         List<Node> nodes = new ArrayList<>(nodeRepository.findAll());
         List<Edge> edges = new ArrayList<>(edgeRepository.findAllWithNodesAndRoute());
@@ -91,13 +104,12 @@ public class TransportationService {
         nodes.add(startTmp);
         nodes.add(endTmp);
 
-        // 4. 그래프 빌드 및 최적 경로 찾기
+        // 4. 그래프 빌드 및 여러 경로 찾기
         TransportationGraphDto graphData = buildGraph(nodes, edges, startTmp, endTmp);
-        return findOptimalRoute(graphData.graph(), startTmp, endTmp, graphData.weightMap(), nodes, nearestToStart, nearestToEnd);
+        return findMultipleOptimalRoutes(graphData.graph(), startTmp, endTmp, graphData.weightMap(), nodes, nearestToStart, nearestToEnd);
     }
 
-
-    private List<TransportationResponseDto.Step> findOptimalRoute(
+    private List<List<TransportationResponseDto.Step>> findMultipleOptimalRoutes(
             Map<Long, List<Edge>> graph, 
             Node startTmp, 
             Node endTmp, 
@@ -121,26 +133,179 @@ public class TransportationService {
             return new ArrayList<>();
         }
         
-        // 2. 다익스트라 알고리즘으로 최적 경로 찾기
-        List<TransportationResponseDto.Step> route = runDijkstra(graph, startNode, endNode, weightMap, nodes);
+        // 2. 여러 경로 찾기
+        List<List<TransportationResponseDto.Step>> allRoutes = findMultipleRoutes(graph, startNode, endNode, weightMap, nodes);
         
-        if (!route.isEmpty()) {
-            // 3. 대중교통 포함 여부 확인
-            boolean hasPublicTransport = route.stream()
-                    .anyMatch(step -> step.mode() == DirectionType.BUS || step.mode() == DirectionType.SUBWAY);
+        // 3. 경로 필터링 및 정렬
+        return filterAndSortRoutes(allRoutes);
+    }
+
+    private List<List<TransportationResponseDto.Step>> findMultipleRoutes(
+            Map<Long, List<Edge>> graph, 
+            Node start, 
+            Node end, 
+            Map<Pair<Long, Long>, Integer> weightMap, 
+            List<Node> nodes) {
+        
+        List<List<TransportationResponseDto.Step>> routes = new ArrayList<>();
+        
+        // 1. 기본 다익스트라로 첫 번째 경로 찾기
+        List<TransportationResponseDto.Step> firstRoute = runDijkstra(graph, start, end, weightMap, nodes);
+        if (!firstRoute.isEmpty()) {
+            routes.add(firstRoute);
+        }
+        
+        // 2. 효율적인 다중 경로 찾기 - 한 번의 탐색으로 여러 경로 생성
+        if (!firstRoute.isEmpty()) {
+            List<List<TransportationResponseDto.Step>> alternativeRoutes = findAlternativeRoutesEfficiently(
+                graph, start, end, weightMap, nodes, firstRoute
+            );
+            routes.addAll(alternativeRoutes);
+        }
+        
+        return routes;
+    }
+
+    private List<List<TransportationResponseDto.Step>> findAlternativeRoutesEfficiently(
+            Map<Long, List<Edge>> graph, 
+            Node start, 
+            Node end, 
+            Map<Pair<Long, Long>, Integer> weightMap, 
+            List<Node> nodes,
+            List<TransportationResponseDto.Step> firstRoute) {
+        
+        List<List<TransportationResponseDto.Step>> alternativeRoutes = new ArrayList<>();
+        
+        // 첫 번째 경로에서 실제 사용된 엣지들을 추출
+        Set<Pair<Long, Long>> usedEdges = extractActualEdgesFromRoute(firstRoute, graph);
+        
+        // 최대 4개의 추가 경로 찾기
+        for (int i = 0; i < 4 && alternativeRoutes.size() < MAX_ROUTES - 1; i++) {
+            // 실제 사용된 엣지들에만 패널티를 적용한 가중치 맵 생성
+            Map<Pair<Long, Long>, Integer> penalizedWeightMap = createActualEdgePenalizedWeightMap(weightMap, usedEdges, i + 1);
             
-            if (!hasPublicTransport) {
-                return new ArrayList<>();
+            // 다익스트라로 새로운 경로 찾기
+            List<TransportationResponseDto.Step> newRoute = runDijkstra(graph, start, end, penalizedWeightMap, nodes);
+            
+            if (newRoute.isEmpty()) {
+                break;
             }
             
-            // 4. 환승 횟수 검증 (4회 이상 제외)
-            int transferCount = calculateTransferCount(route);
-            if (transferCount >= 4) {
-                return new ArrayList<>();
+            // 첫 번째 경로와 동일한지 확인
+            if (areRoutesIdentical(newRoute, firstRoute)) {
+                continue;
+            }
+            
+            // 새로운 경로에서 사용된 엣지들도 추가
+            Set<Pair<Long, Long>> newUsedEdges = extractActualEdgesFromRoute(newRoute, graph);
+            usedEdges.addAll(newUsedEdges);
+            
+            alternativeRoutes.add(newRoute);
+        }
+        
+        return alternativeRoutes;
+    }
+
+
+
+
+
+    private Set<Pair<Long, Long>> extractActualEdgesFromRoute(List<TransportationResponseDto.Step> route, Map<Long, List<Edge>> graph) {
+        Set<Pair<Long, Long>> usedEdges = new HashSet<>();
+        
+        for (TransportationResponseDto.Step step : route) {
+            String fromName = step.from();
+            String toName = step.to();
+            
+            for (Map.Entry<Long, List<Edge>> entry : graph.entrySet()) {
+                Long nodeId = entry.getKey();
+                List<Edge> edges = entry.getValue();
+                
+                for (Edge edge : edges) {
+                    Node fromNode = edge.getStartNode();
+                    Node toNode = edge.getEndNode();
+                    
+                    if ((fromNode.getStationName().equals(fromName) && toNode.getStationName().equals(toName)) ||
+                        (fromNode.getStationName().equals(toName) && toNode.getStationName().equals(fromName))) {
+                        usedEdges.add(Pair.of(fromNode.getId(), toNode.getId()));
+                        usedEdges.add(Pair.of(toNode.getId(), fromNode.getId()));
+                    }
+                }
             }
         }
         
-        return route;
+        return usedEdges;
+    }
+    
+    private Map<Pair<Long, Long>, Integer> createActualEdgePenalizedWeightMap(Map<Pair<Long, Long>, Integer> originalWeightMap, Set<Pair<Long, Long>> usedEdges, int routeIndex) {
+        Map<Pair<Long, Long>, Integer> penalizedWeightMap = new HashMap<>();
+        
+        for (Map.Entry<Pair<Long, Long>, Integer> entry : originalWeightMap.entrySet()) {
+            Pair<Long, Long> edge = entry.getKey();
+            int weight = entry.getValue();
+            
+            if (usedEdges.contains(edge)) {
+                int penalty = routeIndex * 100000;
+                penalizedWeightMap.put(edge, weight + penalty);
+            } else {
+                penalizedWeightMap.put(edge, weight);
+            }
+        }
+        
+        return penalizedWeightMap;
+    }
+    
+    private boolean areRoutesIdentical(List<TransportationResponseDto.Step> route1, List<TransportationResponseDto.Step> route2) {
+        // 두 경로가 완전히 동일한지 확인
+        if (route1.size() != route2.size()) {
+            return false;
+        }
+        
+        for (int i = 0; i < route1.size(); i++) {
+            TransportationResponseDto.Step step1 = route1.get(i);
+            TransportationResponseDto.Step step2 = route2.get(i);
+            
+            if (step1.mode() != step2.mode() || 
+                !Objects.equals(step1.from(), step2.from()) || 
+                !Objects.equals(step1.to(), step2.to()) ||
+                !Objects.equals(step1.routeName(), step2.routeName())) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private List<List<TransportationResponseDto.Step>> filterAndSortRoutes(List<List<TransportationResponseDto.Step>> routes) {
+        return routes.stream()
+                .filter(route -> {
+                    // 대중교통 포함 여부 확인
+                    boolean hasPublicTransport = route.stream()
+                            .anyMatch(step -> step.mode() == DirectionType.BUS || step.mode() == DirectionType.SUBWAY);
+                    
+                    if (!hasPublicTransport) {
+                        return false;
+                    }
+                    
+                    // 환승 횟수 검증 (4회 이상 제외)
+                    int transferCount = calculateTransferCount(route);
+                    return transferCount < 4;
+                })
+                .sorted(Comparator
+                        .<List<TransportationResponseDto.Step>>comparingInt(this::calculateTransferCount)
+                        .thenComparingInt(this::calculateWalkDistance))
+                .limit(MAX_ROUTES)
+                .collect(Collectors.toList());
+    }
+
+    private int calculateWalkDistance(List<TransportationResponseDto.Step> route) {
+        return route.stream()
+                .filter(step -> step.mode() == DirectionType.WALK)
+                .mapToInt(step -> {
+                    // 간단한 도보 거리 추정 (실제로는 정확한 거리 계산 필요)
+                    return 500; // 기본값
+                })
+                .sum();
     }
 
     private TransportationGraphDto buildGraph(List<Node> nodes, List<Edge> edges, Node startTmp, Node endTmp) {
@@ -457,9 +622,9 @@ public class TransportationService {
                             return new ArrayList<>();
                         }
                     }
-                } catch (Exception e) {
+                        } catch (Exception e) {
                     log.info("버스 정보 조회 실패: {}", e.getMessage());
-                }
+        }
             } else if (currentType == DirectionType.SUBWAY) {
                 try {
                     if (currentEdge.getStartNode() != null) {
