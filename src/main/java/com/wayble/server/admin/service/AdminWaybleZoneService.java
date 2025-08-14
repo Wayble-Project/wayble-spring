@@ -2,6 +2,7 @@ package com.wayble.server.admin.service;
 
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneNavigationDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZonePageDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneUpdateDto;
@@ -57,6 +58,10 @@ public class AdminWaybleZoneService {
 
     public Optional<AdminWaybleZoneDetailDto> findWaybleZoneById(Long waybleZoneId) {
         return adminWaybleZoneRepository.findAdminWaybleZoneDetailById(waybleZoneId);
+    }
+    
+    public AdminWaybleZoneNavigationDto getNavigationInfo(Long currentId) {
+        return adminWaybleZoneRepository.getNavigationInfo(currentId);
     }
     
     @Transactional
