@@ -126,7 +126,8 @@ WAYBLE은 장애인·교통약자 사용자를 위해 맞춤형 경로 탐색, �
 <br><br>
 
 ## 🗃️데이터베이스 구조
-<img width="1576" height="749" alt="웨이블erd" src="https://github.com/user-attachments/assets/811142b1-a541-4ccc-b6bc-da17dbc50fb6" />
+<img width="920" height="443" alt="image" src="https://github.com/user-attachments/assets/2e9969cf-1ab1-4502-a262-285c3daf142c" />
+
 
 <br><br>
 
