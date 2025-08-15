@@ -65,7 +65,12 @@ public class FacilityService {
                 if (stinCd != null && railOprLsttCd != null && lnCd != null) {
                     Map<String, Boolean> toiletInfo = getToiletInfo(facility);
                     accessibleRestroom = toiletInfo.getOrDefault(stinCd, false);
+                } else {
+                    log.error("Facility 정보 누락 - nodeId: {}, stinCd: {}, railOprLsttCd: {}, lnCd: {}", 
+                        nodeId, stinCd, railOprLsttCd, lnCd);
                 }
+            } else {
+                log.error("Facility 정보 없음 - nodeId: {}", nodeId);
             }
         }
 
@@ -101,8 +106,12 @@ public class FacilityService {
             }
             
             items = response.body();
+            if (items == null) {
+                return new HashMap<>();
+            }
         } catch(Exception e) {
-            log.error("KRIC API 호출 실패: {}", e.getMessage());
+            log.error("KRIC API 호출 실패 - stinCd: {}, railOprIsttCd: {}, lnCd: {}, error: {}", 
+                facility.getStinCd(), facility.getRailOprLsttCd(), facility.getLnCd(), e.getMessage(), e);
             return new HashMap<>();
         }
 
