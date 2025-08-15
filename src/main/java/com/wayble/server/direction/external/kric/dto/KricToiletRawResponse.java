@@ -3,5 +3,5 @@ package com.wayble.server.direction.external.kric.dto;
 import java.util.List;
 
 public record KricToiletRawResponse(
-        KricToiletRawBody body
+        List<KricToiletRawItem> body
 ) {}

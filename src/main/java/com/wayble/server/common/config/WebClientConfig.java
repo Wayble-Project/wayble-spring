@@ -31,6 +31,7 @@ public class WebClientConfig {
     public WebClient kricWebClient() {
         return WebClient.builder()
                 .baseUrl(kricProperties.baseUrl())
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
                 .build();
     }
 }
