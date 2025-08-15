@@ -20,12 +20,19 @@ public interface UserPlaceWaybleZoneMappingRepository extends JpaRepository<User
     void deleteByUserPlace_IdAndWaybleZone_Id(Long placeId, Long zoneId);
 
     // 리스트 내부 웨이블존 조회 (페이징 포함)
-    @Query("""
-           select m.waybleZone
-           from UserPlaceWaybleZoneMapping m
-           where m.userPlace.id = :placeId
-           order by m.id desc
-           """)
+    @Query(
+            value = """
+          select m.waybleZone
+          from UserPlaceWaybleZoneMapping m
+          where m.userPlace.id = :placeId
+          order by m.id desc
+          """,
+            countQuery = """
+          select count(m)
+          from UserPlaceWaybleZoneMapping m
+          where m.userPlace.id = :placeId
+          """
+    )
     Page<WaybleZone> findZonesByPlaceId(@Param("placeId") Long placeId, Pageable pageable);
 
 
