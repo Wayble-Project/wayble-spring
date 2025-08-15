@@ -38,9 +38,7 @@ public class ReviewController {
     public CommonResponse<String> registerReview(
             @PathVariable Long waybleZoneId,
             @RequestBody @Valid ReviewRegisterDto dto,
-
-            // TODO: 로그인 구현 후 Authorization 헤더 필수로 변경 필요
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
+            @RequestHeader("Authorization") String authorizationHeader
     ) {
         reviewService.registerReview(waybleZoneId, dto, authorizationHeader);
         return CommonResponse.success("리뷰가 등록되었습니다.");
