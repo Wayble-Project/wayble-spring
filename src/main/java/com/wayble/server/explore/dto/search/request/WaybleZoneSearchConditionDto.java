@@ -19,7 +19,6 @@ public record WaybleZoneSearchConditionDto(
         @NotNull(message = "경도 입력은 필수입니다.")
         Double longitude,
 
-        @DecimalMin(value = "0.1", message = "검색 반경은 100미터 이상이어야 합니다.")
         Double radiusKm,
 
         @Size(min = 2, message = "zoneName은 최소 2글자 이상이어야 합니다.")
