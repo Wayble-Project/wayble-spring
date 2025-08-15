@@ -277,7 +277,7 @@ public class TransportationService {
     }
 
     private List<List<TransportationResponseDto.Step>> filterAndSortRoutes(List<List<TransportationResponseDto.Step>> routes) {
-        return routes.stream()
+                return routes.stream()
                 .filter(route -> {
                     // 대중교통 포함 여부 확인
                     boolean hasPublicTransport = route.stream()
@@ -287,9 +287,9 @@ public class TransportationService {
                         return false;
                     }
                     
-                    // 환승 횟수 검증 (4회 이상 제외)
+                    // 환승 횟수 검증 (3회 이상 제외)
                     int transferCount = calculateTransferCount(route);
-                    return transferCount < 4;
+                    return transferCount < 3;
                 })
                 .sorted(Comparator
                         .<List<TransportationResponseDto.Step>>comparingInt(this::calculateTransferCount)
@@ -590,8 +590,20 @@ public class TransportationService {
             String toName = getNodeName(pathEdges.get(j - 1).getEndNode());
             
             if (currentType == DirectionType.WALK) {
+                int walkDistance = 0; // 미터 단위
+                Node walkStartNode = pathEdges.get(i).getStartNode();
+                Node walkEndNode = pathEdges.get(j - 1).getEndNode();
+                
+                if (walkStartNode != null && walkEndNode != null) {
+                    double distanceKm = haversine(
+                        walkStartNode.getLatitude(), walkStartNode.getLongitude(),
+                        walkEndNode.getLatitude(), walkEndNode.getLongitude()
+                    );
+                    walkDistance = (int) (distanceKm * 1000); // km를 m로 변환
+                }
+                
                 mergedSteps.add(new TransportationResponseDto.Step(
-                    DirectionType.WALK, null, null, 0, null, null, fromName, toName
+                    DirectionType.WALK, null, null, walkDistance, null, null, fromName, toName
                 ));
                 i = j;
                 continue;
@@ -623,20 +635,27 @@ public class TransportationService {
                         }
                     }
                         } catch (Exception e) {
-                    log.info("버스 정보 조회 실패: {}", e.getMessage());
-        }
+                            log.error("버스 정보 조회 실패: {}", e.getMessage());
+                        }
             } else if (currentType == DirectionType.SUBWAY) {
                 try {
                     if (currentEdge.getStartNode() != null) {
-                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId());
+                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId(), currentEdge.getRoute().getRouteId());
+                        
                         subwayInfo = new TransportationResponseDto.SubwayInfo(
                             nodeInfo.wheelchair(), 
                             nodeInfo.elevator(), 
                             nodeInfo.accessibleRestroom()
                         );
+                    } else {
+                        subwayInfo = new TransportationResponseDto.SubwayInfo(
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            false
+                        );
                     }
                 } catch (Exception e) {
-                    log.info("지하철 정보 조회 실패: {}", e.getMessage());
+                    log.error("지하철 정보 조회 실패: {}", e.getMessage());
                     subwayInfo = new TransportationResponseDto.SubwayInfo(
                         new ArrayList<>(),
                         new ArrayList<>(),
@@ -716,18 +735,26 @@ public class TransportationService {
 
     private int calculateTransferCount(List<TransportationResponseDto.Step> steps) {
         int transferCount = 0;
-        for (int i = 0; i < steps.size() - 1; i++) {
-            TransportationResponseDto.Step currentStep = steps.get(i);
-            TransportationResponseDto.Step nextStep = steps.get(i + 1);
-            
-            if (currentStep.mode() != DirectionType.WALK && nextStep.mode() != DirectionType.WALK) {
-                if (currentStep.mode() == nextStep.mode() && 
-                    currentStep.routeName() != null && nextStep.routeName() != null &&
-                    !currentStep.routeName().equals(nextStep.routeName())) {
-                    transferCount++;
-                } else if (currentStep.mode() != nextStep.mode()) {
-                    transferCount++;
+        DirectionType previousMode = null;
+        String previousRouteName = null;
+        
+        for (TransportationResponseDto.Step step : steps) {
+            if (step.mode() != DirectionType.WALK && step.mode() != DirectionType.FROM_WAYPOINT && step.mode() != DirectionType.TO_WAYPOINT) {
+                if (previousMode != null) {
+                    if (previousMode == step.mode() && 
+                        previousRouteName != null && step.routeName() != null &&
+                        !previousRouteName.equals(step.routeName())) {
+                        transferCount++;
+                    } else if (previousMode == step.mode() && 
+                        previousRouteName != null && step.routeName() != null &&
+                        previousRouteName.equals(step.routeName())) {
+                        transferCount++;
+                    } else if (previousMode != step.mode()) {
+                        transferCount++;
+                    }
                 }
+                previousMode = step.mode();
+                previousRouteName = step.routeName();
             }
         }
         return transferCount;
