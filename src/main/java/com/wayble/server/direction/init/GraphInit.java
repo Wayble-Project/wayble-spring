@@ -40,7 +40,7 @@ public class GraphInit {
 
         try {
             // 그래프
-            try (InputStream graphStream = getClass().getResourceAsStream("/seocho_pedestrian.json")) {
+            try (InputStream graphStream = getClass().getResourceAsStream("/seocho_gongdeok_pedestrian.json")) {
                 if (graphStream == null) {
                     throw new ApplicationException(WalkingErrorCase.GRAPH_FILE_NOT_FOUND);
                 }

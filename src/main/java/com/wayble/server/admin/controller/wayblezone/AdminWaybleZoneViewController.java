@@ -2,6 +2,7 @@ package com.wayble.server.admin.controller.wayblezone;
 
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneCreateDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneNavigationDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZonePageDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneUpdateDto;
 import com.wayble.server.admin.service.AdminWaybleZoneService;
@@ -58,10 +59,14 @@ public class AdminWaybleZoneViewController {
             return "redirect:/admin/wayblezone/wayble-zones?error=notfound";
         }
 
+        // 이전/다음 네비게이션 정보 추가
+        AdminWaybleZoneNavigationDto navigation = adminWaybleZoneService.getNavigationInfo(id);
+
         model.addAttribute("waybleZone", waybleZoneOpt.get());
+        model.addAttribute("navigation", navigation);
         model.addAttribute("adminUsername", session.getAttribute("adminUsername"));
 
-        log.debug("웨이블존 상세 조회 - ID: {}", id);
+        log.debug("웨이블존 상세 조회 - ID: {}, 이전ID: {}, 다음ID: {}", id, navigation.previousId(), navigation.nextId());
 
         return "admin/wayblezone/wayble-zone-detail";
     }
