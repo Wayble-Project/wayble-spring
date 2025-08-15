@@ -287,9 +287,9 @@ public class TransportationService {
                         return false;
                     }
                     
-                    // 환승 횟수 검증 (4회 이상 제외)
+                    // 환승 횟수 검증 (3회 이상 제외)
                     int transferCount = calculateTransferCount(route);
-                    return transferCount < 4;
+                    return transferCount < 3;
                 })
                 .sorted(Comparator
                         .<List<TransportationResponseDto.Step>>comparingInt(this::calculateTransferCount)
@@ -723,18 +723,22 @@ public class TransportationService {
 
     private int calculateTransferCount(List<TransportationResponseDto.Step> steps) {
         int transferCount = 0;
-        for (int i = 0; i < steps.size() - 1; i++) {
-            TransportationResponseDto.Step currentStep = steps.get(i);
-            TransportationResponseDto.Step nextStep = steps.get(i + 1);
-            
-            if (currentStep.mode() != DirectionType.WALK && nextStep.mode() != DirectionType.WALK) {
-                if (currentStep.mode() == nextStep.mode() && 
-                    currentStep.routeName() != null && nextStep.routeName() != null &&
-                    !currentStep.routeName().equals(nextStep.routeName())) {
-                    transferCount++;
-                } else if (currentStep.mode() != nextStep.mode()) {
-                    transferCount++;
+        DirectionType previousMode = null;
+        String previousRouteName = null;
+        
+        for (TransportationResponseDto.Step step : steps) {
+            if (step.mode() != DirectionType.WALK && step.mode() != DirectionType.FROM_WAYPOINT && step.mode() != DirectionType.TO_WAYPOINT) {
+                if (previousMode != null) {
+                    if (previousMode == step.mode() && 
+                        previousRouteName != null && step.routeName() != null &&
+                        !previousRouteName.equals(step.routeName())) {
+                        transferCount++;
+                    } else if (previousMode != step.mode()) {
+                        transferCount++;
+                    }
                 }
+                previousMode = step.mode();
+                previousRouteName = step.routeName();
             }
         }
         return transferCount;
