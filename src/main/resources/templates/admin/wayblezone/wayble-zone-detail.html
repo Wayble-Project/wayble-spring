@@ -72,6 +72,43 @@
                     </div>
                 </div>
                 <div class="flex space-x-3">
+                    <!-- 이전/다음 네비게이션 버튼 -->
+                    <div class="flex space-x-2 mr-4">
+                        <a th:if="${navigation.previousId != null}" 
+                           th:href="@{/admin/wayble-zones/{id}(id=${navigation.previousId})}"
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
+                           title="이전 웨이블존">
+                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            이전
+                        </a>
+                        <span th:unless="${navigation.previousId != null}" 
+                              class="bg-gray-50 text-gray-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center cursor-not-allowed">
+                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            이전
+                        </span>
+                        
+                        <a th:if="${navigation.nextId != null}" 
+                           th:href="@{/admin/wayble-zones/{id}(id=${navigation.nextId})}"
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
+                           title="다음 웨이블존">
+                            다음
+                            <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <span th:unless="${navigation.nextId != null}" 
+                              class="bg-gray-50 text-gray-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center cursor-not-allowed">
+                            다음
+                            <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                    
                     <a th:href="@{/admin/wayble-zones/{id}/edit(id=${waybleZone.zoneId})}" 
                        class="bg-wayble-blue hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium inline-flex items-center">
                         <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
