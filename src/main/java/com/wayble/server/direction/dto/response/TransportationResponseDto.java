@@ -20,7 +20,7 @@ public record TransportationResponseDto(
             DirectionType mode, // 예: START, WALK, SUBWAY, BUS, FINISH
             @Nullable List<MoveInfo> moveInfo, // 같은 Step으로 이동한 정류장(Node) 정보 (중간 정류장만)
             @Nullable String routeName,
-            Integer moveNumber, // 같은 Step(route)로 이동한 횟수
+            Integer moveNumber, // 같은 Step(route)로 이동한 횟수 또는 WALK step의 경우 거리(미터 단위)
             @Nullable BusInfo busInfo, // 버스일 경우에만 생성, 이외의 경우 null
             @Nullable SubwayInfo subwayInfo, // 지하철일 경우에만 생성, 이외의 경우 null
             String from,

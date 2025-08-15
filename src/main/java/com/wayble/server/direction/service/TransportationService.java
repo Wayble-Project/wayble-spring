@@ -277,7 +277,7 @@ public class TransportationService {
     }
 
     private List<List<TransportationResponseDto.Step>> filterAndSortRoutes(List<List<TransportationResponseDto.Step>> routes) {
-        return routes.stream()
+                return routes.stream()
                 .filter(route -> {
                     // 대중교통 포함 여부 확인
                     boolean hasPublicTransport = route.stream()
@@ -590,8 +590,20 @@ public class TransportationService {
             String toName = getNodeName(pathEdges.get(j - 1).getEndNode());
             
             if (currentType == DirectionType.WALK) {
+                int walkDistance = 0; // 미터 단위
+                Node walkStartNode = pathEdges.get(i).getStartNode();
+                Node walkEndNode = pathEdges.get(j - 1).getEndNode();
+                
+                if (walkStartNode != null && walkEndNode != null) {
+                    double distanceKm = haversine(
+                        walkStartNode.getLatitude(), walkStartNode.getLongitude(),
+                        walkEndNode.getLatitude(), walkEndNode.getLongitude()
+                    );
+                    walkDistance = (int) (distanceKm * 1000); // km를 m로 변환
+                }
+                
                 mergedSteps.add(new TransportationResponseDto.Step(
-                    DirectionType.WALK, null, null, 0, null, null, fromName, toName
+                    DirectionType.WALK, null, null, walkDistance, null, null, fromName, toName
                 ));
                 i = j;
                 continue;
@@ -732,6 +744,10 @@ public class TransportationService {
                     if (previousMode == step.mode() && 
                         previousRouteName != null && step.routeName() != null &&
                         !previousRouteName.equals(step.routeName())) {
+                        transferCount++;
+                    } else if (previousMode == step.mode() && 
+                        previousRouteName != null && step.routeName() != null &&
+                        previousRouteName.equals(step.routeName())) {
                         transferCount++;
                     } else if (previousMode != step.mode()) {
                         transferCount++;
