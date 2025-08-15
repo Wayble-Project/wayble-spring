@@ -3,6 +3,7 @@ package com.wayble.server.admin.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneDetailDto;
+import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneNavigationDto;
 import com.wayble.server.admin.dto.wayblezone.AdminWaybleZoneThumbnailDto;
 import com.wayble.server.common.entity.Address;
 import com.wayble.server.wayblezone.entity.WaybleZone;
@@ -101,5 +102,24 @@ public class AdminWaybleZoneRepositoryImpl implements AdminWaybleZoneRepositoryC
         );
 
         return Optional.of(detailDto);
+    }
+
+    @Override
+    public AdminWaybleZoneNavigationDto getNavigationInfo(Long currentId) {
+        // 이전 ID 조회 (현재 ID보다 작은 ID 중 가장 큰 값)
+        Long previousId = queryFactory
+                .select(waybleZone.id.max())
+                .from(waybleZone)
+                .where(waybleZone.id.lt(currentId))
+                .fetchOne();
+
+        // 다음 ID 조회 (현재 ID보다 큰 ID 중 가장 작은 값)
+        Long nextId = queryFactory
+                .select(waybleZone.id.min())
+                .from(waybleZone)
+                .where(waybleZone.id.gt(currentId))
+                .fetchOne();
+
+        return new AdminWaybleZoneNavigationDto(previousId, nextId);
     }
 }

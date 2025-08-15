@@ -8,14 +8,19 @@ import java.util.List;
 
 @Schema(description = "대중교통 길찾기 응답 DTO")
 public record TransportationResponseDto(
-        List<Step> routes,
+        List<Route> routes,
         PageInfo pageInfo
 ) {
+    public record Route(
+            Integer routeIndex, // 경로 인덱스
+            List<Step> steps // 해당 경로의 단계들
+    ) {}
+
     public record Step(
             DirectionType mode, // 예: START, WALK, SUBWAY, BUS, FINISH
             @Nullable List<MoveInfo> moveInfo, // 같은 Step으로 이동한 정류장(Node) 정보 (중간 정류장만)
             @Nullable String routeName,
-            Integer moveNumber, // 같은 Step(route)로 이동한 횟수
+            Integer moveNumber, // 같은 Step(route)로 이동한 횟수 또는 WALK step의 경우 거리(미터 단위)
             @Nullable BusInfo busInfo, // 버스일 경우에만 생성, 이외의 경우 null
             @Nullable SubwayInfo subwayInfo, // 지하철일 경우에만 생성, 이외의 경우 null
             String from,
@@ -38,8 +43,8 @@ public record TransportationResponseDto(
     ){}
 
     public record SubwayInfo(
-            List<LocationInfo> wheelchair,
-            List<LocationInfo> elevator,
+            List<String> wheelchair,
+            List<String> elevator,
             Boolean accessibleRestroom
     ) {}
 
@@ -50,8 +55,8 @@ public record TransportationResponseDto(
 
     // 지하철 시설 정보 묶음 (서비스 내부에서 사용)
     public record NodeInfo(
-            List<LocationInfo> wheelchair,
-            List<LocationInfo> elevator,
+            List<String> wheelchair,
+            List<String> elevator,
             Boolean accessibleRestroom
     ) {}
 }

@@ -92,7 +92,6 @@ public class WalkingServiceTest {
 
         // then
         assertNotNull(response);
-
         assertEquals(
                 List.of(
                         new WayblePathResponse.WayblePoint(37.1, 127.1, Type.NONE),
