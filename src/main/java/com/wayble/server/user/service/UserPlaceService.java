@@ -2,7 +2,6 @@ package com.wayble.server.user.service;
 
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.user.dto.UserPlaceListResponseDto;
 import com.wayble.server.user.dto.UserPlaceRequestDto;
 import com.wayble.server.user.dto.UserPlaceSummaryDto;
 import com.wayble.server.user.entity.User;
