@@ -32,6 +32,10 @@ public class WebClientConfig {
         return WebClient.builder()
                 .baseUrl(kricProperties.baseUrl())
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+                .filter((request, next) -> next.exchange(request)
+                        .timeout(java.time.Duration.ofSeconds(15))
+                        .retryWhen(reactor.util.retry.Retry.backoff(3, java.time.Duration.ofSeconds(1))
+                                .filter(throwable -> throwable instanceof org.springframework.web.reactive.function.client.WebClientRequestException)))
                 .build();
     }
 }
