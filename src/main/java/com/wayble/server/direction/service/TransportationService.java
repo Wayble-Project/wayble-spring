@@ -623,20 +623,27 @@ public class TransportationService {
                         }
                     }
                         } catch (Exception e) {
-                    log.info("버스 정보 조회 실패: {}", e.getMessage());
-        }
+                            log.error("버스 정보 조회 실패: {}", e.getMessage());
+                        }
             } else if (currentType == DirectionType.SUBWAY) {
                 try {
                     if (currentEdge.getStartNode() != null) {
-                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId());
+                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId(), currentEdge.getRoute().getRouteId());
+                        
                         subwayInfo = new TransportationResponseDto.SubwayInfo(
                             nodeInfo.wheelchair(), 
                             nodeInfo.elevator(), 
                             nodeInfo.accessibleRestroom()
                         );
+                    } else {
+                        subwayInfo = new TransportationResponseDto.SubwayInfo(
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            false
+                        );
                     }
                 } catch (Exception e) {
-                    log.info("지하철 정보 조회 실패: {}", e.getMessage());
+                    log.error("지하철 정보 조회 실패: {}", e.getMessage());
                     subwayInfo = new TransportationResponseDto.SubwayInfo(
                         new ArrayList<>(),
                         new ArrayList<>(),

@@ -43,8 +43,8 @@ public record TransportationResponseDto(
     ){}
 
     public record SubwayInfo(
-            List<LocationInfo> wheelchair,
-            List<LocationInfo> elevator,
+            List<String> wheelchair,
+            List<String> elevator,
             Boolean accessibleRestroom
     ) {}
 
@@ -55,8 +55,8 @@ public record TransportationResponseDto(
 
     // 지하철 시설 정보 묶음 (서비스 내부에서 사용)
     public record NodeInfo(
-            List<LocationInfo> wheelchair,
-            List<LocationInfo> elevator,
+            List<String> wheelchair,
+            List<String> elevator,
             Boolean accessibleRestroom
     ) {}
 }

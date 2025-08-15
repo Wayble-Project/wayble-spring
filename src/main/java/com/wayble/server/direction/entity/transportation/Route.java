@@ -6,6 +6,8 @@ import com.wayble.server.direction.entity.transportation.*;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
@@ -33,4 +35,8 @@ public class Route {
     @ManyToOne
     @JoinColumn(name = "end_node_id")
     private Node endNode;
+    
+    // 휠체어 정보
+    @OneToMany(mappedBy = "route", fetch = FetchType.LAZY)
+    private List<Wheelchair> wheelchairs;
 }
