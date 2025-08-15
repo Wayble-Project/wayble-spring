@@ -72,7 +72,9 @@ public class UserPlaceController {
             return CommonResponse.success(summaries);
         } else {
             // 특정 장소 내 웨이블존 목록
-            Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
+            int zeroBased = (page == null ? 0 : Math.max(0, page - 1));
+            Page<WaybleZoneListResponseDto> zones =
+                    userPlaceService.getZonesInPlace(userId, placeId, zeroBased, size);
             return CommonResponse.success(zones);
         }
     }
