@@ -8,7 +8,6 @@ import com.wayble.server.user.dto.UserPlaceSummaryDto;
 import com.wayble.server.user.service.UserPlaceService;
 import com.wayble.server.wayblezone.dto.WaybleZoneListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Parameter;
 
 import java.util.List;
 
@@ -45,38 +43,37 @@ public class UserPlaceController {
     }
 
     @GetMapping
-    @Operation(
-            summary = "내 장소 요약 또는 특정 장소 내 웨이블존 조회",
-            description = "placeId 미지정 시 장소 요약 목록(정렬 지원), placeId 지정 시 해당 장소 내 웨이블존 목록(페이징)을 반환합니다."
-    )
+    @Operation(summary = "내 장소 리스트 요약 조회", description = "장소 관련 목록(리스트)만 반환합니다(개수 포함).")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
+    })
+    public CommonResponse<List<UserPlaceSummaryDto>> getMyPlaceSummaries(
+            @RequestParam(name = "sort", defaultValue = "latest") String sort
+    ) {
+        Long userId = extractUserId();
+        List<UserPlaceSummaryDto> summaries = userPlaceService.getMyPlaceSummaries(userId, sort);
+        return CommonResponse.success(summaries);
+    }
+
+
+    @GetMapping("/zones")
+    @Operation(summary = "특정 장소 내 웨이블존 목록 조회(페이징)",
+            description = "placeId로 해당 장소 내부의 웨이블존 카드 목록을 반환합니다. (page는 1부터 시작.)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저/장소를 찾을 수 없음"),
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
-    public CommonResponse<?> getPlacesOrZones(
-            @Parameter(description = "장소 ID (지정 시 해당 장소 내 웨이블존 목록 조회)")
-            @RequestParam(required = false) Long placeId,
-            @Parameter(description = "요약 목록 정렬: latest(최신순)/name|title(이름순)", schema = @Schema(defaultValue = "latest"))
-            @RequestParam(required = false, defaultValue = "latest") String sort,
-            @Parameter(description = "페이지 (장소 내 웨이블존 조회 시 사용)", schema = @Schema(defaultValue = "0"))
-            @RequestParam(required = false, defaultValue = "0") Integer page,
-            @Parameter(description = "사이즈 (장소 내 웨이블존 조회 시 사용)", schema = @Schema(defaultValue = "20"))
-            @RequestParam(required = false, defaultValue = "20") Integer size
+    public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
+            @RequestParam Long placeId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer size
     ) {
         Long userId = extractUserId();
-
-        if (placeId == null) {
-            // 장소 요약 목록
-            List<UserPlaceSummaryDto> summaries = userPlaceService.getMyPlaceSummaries(userId, sort);
-            return CommonResponse.success(summaries);
-        } else {
-            // 특정 장소 내 웨이블존 목록
-            int zeroBased = (page == null ? 0 : Math.max(0, page - 1));
-            Page<WaybleZoneListResponseDto> zones =
-                    userPlaceService.getZonesInPlace(userId, placeId, zeroBased, size);
-            return CommonResponse.success(zones);
-        }
+        Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
+        return CommonResponse.success(zones);
     }
 
     @DeleteMapping
