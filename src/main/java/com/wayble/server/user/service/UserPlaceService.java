@@ -96,7 +96,9 @@ public class UserPlaceService {
         UserPlace place = userPlaceRepository.findByIdAndUser_Id(placeId, userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.PLACE_NOT_FOUND));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        int zeroBased = Math.max(0, page - 1);
+
+        Pageable pageable = PageRequest.of(zeroBased, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<WaybleZone> zones = mappingRepository.findZonesByPlaceId(place.getId(), pageable);
 
         return zones.map(z ->
@@ -132,38 +134,5 @@ public class UserPlaceService {
             z.addLikes(-1);
             waybleZoneRepository.save(z);
         });
-    }
-
-
-    @Transactional(readOnly = true)
-    public List<UserPlaceListResponseDto> getUserPlaces(Long userId) {
-        // 유저 존재 여부 확인
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
-
-        List<UserPlaceWaybleZoneMapping> mappings = mappingRepository.findAllByUserPlace_User_Id(userId);
-
-        return mappings.stream().map(mapping -> {
-            UserPlace userPlace = mapping.getUserPlace();
-            WaybleZone waybleZone = mapping.getWaybleZone();
-
-            // 웨이블존 대표 이미지 가져오기
-            String imageUrl = waybleZone.getMainImageUrl();
-
-            return UserPlaceListResponseDto.builder()
-                    .placeId(userPlace.getId())
-                    .title(userPlace.getTitle())
-                    .waybleZone(
-                            UserPlaceListResponseDto.WaybleZoneDto.builder()
-                                    .waybleZoneId(waybleZone.getId())
-                                    .name(waybleZone.getZoneName())
-                                    .category(waybleZone.getZoneType().toString())
-                                    .rating(waybleZone.getRating())
-                                    .address(waybleZone.getAddress().toFullAddress())
-                                    .imageUrl(imageUrl)
-                                    .build()
-                    )
-                    .build();
-        }).toList();
     }
 }
