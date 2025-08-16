@@ -4,5 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record UserPlaceRequestDto(
         @NotNull Long waybleZoneId,
-        @NotNull String title
+        @NotNull String title,
+        String color
 ) {}

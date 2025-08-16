@@ -100,6 +100,7 @@ public class WaybleZone extends BaseEntity {
 
     public void addLikes(long count) {
         this.likes += count;
+        if (this.likes < 0) this.likes = 0;
         this.markAsModified(); // 변경 시 자동으로 수정 시간 갱신
     }
     
