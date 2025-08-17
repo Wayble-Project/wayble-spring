@@ -64,14 +64,15 @@ public class WaybleDijkstraService {
             // 좌표 중복 제거 (동일 좌표가 연속될 시, 추가 X)
             if (edge != null && edge.geometry() != null && !edge.geometry().isEmpty()) {
                 for (double[] coords : edge.geometry()) {
-                    deleteDuplicateCoords(polyline, coords);
+                    double[] latLon = new double[]{coords[1], coords[0]};
+                    deleteDuplicateCoords(polyline, latLon);
                 }
             } else {
                 Node fromNode = graphInit.getNodeMap().get(from);
                 Node toNode = graphInit.getNodeMap().get(to);
 
-                double[] fromCoord = new double[]{fromNode.lon(), fromNode.lat()};
-                double[] toCoord = new double[]{toNode.lon(), toNode.lat()};
+                double[] fromCoord = new double[]{fromNode.lat(), fromNode.lon()};
+                double[] toCoord = new double[]{toNode.lat(), toNode.lon()};
 
                 deleteDuplicateCoords(polyline, fromCoord);
                 deleteDuplicateCoords(polyline, toCoord);
