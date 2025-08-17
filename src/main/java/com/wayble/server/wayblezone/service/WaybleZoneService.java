@@ -83,6 +83,9 @@ public class WaybleZoneService {
                     .build());
         }
 
+        Double lat = zone.getAddress() != null ? zone.getAddress().getLatitude() : null;
+        Double lon = zone.getAddress() != null ? zone.getAddress().getLongitude() : null;
+
         return WaybleZoneDetailResponseDto.builder()
                 .waybleZoneId(zone.getId())
                 .name(zone.getZoneName())
@@ -102,6 +105,8 @@ public class WaybleZoneService {
                         .floorInfo(f.getFloorInfo())
                         .build())
                 .businessHours(businessHours)
+                .latitude(lat)
+                .longitude(lon)
                 .build();
     }
 
