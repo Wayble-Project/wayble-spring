@@ -1,6 +1,7 @@
 package com.wayble.server.user.controller;
 
 
+import com.wayble.server.auth.resolver.CurrentUser;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.user.dto.UserPlaceRemoveRequestDto;
 import com.wayble.server.user.dto.UserPlaceRequestDto;
@@ -13,8 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,9 +34,9 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<String> saveUserPlace(
+            @CurrentUser Long userId,
             @RequestBody @Valid UserPlaceRequestDto request
     ) {
-        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         userPlaceService.saveUserPlace(userId, request); // userId 파라미터로 넘김
         return CommonResponse.success("장소가 저장되었습니다.");
     }
@@ -50,9 +49,9 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<List<UserPlaceSummaryDto>> getMyPlaceSummaries(
+            @CurrentUser Long userId,
             @RequestParam(name = "sort", defaultValue = "latest") String sort
     ) {
-        Long userId = extractUserId();
         List<UserPlaceSummaryDto> summaries = userPlaceService.getMyPlaceSummaries(userId, sort);
         return CommonResponse.success(summaries);
     }
@@ -67,11 +66,11 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
+            @CurrentUser Long userId,
             @RequestParam Long placeId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer size
     ) {
-        Long userId = extractUserId();
         Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
         return CommonResponse.success(zones);
     }
@@ -86,37 +85,11 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "404", description = "장소 또는 매핑 정보를 찾을 수 없음"),
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
-    public CommonResponse<String> removeZoneFromPlace(@RequestBody @Valid UserPlaceRemoveRequestDto request) {
-        Long userId = extractUserId();
+    public CommonResponse<String> removeZoneFromPlace(
+            @CurrentUser Long userId,
+            @RequestBody @Valid UserPlaceRemoveRequestDto request
+    ) {
         userPlaceService.removeZoneFromPlace(userId, request.placeId(), request.waybleZoneId());
         return CommonResponse.success("제거되었습니다.");
-    }
-
-
-    // SecurityContext에서 userId 추출하는 로직
-    private Long extractUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            throw new IllegalStateException("인증 정보가 없습니다.");
-        }
-
-        Object p = auth.getPrincipal();
-
-        if (p instanceof Long l) { return l; }
-        if (p instanceof Integer i) { return i.longValue(); }
-        if (p instanceof String s) {
-            try {
-                return Long.parseLong(s);
-            } catch (NumberFormatException e) {
-                // 숫자 변환 실패 시 출력
-                System.err.println("Principal 문자열을 Long으로 변환할 수 없습니다: " + s);
-            }
-        }
-
-        try {
-            return Long.parseLong(auth.getName());
-        } catch (Exception e) {
-            throw new IllegalStateException("인증 정보에서 userId를 추출할 수 없습니다. Principal=" + p, e);
-        }
     }
 }
