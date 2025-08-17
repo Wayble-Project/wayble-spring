@@ -39,6 +39,9 @@ public class TransportationService {
     private static final int MAX_NEARBY_NODES = 5; // 출발지/도착지 주변에서 고려할 최대 정류장 수
     private static final int MAX_DIJKSTRA_VISITS = 5000; // 다익스트라 알고리즘에서 방문할 수 있는 최대 노드 수 (무한 루프 방지)
     private static final int MAX_ROUTES = 5; // 찾을 최대 경로 수
+    
+    // 공간 필터링
+    private static final double SPATIAL_BUFFER_KM = 15.0; // 지작점/도착점 주변 15km
 
     public TransportationResponseDto findRoutes(TransportationRequestDto request){
     
@@ -88,25 +91,54 @@ public class TransportationService {
     }
 
     private List<List<TransportationResponseDto.Step>> findMultipleTransportationRoutes(Node startTmp, Node endTmp){
-        // 1. 데이터 로드
-        List<Node> nodes = new ArrayList<>(nodeRepository.findAll());
-        List<Edge> edges = new ArrayList<>(edgeRepository.findAllWithNodesAndRoute());
-        
-        // 2. 가장 가까운 정류장 찾기
-        Node nearestToStart = findNearestNode(nodes, startTmp.getLatitude(), startTmp.getLongitude());
-        Node nearestToEnd = findNearestNode(nodes, endTmp.getLatitude(), endTmp.getLongitude());
-        
-        if (nearestToStart == null || nearestToEnd == null) {
+        try {
+            // 1. 공간 필터링을 사용한 데이터 로드
+            double[] boundingBox = calculateBoundingBox(startTmp, endTmp);
+            List<Node> nodes = nodeRepository.findNodesInBoundingBox(
+                boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]
+            );
+            List<Edge> edges = edgeRepository.findEdgesInBoundingBox(
+                boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]
+            );
+            
+            log.debug("Spatial filtering loaded {} nodes and {} edges", nodes.size(), edges.size());
+            
+            // 2. 가장 가까운 정류장 찾기
+            Node nearestToStart = findNearestNode(nodes, startTmp.getLatitude(), startTmp.getLongitude());
+            Node nearestToEnd = findNearestNode(nodes, endTmp.getLatitude(), endTmp.getLongitude());
+            
+            if (nearestToStart == null || nearestToEnd == null) {
+                throw new ApplicationException(PATH_NOT_FOUND);
+            }
+            
+            // 3. 임시 노드 추가
+            nodes.add(startTmp);
+            nodes.add(endTmp);
+
+            // 4. 그래프 빌드 및 여러 경로 찾기
+            TransportationGraphDto graphData = buildGraph(nodes, edges, startTmp, endTmp);
+            List<List<TransportationResponseDto.Step>> result = findMultipleOptimalRoutes(
+                graphData.graph(), startTmp, endTmp, graphData.weightMap(), nodes, nearestToStart, nearestToEnd
+            );
+            
+            // 5. 메모리 정리 (명시적으로 null 설정)
+            nodes.clear();
+            edges.clear();
+            
+            return result;
+        } catch (OutOfMemoryError e) {
+            log.error("Out of memory error in transportation route finding: {}", e.getMessage());
             throw new ApplicationException(PATH_NOT_FOUND);
         }
+    }
+    
+    private double[] calculateBoundingBox(Node start, Node end) {
+        double minLat = Math.min(start.getLatitude(), end.getLatitude()) - SPATIAL_BUFFER_KM / 111.0;
+        double maxLat = Math.max(start.getLatitude(), end.getLatitude()) + SPATIAL_BUFFER_KM / 111.0;
+        double minLon = Math.min(start.getLongitude(), end.getLongitude()) - SPATIAL_BUFFER_KM / (111.0 * Math.cos(Math.toRadians(start.getLatitude())));
+        double maxLon = Math.max(start.getLongitude(), end.getLongitude()) + SPATIAL_BUFFER_KM / (111.0 * Math.cos(Math.toRadians(start.getLatitude())));
         
-        // 3. 임시 노드 추가
-        nodes.add(startTmp);
-        nodes.add(endTmp);
-
-        // 4. 그래프 빌드 및 여러 경로 찾기
-        TransportationGraphDto graphData = buildGraph(nodes, edges, startTmp, endTmp);
-        return findMultipleOptimalRoutes(graphData.graph(), startTmp, endTmp, graphData.weightMap(), nodes, nearestToStart, nearestToEnd);
+        return new double[]{minLat, maxLat, minLon, maxLon};
     }
 
     private List<List<TransportationResponseDto.Step>> findMultipleOptimalRoutes(
@@ -312,15 +344,18 @@ public class TransportationService {
         Map<Long, List<Edge>> graph = new HashMap<>();
         Map<Pair<Long, Long>, Integer> weightMap = new HashMap<>();
         
-        // 1. 노드 초기화
-        for (Node node : nodes) {
-            Long nodeId = node.getId();
-            if (nodeId != null) {
-                graph.put(nodeId, new ArrayList<>());
-            }
+        // 1. 노드 ID를 Set으로 변환해 빠른 검색
+        Set<Long> nodeIds = nodes.stream()
+                .map(Node::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        
+        // 2. 노드 초기화
+        for (Long nodeId : nodeIds) {
+            graph.put(nodeId, new ArrayList<>());
         }
         
-        // 2. 기존 엣지 추가 및 가중치 계산
+        // 3. 기존 엣지 추가 및 가중치 계산 (필터링된 노드만)
         for (Edge edge : edges) {
             if (edge == null) continue;
 
@@ -331,7 +366,8 @@ public class TransportationService {
             Long startId = start.getId();
             Long endId = end.getId();
             
-            if (!graph.containsKey(startId)) continue;
+            // 공간 필터링된 노드들만 처리
+            if (!nodeIds.contains(startId) || !nodeIds.contains(endId)) continue;
 
             graph.get(startId).add(edge);
             
@@ -342,7 +378,7 @@ public class TransportationService {
             weightMap.put(Pair.of(startId, endId), weight);
         }
         
-        // 3. 출발지/도착지 도보 연결 추가
+        // 4. 출발지/도착지 도보 연결 추가
         addOriginDestinationWalkConnections(graph, weightMap, nodes, startTmp, endTmp);
         
         return new TransportationGraphDto(graph, weightMap);
@@ -393,8 +429,21 @@ public class TransportationService {
     }
 
     private List<Node> findNearbyNodes(List<Node> nodes, double lat, double lon, int maxDistanceMeters) {
+        // 대략적인 거리 필터링
+        double maxDistanceKm = maxDistanceMeters / 1000.0;
+        
         return nodes.stream()
                 .filter(node -> {
+                    // 빠른 거리 계산 (대략적)
+                    double latDiff = Math.abs(lat - node.getLatitude());
+                    double lonDiff = Math.abs(lon - node.getLongitude());
+                    
+                    // 필터링 (1도 ≈ 111km)
+                    if (latDiff > maxDistanceKm / 111.0 || lonDiff > maxDistanceKm / (111.0 * Math.cos(Math.toRadians(lat)))) {
+                        return false;
+                    }
+                    
+                    // 정확한 거리 계산
                     double distance = haversine(lat, lon, node.getLatitude(), node.getLongitude()) * METER_CONVERSION;
                     return distance <= maxDistanceMeters;
                 })
@@ -680,7 +729,82 @@ public class TransportationService {
             i = j;
         }
         
-        return mergedSteps;
+        // 환승 시 walk step 추가
+        return addTransferWalkSteps(mergedSteps, pathEdges);
+    }
+    
+    private List<TransportationResponseDto.Step> addTransferWalkSteps(List<TransportationResponseDto.Step> steps, List<Edge> pathEdges) {
+        List<TransportationResponseDto.Step> result = new ArrayList<>();
+        
+        for (int i = 0; i < steps.size(); i++) {
+            TransportationResponseDto.Step currentStep = steps.get(i);
+            result.add(currentStep);
+            
+            // 마지막 step이 아니고, 현재 step이 walk가 아닌 경우
+            if (i < steps.size() - 1 && currentStep.mode() != DirectionType.WALK) {
+                TransportationResponseDto.Step nextStep = steps.get(i + 1);
+                
+                // 다음 step도 walk가 아닌 경우 (bus -> subway, subway -> bus 등)
+                if (nextStep.mode() != DirectionType.WALK) {
+                    // 환승 walk step 추가
+                    String transferFrom = currentStep.to();
+                    String transferTo = nextStep.from();
+                    
+                    // 이전 step의 도착지와 다음 step의 출발지 사이의 직선거리 계산
+                    int walkDistance = calculateTransferWalkDistance(transferFrom, transferTo, pathEdges);
+                    
+                    TransportationResponseDto.Step walkStep = new TransportationResponseDto.Step(
+                        DirectionType.WALK,
+                        null,
+                        null,
+                        walkDistance,
+                        null,
+                        null,
+                        transferFrom,
+                        transferTo
+                    );
+                    
+                    result.add(walkStep);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private int calculateTransferWalkDistance(String fromStation, String toStation, List<Edge> pathEdges) {
+        // pathEdges에서 해당 정류장의 노드 정보 찾기
+        Node fromNode = null;
+        Node toNode = null;
+        
+        for (Edge edge : pathEdges) {
+            if (edge.getStartNode() != null && edge.getStartNode().getStationName() != null && 
+                edge.getStartNode().getStationName().equals(fromStation)) {
+                fromNode = edge.getStartNode();
+            }
+            if (edge.getEndNode() != null && edge.getEndNode().getStationName() != null && 
+                edge.getEndNode().getStationName().equals(fromStation)) {
+                fromNode = edge.getEndNode();
+            }
+            if (edge.getStartNode() != null && edge.getStartNode().getStationName() != null && 
+                edge.getStartNode().getStationName().equals(toStation)) {
+                toNode = edge.getStartNode();
+            }
+            if (edge.getEndNode() != null && edge.getEndNode().getStationName() != null && 
+                edge.getEndNode().getStationName().equals(toStation)) {
+                toNode = edge.getEndNode();
+            }
+        }
+        
+        if (fromNode != null && toNode != null) {
+            double distanceKm = haversine(
+                fromNode.getLatitude(), fromNode.getLongitude(),
+                toNode.getLatitude(), toNode.getLongitude()
+            );
+            return (int) (distanceKm * 1000); // km를 m로 변환
+        }
+        
+        return 0; // 노드를 찾지 못한 경우
     }
     
     private String getNodeName(Node node) {
