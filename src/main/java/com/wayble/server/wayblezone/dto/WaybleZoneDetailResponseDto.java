@@ -18,7 +18,9 @@ public record WaybleZoneDetailResponseDto(
         String imageUrl,
         FacilityDto facilities,
         Map<String, BusinessHourDto> businessHours,
-        List<String> photos
+        List<String> photos,
+        Double latitude,
+        Double longitude
 ) {
     @Builder
     public record BusinessHourDto(
