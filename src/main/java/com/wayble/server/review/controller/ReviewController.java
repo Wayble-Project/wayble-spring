@@ -1,5 +1,6 @@
 package com.wayble.server.review.controller;
 
+import com.wayble.server.auth.resolver.CurrentUser;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.review.dto.ReviewRegisterDto;
 import com.wayble.server.review.dto.ReviewResponseDto;
@@ -11,8 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -38,9 +37,9 @@ public class ReviewController {
     })
     public CommonResponse<String> registerReview(
             @PathVariable Long waybleZoneId,
+            @CurrentUser Long userId,
             @RequestBody @Valid ReviewRegisterDto dto
     ) {
-        Long userId = extractUserId(); // 토큰에서 유저 ID 추출
         reviewService.registerReview(waybleZoneId, userId, dto);
         return CommonResponse.success("리뷰가 등록되었습니다.");
     }
@@ -56,27 +55,5 @@ public class ReviewController {
             @RequestParam(defaultValue = "latest") String sort
     ) {
         return CommonResponse.success(reviewService.getReviews(waybleZoneId, sort));
-    }
-
-    private Long extractUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { throw new IllegalStateException("인증 정보가 없습니다."); }
-
-        Object p = auth.getPrincipal();
-        if (p instanceof Long l) { return l; }
-        if (p instanceof Integer i) { return i.longValue(); }
-        if (p instanceof String s) {
-            try {
-                return Long.parseLong(s);
-            } catch (NumberFormatException e) {
-                throw new IllegalStateException("principal에서 userId 파싱 실패");
-            }
-        }
-        try {
-            return Long.parseLong(auth.getName());
-        }
-        catch (Exception e) {
-            throw new IllegalStateException("인증 정보에서 userId를 추출할 수 없습니다.");
-        }
     }
 }
