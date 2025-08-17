@@ -29,6 +29,11 @@ public class BusInfoService {
     private final RouteRepository routeRepository;
 
     public TransportationResponseDto.BusInfo getBusInfo(String stationName, Long busId, Double x, Double y) {
+        // 나중에 서비스키 문제 해결되면 이 함수 호출 제거
+        return createDummyBusInfo(stationName, busId, x, y);
+        
+        // 실제 API 호출 코드 (현재 주석 처리)
+        /*
         List<Boolean> isLowFloor = new ArrayList<>();
         Integer dispatchInterval = null;
 
@@ -79,6 +84,7 @@ public class BusInfoService {
                     dispatchInterval = Integer.parseInt(item.term());
                 } catch (NumberFormatException e) {
                     dispatchInterval = 0;
+                    log.warn("⚠️ 배차간격 파싱 실패: {}", item.term());
                 }
                 
                 count++;
@@ -89,6 +95,30 @@ public class BusInfoService {
             return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
         }
 
+        return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
+        */
+        
+    }
+
+    // 나중에 이 함수 제거
+    private TransportationResponseDto.BusInfo createDummyBusInfo(String stationName, Long busId, Double x, Double y) {
+        log.info("🎭 더미 BusInfo 생성 - stationName: {}, busId: {}, x: {}, y: {}", stationName, busId, x, y);
+        
+        // 셔틀버스 여부 확인 (기존 로직 유지)
+        boolean isShuttleBus = false;
+        if (busId != null) {
+            var route = routeRepository.findById(busId);
+            isShuttleBus = route.isPresent() && route.get().getRouteName().contains("마포");
+        }
+        
+        // 랜덤 더미 데이터 생성
+        List<Boolean> isLowFloor = new ArrayList<>();
+        isLowFloor.add(Math.random() < 0.7);
+        isLowFloor.add(Math.random() < 0.5);
+        
+        Integer dispatchInterval = (int) (Math.random() * 15) + 1;
+        
+        
         return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
     }
 
@@ -165,6 +195,7 @@ public class BusInfoService {
 
     private StationSearchResponse.StationItem findClosestStation(List<StationSearchResponse.StationItem> stations, Double x, Double y) {
         if (stations == null || stations.isEmpty()) {
+            log.warn("❌ 정류소 목록이 비어있음");
             return null;
         }
 
