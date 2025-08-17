@@ -72,7 +72,7 @@ public class WaybleDijkstraService {
                 Node toNode = graphInit.getNodeMap().get(to);
 
                 double[] fromCoord = new double[]{fromNode.lat(), fromNode.lon()};
-                double[] toCoord   = new double[]{toNode.lat(), toNode.lon()};
+                double[] toCoord = new double[]{toNode.lat(), toNode.lon()};
 
                 deleteDuplicateCoords(polyline, fromCoord);
                 deleteDuplicateCoords(polyline, toCoord);
