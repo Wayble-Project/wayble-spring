@@ -3,7 +3,7 @@
     "id": 7298089134,
     "lat": 37.5512883,
     "lon": 126.9564571,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4656545971,
@@ -15,7 +15,7 @@
     "id": 4656545972,
     "lat": 37.556118,
     "lon": 126.9582732,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352633629,
@@ -27,13 +27,13 @@
     "id": 3352633633,
     "lat": 37.5520332,
     "lon": 126.9593289,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352633687,
     "lat": 37.5530731,
     "lon": 126.9606333,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352633694,
@@ -57,7 +57,7 @@
     "id": 3352633763,
     "lat": 37.5539764,
     "lon": 126.9605364,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352633788,
@@ -81,7 +81,7 @@
     "id": 8383078921,
     "lat": 37.5529594,
     "lon": 126.9581425,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078923,
@@ -93,19 +93,19 @@
     "id": 8383078924,
     "lat": 37.5533472,
     "lon": 126.9581968,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078925,
     "lat": 37.5533868,
     "lon": 126.9580771,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078926,
     "lat": 37.5532594,
     "lon": 126.9580145,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078927,
@@ -123,7 +123,7 @@
     "id": 8383078929,
     "lat": 37.5532677,
     "lon": 126.9572353,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078930,
@@ -135,19 +135,19 @@
     "id": 8383078931,
     "lat": 37.5531477,
     "lon": 126.9572573,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078934,
     "lat": 37.5528591,
     "lon": 126.9577837,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078936,
     "lat": 37.552803,
     "lon": 126.9577695,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078937,
@@ -171,19 +171,19 @@
     "id": 8383078940,
     "lat": 37.552862,
     "lon": 126.9578863,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078942,
     "lat": 37.5527703,
     "lon": 126.9587003,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078943,
     "lat": 37.5526084,
     "lon": 126.9575484,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078944,
@@ -207,7 +207,7 @@
     "id": 8383078948,
     "lat": 37.5522131,
     "lon": 126.9577286,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078949,
@@ -225,13 +225,13 @@
     "id": 8383078951,
     "lat": 37.5521014,
     "lon": 126.9584072,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078952,
     "lat": 37.5520835,
     "lon": 126.9585061,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078953,
@@ -249,7 +249,7 @@
     "id": 8383078956,
     "lat": 37.5524584,
     "lon": 126.9595479,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078955,
@@ -261,13 +261,13 @@
     "id": 8383078960,
     "lat": 37.5526992,
     "lon": 126.9587995,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078963,
     "lat": 37.5525698,
     "lon": 126.958825,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078964,
@@ -285,25 +285,25 @@
     "id": 8383078966,
     "lat": 37.5528936,
     "lon": 126.9590406,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078967,
     "lat": 37.5530089,
     "lon": 126.9590879,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078968,
     "lat": 37.5529688,
     "lon": 126.9592347,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078970,
     "lat": 37.5524885,
     "lon": 126.9596225,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078971,
@@ -327,13 +327,13 @@
     "id": 8383078974,
     "lat": 37.5536343,
     "lon": 126.95915,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078980,
     "lat": 37.553573,
     "lon": 126.9595946,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383078982,
@@ -351,13 +351,13 @@
     "id": 8383078988,
     "lat": 37.5531846,
     "lon": 126.9594456,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078989,
     "lat": 37.5531444,
     "lon": 126.9595565,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078990,
@@ -387,43 +387,43 @@
     "id": 3352633975,
     "lat": 37.5556728,
     "lon": 126.9618636,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352633979,
     "lat": 37.5559833,
     "lon": 126.9611698,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352634000,
     "lat": 37.5563537,
     "lon": 126.9608113,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352634007,
     "lat": 37.5565114,
     "lon": 126.9610265,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352634040,
     "lat": 37.5573377,
     "lon": 126.9626846,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352634043,
     "lat": 37.5573872,
     "lon": 126.9617449,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352634051,
     "lat": 37.5575764,
     "lon": 126.9625284,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352634054,
@@ -435,13 +435,13 @@
     "id": 3352634055,
     "lat": 37.5575876,
     "lon": 126.9626803,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3352634062,
     "lat": 37.5576149,
     "lon": 126.96305,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352634076,
@@ -453,7 +453,7 @@
     "id": 3157336863,
     "lat": 37.5517399,
     "lon": 126.9574135,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3157336864,
@@ -489,7 +489,7 @@
     "id": 8383046643,
     "lat": 37.5509245,
     "lon": 126.9600959,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046644,
@@ -507,7 +507,7 @@
     "id": 8383046650,
     "lat": 37.5515608,
     "lon": 126.9606062,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046652,
@@ -519,31 +519,31 @@
     "id": 8383046654,
     "lat": 37.5512359,
     "lon": 126.9607078,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046655,
     "lat": 37.5514265,
     "lon": 126.9609821,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046657,
     "lat": 37.5519212,
     "lon": 126.9589357,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046658,
     "lat": 37.5512983,
     "lon": 126.9588242,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046659,
     "lat": 37.5515416,
     "lon": 126.9592582,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046660,
@@ -561,7 +561,7 @@
     "id": 8383046662,
     "lat": 37.5511447,
     "lon": 126.9589577,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046663,
@@ -573,25 +573,25 @@
     "id": 8383046664,
     "lat": 37.5516072,
     "lon": 126.9586545,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046665,
     "lat": 37.5515342,
     "lon": 126.9587409,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046666,
     "lat": 37.5517373,
     "lon": 126.9588719,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046667,
     "lat": 37.5516622,
     "lon": 126.958953,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046668,
@@ -621,19 +621,19 @@
     "id": 8383046674,
     "lat": 37.5511283,
     "lon": 126.9591005,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046675,
     "lat": 37.5510663,
     "lon": 126.9591562,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046676,
     "lat": 37.5512384,
     "lon": 126.95931,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046677,
@@ -651,7 +651,7 @@
     "id": 8383046679,
     "lat": 37.5507573,
     "lon": 126.9591816,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046680,
@@ -663,13 +663,13 @@
     "id": 8383046681,
     "lat": 37.5506377,
     "lon": 126.9593174,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046682,
     "lat": 37.5508427,
     "lon": 126.9591753,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046683,
@@ -687,19 +687,19 @@
     "id": 8383046686,
     "lat": 37.5508792,
     "lon": 126.9598572,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046687,
     "lat": 37.5507259,
     "lon": 126.9597554,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046688,
     "lat": 37.5506618,
     "lon": 126.9598193,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046689,
@@ -711,7 +711,7 @@
     "id": 8383046690,
     "lat": 37.5505361,
     "lon": 126.9596089,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046691,
@@ -729,7 +729,7 @@
     "id": 8383046693,
     "lat": 37.5503089,
     "lon": 126.959402,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046698,
@@ -747,7 +747,7 @@
     "id": 8383046700,
     "lat": 37.5508751,
     "lon": 126.9601562,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046701,
@@ -759,7 +759,7 @@
     "id": 8383046702,
     "lat": 37.5509923,
     "lon": 126.9603522,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046703,
@@ -777,13 +777,13 @@
     "id": 8383046707,
     "lat": 37.5511275,
     "lon": 126.9604279,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046708,
     "lat": 37.5512765,
     "lon": 126.9606671,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046709,
@@ -801,13 +801,13 @@
     "id": 8383046714,
     "lat": 37.5512425,
     "lon": 126.9599275,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046715,
     "lat": 37.5512063,
     "lon": 126.9598398,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046716,
@@ -825,13 +825,13 @@
     "id": 8383073895,
     "lat": 37.5535858,
     "lon": 126.9587903,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7831053530,
     "lat": 37.5528875,
     "lon": 126.9598805,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7831053531,
@@ -849,7 +849,7 @@
     "id": 7831053533,
     "lat": 37.5539427,
     "lon": 126.9592139,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7831053538,
@@ -867,13 +867,13 @@
     "id": 7831053541,
     "lat": 37.5530512,
     "lon": 126.9593944,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7831053542,
     "lat": 37.553084,
     "lon": 126.9597535,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7831053543,
@@ -891,7 +891,7 @@
     "id": 8383046918,
     "lat": 37.5512413,
     "lon": 126.9595298,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046921,
@@ -915,25 +915,25 @@
     "id": 8383046926,
     "lat": 37.5518041,
     "lon": 126.9594478,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046927,
     "lat": 37.5516732,
     "lon": 126.959428,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046928,
     "lat": 37.5517176,
     "lon": 126.9595269,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046929,
     "lat": 37.5515388,
     "lon": 126.9595176,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383046930,
@@ -951,7 +951,7 @@
     "id": 8383046932,
     "lat": 37.5515204,
     "lon": 126.9598187,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383046933,
@@ -993,7 +993,7 @@
     "id": 8383088118,
     "lat": 37.5548672,
     "lon": 126.9586509,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383088119,
@@ -1011,7 +1011,7 @@
     "id": 8383088129,
     "lat": 37.5541739,
     "lon": 126.9589386,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383088131,
@@ -1023,7 +1023,7 @@
     "id": 8383088125,
     "lat": 37.5542591,
     "lon": 126.9584914,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383088126,
@@ -1035,7 +1035,7 @@
     "id": 3157763607,
     "lat": 37.5518644,
     "lon": 126.9559832,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112817,
@@ -1047,19 +1047,19 @@
     "id": 8383112819,
     "lat": 37.5553283,
     "lon": 126.95832,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112820,
     "lat": 37.5554894,
     "lon": 126.9585218,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112821,
     "lat": 37.5553451,
     "lon": 126.9584965,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112824,
@@ -1077,13 +1077,13 @@
     "id": 8383112827,
     "lat": 37.5556779,
     "lon": 126.9587077,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112828,
     "lat": 37.5552905,
     "lon": 126.9587424,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112829,
@@ -1095,7 +1095,7 @@
     "id": 8383112830,
     "lat": 37.5552564,
     "lon": 126.9590219,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112831,
@@ -1107,7 +1107,7 @@
     "id": 8383112832,
     "lat": 37.5552784,
     "lon": 126.9588416,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112833,
@@ -1119,13 +1119,13 @@
     "id": 8383112834,
     "lat": 37.5555656,
     "lon": 126.9587709,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112835,
     "lat": 37.5554795,
     "lon": 126.9592963,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112836,
@@ -1161,13 +1161,13 @@
     "id": 8383112841,
     "lat": 37.555303,
     "lon": 126.9599418,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112842,
     "lat": 37.5550887,
     "lon": 126.9594288,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112843,
@@ -1179,7 +1179,7 @@
     "id": 8383112844,
     "lat": 37.555878,
     "lon": 126.9596583,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112845,
@@ -1191,25 +1191,25 @@
     "id": 8383112846,
     "lat": 37.5557283,
     "lon": 126.9592923,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112847,
     "lat": 37.5557738,
     "lon": 126.9591242,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112848,
     "lat": 37.5556867,
     "lon": 126.959079,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112849,
     "lat": 37.555657,
     "lon": 126.9596016,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383112850,
@@ -1233,7 +1233,7 @@
     "id": 8383112853,
     "lat": 37.5554119,
     "lon": 126.9598804,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112854,
@@ -1245,7 +1245,7 @@
     "id": 8383112855,
     "lat": 37.5551237,
     "lon": 126.9598037,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112856,
@@ -1257,19 +1257,19 @@
     "id": 8383112857,
     "lat": 37.5551806,
     "lon": 126.9594613,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112858,
     "lat": 37.5551221,
     "lon": 126.9600308,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383112860,
     "lat": 37.5559234,
     "lon": 126.9598504,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4593779238,
@@ -1311,7 +1311,7 @@
     "id": 4593779252,
     "lat": 37.5543449,
     "lon": 126.9609272,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4593779253,
@@ -1341,7 +1341,7 @@
     "id": 8383078957,
     "lat": 37.5523773,
     "lon": 126.959077,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383078958,
@@ -1353,7 +1353,7 @@
     "id": 7298467878,
     "lat": 37.5567722,
     "lon": 126.9618134,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8179869930,
@@ -1365,7 +1365,7 @@
     "id": 8179869933,
     "lat": 37.5556088,
     "lon": 126.9599667,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2330782501,
@@ -1377,7 +1377,7 @@
     "id": 13061368648,
     "lat": 37.5517847,
     "lon": 126.9570945,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 13061368649,
@@ -1389,7 +1389,7 @@
     "id": 13061368650,
     "lat": 37.5518477,
     "lon": 126.9567157,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2330782543,
@@ -1401,19 +1401,19 @@
     "id": 13061368661,
     "lat": 37.5517295,
     "lon": 126.9574663,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2330782561,
     "lat": 37.5523956,
     "lon": 126.9616748,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2330782565,
     "lat": 37.5561106,
     "lon": 126.9604794,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 13061368705,
@@ -1431,7 +1431,7 @@
     "id": 3352620571,
     "lat": 37.5509003,
     "lon": 126.9562516,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352620573,
@@ -1443,13 +1443,13 @@
     "id": 3352620587,
     "lat": 37.5511913,
     "lon": 126.9615554,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3352620591,
     "lat": 37.5504945,
     "lon": 126.9602051,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383073841,
@@ -1479,13 +1479,13 @@
     "id": 8383073845,
     "lat": 37.552414,
     "lon": 126.9586793,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073846,
     "lat": 37.5524945,
     "lon": 126.9585794,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383073847,
@@ -1497,7 +1497,7 @@
     "id": 8383073859,
     "lat": 37.5520249,
     "lon": 126.9583736,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073869,
@@ -1509,7 +1509,7 @@
     "id": 8383073877,
     "lat": 37.5539163,
     "lon": 126.9584535,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073878,
@@ -1533,13 +1533,13 @@
     "id": 8383073881,
     "lat": 37.5538437,
     "lon": 126.9579295,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073882,
     "lat": 37.5536203,
     "lon": 126.957658,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383073883,
@@ -1563,25 +1563,25 @@
     "id": 8383073886,
     "lat": 37.55354,
     "lon": 126.9581363,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073887,
     "lat": 37.5534767,
     "lon": 126.9580951,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073888,
     "lat": 37.5541829,
     "lon": 126.9585173,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383073892,
     "lat": 37.5537308,
     "lon": 126.9587451,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383073893,
@@ -1593,7 +1593,7 @@
     "id": 8383073898,
     "lat": 37.5533533,
     "lon": 126.9584703,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383073904,
@@ -1605,7 +1605,7 @@
     "id": 8383073908,
     "lat": 37.5531748,
     "lon": 126.9590145,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383073912,
@@ -1617,13 +1617,13 @@
     "id": 8383073916,
     "lat": 37.5535808,
     "lon": 126.957452,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 11703439232,
     "lat": 37.5579211,
     "lon": 126.9612617,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383098864,
@@ -1635,7 +1635,7 @@
     "id": 8383098865,
     "lat": 37.5566813,
     "lon": 126.9599108,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383098866,
@@ -1671,13 +1671,13 @@
     "id": 4593791017,
     "lat": 37.5538483,
     "lon": 126.9601046,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4593791018,
     "lat": 37.5540333,
     "lon": 126.9598295,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4593791020,
@@ -1695,13 +1695,13 @@
     "id": 4593791022,
     "lat": 37.5549005,
     "lon": 126.958913,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3157553461,
     "lat": 37.5524269,
     "lon": 126.9562738,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383108586,
@@ -1713,7 +1713,7 @@
     "id": 8383108587,
     "lat": 37.5560893,
     "lon": 126.9584106,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383108588,
@@ -1755,13 +1755,13 @@
     "id": 8383108597,
     "lat": 37.5556309,
     "lon": 126.958823,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383108598,
     "lat": 37.5557901,
     "lon": 126.9588837,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383108601,
@@ -1773,13 +1773,13 @@
     "id": 8383108602,
     "lat": 37.5559879,
     "lon": 126.9594688,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8383108604,
     "lat": 37.5558604,
     "lon": 126.9597804,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8383108611,
@@ -1791,7 +1791,7 @@
     "id": 8383108614,
     "lat": 37.5550793,
     "lon": 126.9601913,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4593833801,
@@ -1809,7 +1809,7 @@
     "id": 4593817591,
     "lat": 37.553549,
     "lon": 126.9604195,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4593817613,
@@ -1821,7 +1821,7 @@
     "id": 13061331029,
     "lat": 37.5511256,
     "lon": 126.9569678,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3893042410,
@@ -1833,19 +1833,19 @@
     "id": 13061368657,
     "lat": 37.5513611,
     "lon": 126.9573795,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 13061368658,
     "lat": 37.5514472,
     "lon": 126.9574901,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 13061368659,
     "lat": 37.5514616,
     "lon": 126.9574043,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 10156195562,
@@ -1857,7 +1857,7 @@
     "id": 2329648966,
     "lat": 37.5551398,
     "lon": 126.9576893,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2329648967,
@@ -1869,7 +1869,7 @@
     "id": 10099008029,
     "lat": 37.5564366,
     "lon": 126.9609331,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6032122363,
@@ -1881,7 +1881,7 @@
     "id": 1139615497,
     "lat": 37.46710061577592,
     "lon": 127.00360052072506,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1147604536,
@@ -1911,7 +1911,7 @@
     "id": 6202532875,
     "lat": 37.50108496084193,
     "lon": 127.01208549060496,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6532360448,
@@ -1923,13 +1923,13 @@
     "id": 2985588085,
     "lat": 37.49329939155491,
     "lon": 127.02677618460629,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2874243392,
     "lat": 37.49528156156812,
     "lon": 127.0230378592194,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9183625124,
@@ -1965,7 +1965,7 @@
     "id": 6759916411,
     "lat": 37.49340423515337,
     "lon": 126.98522213109369,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6756811616,
@@ -1977,13 +1977,13 @@
     "id": 1830362750,
     "lat": 37.501095202094845,
     "lon": 127.00922218420071,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5148633959,
     "lat": 37.49269244001886,
     "lon": 126.99505830299728,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1418304579,
@@ -1995,31 +1995,31 @@
     "id": 1740825183,
     "lat": 37.49930939062552,
     "lon": 127.02269235121697,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1012654209,
     "lat": 37.47030346142741,
     "lon": 127.02480372021024,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4487534788,
     "lat": 37.498201655516716,
     "lon": 126.99161804771447,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8062866696,
     "lat": 37.470474979037704,
     "lon": 127.02318170154052,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4322113165,
     "lat": 37.48888236706485,
     "lon": 127.01374477982087,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2593037359,
@@ -2049,13 +2049,13 @@
     "id": 7220574189,
     "lat": 37.474280055676836,
     "lon": 127.04718372097973,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6719301524,
     "lat": 37.47748371349985,
     "lon": 126.99231635227358,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3993939261,
@@ -2085,13 +2085,13 @@
     "id": 3192401530,
     "lat": 37.485298061784626,
     "lon": 127.0304535863728,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5047005645,
     "lat": 37.47060952896552,
     "lon": 127.0355414963852,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4188620496,
@@ -2103,7 +2103,7 @@
     "id": 6715241105,
     "lat": 37.49500265530357,
     "lon": 127.02503892154563,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5326285830,
@@ -2133,7 +2133,7 @@
     "id": 8504879976,
     "lat": 37.485319781932404,
     "lon": 127.03032093911281,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9169674314,
@@ -2157,13 +2157,13 @@
     "id": 9869178896,
     "lat": 37.512671173829006,
     "lon": 127.0176184617426,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4010383586,
     "lat": 37.49221412365555,
     "lon": 126.997789526421,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9864172688,
@@ -2181,7 +2181,7 @@
     "id": 9310552425,
     "lat": 37.50485479412228,
     "lon": 127.0022785215173,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6939341518,
@@ -2205,19 +2205,19 @@
     "id": 9410940212,
     "lat": 37.50580658236315,
     "lon": 127.02150776834237,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1827978549,
     "lat": 37.468340084731594,
     "lon": 127.02717609241027,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5236714683,
     "lat": 37.48740050828999,
     "lon": 126.99614193691365,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9861482537,
@@ -2229,25 +2229,25 @@
     "id": 3677365113,
     "lat": 37.483105123199394,
     "lon": 127.00242522267216,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3846523988,
     "lat": 37.48172412935409,
     "lon": 126.99868033945297,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3253653058,
     "lat": 37.47868007846037,
     "lon": 127.03871049315143,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5804064578,
     "lat": 37.51279230406295,
     "lon": 127.0204898068004,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6829043144,
@@ -2259,7 +2259,7 @@
     "id": 6618400868,
     "lat": 37.484733937588786,
     "lon": 127.02459336474656,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8700223515,
@@ -2283,7 +2283,7 @@
     "id": 2592076936,
     "lat": 37.48159234233809,
     "lon": 126.99893147963175,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1935117614,
@@ -2295,13 +2295,13 @@
     "id": 7952001443,
     "lat": 37.47094118108852,
     "lon": 127.04131621506303,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3895648841,
     "lat": 37.48209139665404,
     "lon": 126.9845563295636,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1302190544,
@@ -2319,7 +2319,7 @@
     "id": 4581416448,
     "lat": 37.47187052185674,
     "lon": 127.0411159298223,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9558459772,
@@ -2343,25 +2343,25 @@
     "id": 5360723842,
     "lat": 37.503772351102896,
     "lon": 127.01896418047548,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3890498031,
     "lat": 37.48699674809802,
     "lon": 127.029239426352,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5195940900,
     "lat": 37.49116713568968,
     "lon": 127.02658986073963,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4794112778,
     "lat": 37.49448391499644,
     "lon": 127.02356332109663,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1817745024,
@@ -2373,7 +2373,7 @@
     "id": 1520908932,
     "lat": 37.51010485173279,
     "lon": 127.00551884902175,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3879039901,
@@ -2385,7 +2385,7 @@
     "id": 1615006801,
     "lat": 37.492778983774166,
     "lon": 127.02438841690298,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6355776064,
@@ -2403,13 +2403,13 @@
     "id": 3487487629,
     "lat": 37.48302816680313,
     "lon": 127.03408140153773,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6293303309,
     "lat": 37.49032719795774,
     "lon": 127.01751615581765,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2799978160,
@@ -2421,13 +2421,13 @@
     "id": 1466160553,
     "lat": 37.50320093711676,
     "lon": 127.02092426265791,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7441177903,
     "lat": 37.48390301622595,
     "lon": 127.01369732136153,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8881996616,
@@ -2439,7 +2439,7 @@
     "id": 8385071314,
     "lat": 37.48314041012829,
     "lon": 127.03093790043322,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3603772530,
@@ -2451,13 +2451,13 @@
     "id": 5400828879,
     "lat": 37.49755175470783,
     "lon": 126.99948717246224,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7188358974,
     "lat": 37.49252818114755,
     "lon": 127.02614407136457,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6788254357,
@@ -2469,7 +2469,7 @@
     "id": 6580191822,
     "lat": 37.48284925435961,
     "lon": 127.0366240722821,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1072249903,
@@ -2487,13 +2487,13 @@
     "id": 7767277801,
     "lat": 37.49002199725829,
     "lon": 126.99314054889739,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7192957514,
     "lat": 37.50439023295816,
     "lon": 127.00951982673362,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4152461424,
@@ -2511,7 +2511,7 @@
     "id": 8950420343,
     "lat": 37.46990936042457,
     "lon": 127.02411114201155,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6250462518,
@@ -2565,19 +2565,19 @@
     "id": 5165052659,
     "lat": 37.48626083978189,
     "lon": 127.02941390253822,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8597354895,
     "lat": 37.47073955890338,
     "lon": 127.04147487146439,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1814435816,
     "lat": 37.509185982492205,
     "lon": 127.01929489748045,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3596974214,
@@ -2595,7 +2595,7 @@
     "id": 1116768281,
     "lat": 37.489013016842826,
     "lon": 127.011965125723,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7219787199,
@@ -2607,13 +2607,13 @@
     "id": 8159633212,
     "lat": 37.47681704095472,
     "lon": 127.00645191007682,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9976375547,
     "lat": 37.487100840332516,
     "lon": 126.98383493895967,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7837947963,
@@ -2637,19 +2637,19 @@
     "id": 6168813312,
     "lat": 37.48251571029648,
     "lon": 127.024416709042,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9343284737,
     "lat": 37.468861903869886,
     "lon": 127.03737929038616,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8982377547,
     "lat": 37.46818909586299,
     "lon": 126.98839781223847,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6376015741,
@@ -2661,7 +2661,7 @@
     "id": 7735205625,
     "lat": 37.481347067567235,
     "lon": 126.99239975985198,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4438630622,
@@ -2673,7 +2673,7 @@
     "id": 7065367828,
     "lat": 37.46797013291159,
     "lon": 126.98894319227325,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1003168184,
@@ -2715,13 +2715,13 @@
     "id": 2441186840,
     "lat": 37.47670221233723,
     "lon": 127.00721181082925,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1839491334,
     "lat": 37.50898101414888,
     "lon": 126.9941942973471,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7496783936,
@@ -2739,55 +2739,55 @@
     "id": 5505094984,
     "lat": 37.507431590071555,
     "lon": 126.9903524705715,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7715064476,
     "lat": 37.48372381093342,
     "lon": 127.04109381367694,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7387212486,
     "lat": 37.49592821628447,
     "lon": 126.99225809263437,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9271175235,
     "lat": 37.492855610730665,
     "lon": 127.0286664113651,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1215997060,
     "lat": 37.512180052282936,
     "lon": 127.02033431267337,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4778066843,
     "lat": 37.495802191045875,
     "lon": 127.02457477288637,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1840571309,
     "lat": 37.499791175696075,
     "lon": 126.99808226004947,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5496011892,
     "lat": 37.494197755695645,
     "lon": 127.0143783587334,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8241060167,
     "lat": 37.48267735176418,
     "lon": 127.02407138126631,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4461909497,
@@ -2799,19 +2799,19 @@
     "id": 4528029275,
     "lat": 37.49136358332688,
     "lon": 127.02861109660591,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4193033024,
     "lat": 37.49132909422427,
     "lon": 127.02730163745561,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7197194022,
     "lat": 37.497517604593845,
     "lon": 127.01887893831454,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3070069100,
@@ -2829,19 +2829,19 @@
     "id": 9269200915,
     "lat": 37.460808302536186,
     "lon": 127.03462187597574,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7456523500,
     "lat": 37.49164845481697,
     "lon": 126.99044941371352,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9756588925,
     "lat": 37.49377030108439,
     "lon": 127.02551528714582,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7621135620,
@@ -2853,19 +2853,19 @@
     "id": 5836884245,
     "lat": 37.48998542812462,
     "lon": 127.02718592855746,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5406283834,
     "lat": 37.50830407922692,
     "lon": 126.99010026123945,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2480740738,
     "lat": 37.48024069800434,
     "lon": 127.03876453882177,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5939133033,
@@ -2877,7 +2877,7 @@
     "id": 1462496872,
     "lat": 37.49697673519277,
     "lon": 127.01395750236077,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1370938708,
@@ -2889,7 +2889,7 @@
     "id": 9693750659,
     "lat": 37.48239831405979,
     "lon": 127.01219531154831,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1004094388,
@@ -2907,7 +2907,7 @@
     "id": 1325778563,
     "lat": 37.489277706342854,
     "lon": 127.02142222368684,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2474961895,
@@ -2919,7 +2919,7 @@
     "id": 6913996501,
     "lat": 37.47935780244397,
     "lon": 127.0128752413458,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3955662749,
@@ -2937,13 +2937,13 @@
     "id": 1326159484,
     "lat": 37.489491658107255,
     "lon": 127.01064614934948,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1666339522,
     "lat": 37.473391887260156,
     "lon": 127.03887892849039,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6910419704,
@@ -2961,19 +2961,19 @@
     "id": 4234622649,
     "lat": 37.48334349757168,
     "lon": 127.01240589406045,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3761961757,
     "lat": 37.48872509331885,
     "lon": 126.99651629766059,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7618126823,
     "lat": 37.473414583919045,
     "lon": 126.98273130730726,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5788413771,
@@ -2991,7 +2991,7 @@
     "id": 9800341129,
     "lat": 37.48805105915318,
     "lon": 127.00822109621839,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5274606673,
@@ -3009,37 +3009,37 @@
     "id": 5806993140,
     "lat": 37.50084938985513,
     "lon": 127.02300525335068,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2801372229,
     "lat": 37.49613360215391,
     "lon": 126.98740138606794,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1729487071,
     "lat": 37.49806868828745,
     "lon": 127.02342229225053,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2970357771,
     "lat": 37.504847206727206,
     "lon": 127.00989636967981,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6294012244,
     "lat": 37.47322829372642,
     "lon": 127.02339568816814,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9561098699,
     "lat": 37.49466231890263,
     "lon": 127.02457993058783,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5167055115,
@@ -3069,13 +3069,13 @@
     "id": 9658347982,
     "lat": 37.4969019499755,
     "lon": 127.0238992406597,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3317304623,
     "lat": 37.48261118718192,
     "lon": 127.03755979422259,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5196693665,
@@ -3105,13 +3105,13 @@
     "id": 4253148431,
     "lat": 37.495056886174886,
     "lon": 127.00434355789099,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3685045004,
     "lat": 37.48638870646749,
     "lon": 127.02945513355172,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1698339669,
@@ -3123,7 +3123,7 @@
     "id": 6366621100,
     "lat": 37.48033850796611,
     "lon": 127.04170483557397,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9958662851,
@@ -3141,7 +3141,7 @@
     "id": 3714446212,
     "lat": 37.502898856356126,
     "lon": 126.9990422513314,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1966061821,
@@ -3153,7 +3153,7 @@
     "id": 1358768988,
     "lat": 37.489591377739494,
     "lon": 127.00657828911618,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4316773698,
@@ -3165,7 +3165,7 @@
     "id": 4352230141,
     "lat": 37.49089713917245,
     "lon": 127.02866440771065,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2654531601,
@@ -3177,7 +3177,7 @@
     "id": 7375887743,
     "lat": 37.514948536726486,
     "lon": 127.01822037811151,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9192553407,
@@ -3189,13 +3189,13 @@
     "id": 9771587698,
     "lat": 37.49276571860681,
     "lon": 126.99584547225977,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2673305582,
     "lat": 37.48771829595097,
     "lon": 127.03104614363811,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4098544759,
@@ -3219,7 +3219,7 @@
     "id": 4800507149,
     "lat": 37.49316810573579,
     "lon": 127.02594564616082,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7979866858,
@@ -3237,19 +3237,19 @@
     "id": 9668941582,
     "lat": 37.49460300752361,
     "lon": 127.01681205763077,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6794550928,
     "lat": 37.48591905568338,
     "lon": 126.98766445582092,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8224685709,
     "lat": 37.49436028608043,
     "lon": 127.0229031703619,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1848839857,
@@ -3261,7 +3261,7 @@
     "id": 9218006033,
     "lat": 37.496830151781076,
     "lon": 127.00191667714327,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1880421762,
@@ -3273,37 +3273,37 @@
     "id": 2651422902,
     "lat": 37.48817316437196,
     "lon": 127.03070153814716,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5693317721,
     "lat": 37.48667307570222,
     "lon": 127.01480072245525,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1818887670,
     "lat": 37.485252306676536,
     "lon": 126.99187076953069,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6130339880,
     "lat": 37.487984742907926,
     "lon": 127.01052608143323,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3525440136,
     "lat": 37.49989719699298,
     "lon": 127.02175812790269,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3999732170,
     "lat": 37.47118744978502,
     "lon": 126.98696844923252,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4730676652,
@@ -3315,31 +3315,31 @@
     "id": 2157047855,
     "lat": 37.477244375816646,
     "lon": 126.98523136367317,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8475304136,
     "lat": 37.48301562478889,
     "lon": 127.00863496490587,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9541200681,
     "lat": 37.49780465511929,
     "lon": 126.99079379245555,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7037638769,
     "lat": 37.50318358452143,
     "lon": 126.99894432691977,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5467827140,
     "lat": 37.492150769047754,
     "lon": 126.99451333129133,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7038859118,
@@ -3363,7 +3363,7 @@
     "id": 5495189598,
     "lat": 37.488498413574625,
     "lon": 126.99257651508766,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6125001945,
@@ -3375,19 +3375,19 @@
     "id": 7290475386,
     "lat": 37.497474065972796,
     "lon": 127.00456816360713,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2657600134,
     "lat": 37.477867155202,
     "lon": 126.98980170130336,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6112384938,
     "lat": 37.48113178993798,
     "lon": 127.03135859576633,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2992373252,
@@ -3399,19 +3399,19 @@
     "id": 1625324984,
     "lat": 37.500995888265635,
     "lon": 127.02280978862865,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8228566691,
     "lat": 37.50046392852961,
     "lon": 127.00025430042876,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4227567105,
     "lat": 37.48541449157445,
     "lon": 127.02674114173428,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6478056017,
@@ -3423,7 +3423,7 @@
     "id": 5218097585,
     "lat": 37.49084511694027,
     "lon": 127.01069696076954,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9444752783,
@@ -3435,31 +3435,31 @@
     "id": 7078320381,
     "lat": 37.48078482829831,
     "lon": 127.02804324826623,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5531514410,
     "lat": 37.507405675445085,
     "lon": 126.98902392870525,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4146127698,
     "lat": 37.48189027821521,
     "lon": 127.01402489914855,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2049038327,
     "lat": 37.50330765420208,
     "lon": 127.00058791538487,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1924849026,
     "lat": 37.474745576515346,
     "lon": 127.03041268068608,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3403339235,
@@ -3471,7 +3471,7 @@
     "id": 7004658185,
     "lat": 37.505593413637285,
     "lon": 126.99294790659336,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8384789216,
@@ -3495,7 +3495,7 @@
     "id": 8506442728,
     "lat": 37.4765282033465,
     "lon": 127.01792916723744,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7989149015,
@@ -3519,13 +3519,13 @@
     "id": 7543385635,
     "lat": 37.50468856225461,
     "lon": 127.00971834262614,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3934116191,
     "lat": 37.497683397179124,
     "lon": 127.00489678415454,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9803075075,
@@ -3537,19 +3537,19 @@
     "id": 2906594026,
     "lat": 37.495532691469876,
     "lon": 127.02340630780773,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1251146374,
     "lat": 37.484138860108125,
     "lon": 126.9966676849575,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9530428408,
     "lat": 37.49247490602734,
     "lon": 127.00680861590568,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5827523420,
@@ -3609,7 +3609,7 @@
     "id": 2363739555,
     "lat": 37.490795383726834,
     "lon": 126.99333439716624,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1222882845,
@@ -3621,37 +3621,37 @@
     "id": 3985718411,
     "lat": 37.51400455639503,
     "lon": 127.01900052293252,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6390598093,
     "lat": 37.49592212387095,
     "lon": 127.02683873112252,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3458463285,
     "lat": 37.474428095479645,
     "lon": 126.99109227121336,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5707958876,
     "lat": 37.49117742171917,
     "lon": 127.02845361909809,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9205906784,
     "lat": 37.47142353913955,
     "lon": 126.9915399284571,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9320495141,
     "lat": 37.50194152402597,
     "lon": 127.01707100585374,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9697164191,
@@ -3687,7 +3687,7 @@
     "id": 5495895208,
     "lat": 37.510273633767696,
     "lon": 126.9956406016549,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3437556102,
@@ -3699,13 +3699,13 @@
     "id": 2624307190,
     "lat": 37.48507641362057,
     "lon": 127.00143895885708,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3089503592,
     "lat": 37.46951617252476,
     "lon": 127.02524439739581,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7411090582,
@@ -3717,7 +3717,7 @@
     "id": 6244528918,
     "lat": 37.48258192688004,
     "lon": 127.03769156532432,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4322347589,
@@ -3729,13 +3729,13 @@
     "id": 5666401865,
     "lat": 37.4977610894675,
     "lon": 127.02566660698027,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4236745361,
     "lat": 37.502432736342705,
     "lon": 127.02167309380417,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7832495240,
@@ -3747,13 +3747,13 @@
     "id": 7938315602,
     "lat": 37.500702959876094,
     "lon": 127.01921096290427,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1495071585,
     "lat": 37.46454922905423,
     "lon": 126.98788326030972,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9997221349,
@@ -3777,7 +3777,7 @@
     "id": 5831407070,
     "lat": 37.50480530419066,
     "lon": 127.00258425524689,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5871363144,
@@ -3795,25 +3795,25 @@
     "id": 8262136751,
     "lat": 37.46905048951163,
     "lon": 127.0243350369204,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2714793911,
     "lat": 37.49379900870846,
     "lon": 127.02593076656952,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5522806938,
     "lat": 37.507327657760165,
     "lon": 127.00751412555073,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7605294833,
     "lat": 37.48415310866106,
     "lon": 127.03590749007503,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7472180146,
@@ -3825,13 +3825,13 @@
     "id": 1936713936,
     "lat": 37.50561284201876,
     "lon": 127.00415749592598,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3311814457,
     "lat": 37.47731264267677,
     "lon": 126.98483352758998,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2785186532,
@@ -3843,19 +3843,19 @@
     "id": 2557924720,
     "lat": 37.47166256899622,
     "lon": 127.02271608112531,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6297766852,
     "lat": 37.482190821282494,
     "lon": 127.01678127757675,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7334229274,
     "lat": 37.46797662332566,
     "lon": 127.03745201064919,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8419752491,
@@ -3867,13 +3867,13 @@
     "id": 9045864968,
     "lat": 37.48974901417174,
     "lon": 127.02768891385452,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4095249945,
     "lat": 37.49526345125212,
     "lon": 127.0129105093736,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9076457461,
@@ -3891,13 +3891,13 @@
     "id": 7022153602,
     "lat": 37.48946880345225,
     "lon": 127.00795469533254,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9173332944,
     "lat": 37.494609416771816,
     "lon": 127.02392789076048,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5144873780,
@@ -3915,7 +3915,7 @@
     "id": 5797328290,
     "lat": 37.471666590210546,
     "lon": 127.00901172858734,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5584561320,
@@ -3927,13 +3927,13 @@
     "id": 6482774870,
     "lat": 37.514023263697794,
     "lon": 127.01777921943359,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8524911102,
     "lat": 37.4985053253038,
     "lon": 127.01801980881139,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7563772153,
@@ -3945,25 +3945,25 @@
     "id": 5511350389,
     "lat": 37.48909858087345,
     "lon": 127.01833810286462,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8542933180,
     "lat": 37.49176218335496,
     "lon": 127.02665980974102,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8224326102,
     "lat": 37.48701811704701,
     "lon": 127.01586070030581,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8970871179,
     "lat": 37.475122246307066,
     "lon": 127.04318966056005,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2809956777,
@@ -3981,7 +3981,7 @@
     "id": 9965314915,
     "lat": 37.467242407009756,
     "lon": 127.02163938383609,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4225352584,
@@ -3993,7 +3993,7 @@
     "id": 3707418229,
     "lat": 37.49041738985191,
     "lon": 126.98428165021394,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8961620895,
@@ -4011,13 +4011,13 @@
     "id": 5880211926,
     "lat": 37.49488661612968,
     "lon": 127.01209115070027,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9596103041,
     "lat": 37.48596611988156,
     "lon": 126.98451932744703,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2944669896,
@@ -4029,7 +4029,7 @@
     "id": 9324675130,
     "lat": 37.486882767020376,
     "lon": 126.98849911484082,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3918736306,
@@ -4053,13 +4053,13 @@
     "id": 2096116719,
     "lat": 37.49851021624169,
     "lon": 126.98803057930145,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8882742260,
     "lat": 37.49844676984014,
     "lon": 127.01841475757686,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4825942679,
@@ -4071,25 +4071,25 @@
     "id": 5078200866,
     "lat": 37.50462764217836,
     "lon": 127.0033831612423,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3924153107,
     "lat": 37.495462009976606,
     "lon": 127.01249356905892,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6692138362,
     "lat": 37.493782404992885,
     "lon": 127.02382813964203,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4549438038,
     "lat": 37.48223350363493,
     "lon": 127.03907615283276,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2544634380,
@@ -4107,7 +4107,7 @@
     "id": 2256228507,
     "lat": 37.47539077347976,
     "lon": 127.01696087901891,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7597202055,
@@ -4119,25 +4119,25 @@
     "id": 8886148981,
     "lat": 37.46817021053276,
     "lon": 126.98831224835821,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2461548514,
     "lat": 37.48981616991377,
     "lon": 127.023213733475,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6195571829,
     "lat": 37.514608647222424,
     "lon": 127.01840376334641,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3472771110,
     "lat": 37.482997903127945,
     "lon": 127.03170842292225,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2312458426,
@@ -4155,7 +4155,7 @@
     "id": 3764287736,
     "lat": 37.47832840965309,
     "lon": 126.99287960503405,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6730399667,
@@ -4173,31 +4173,31 @@
     "id": 5705147360,
     "lat": 37.46998534382806,
     "lon": 127.02465369642302,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4319265329,
     "lat": 37.50009883977636,
     "lon": 127.00666957925125,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8743659764,
     "lat": 37.48781561170932,
     "lon": 127.0320464123518,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4516849183,
     "lat": 37.49341873840252,
     "lon": 127.00489885488412,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3270100698,
     "lat": 37.481093323801936,
     "lon": 127.01749244376064,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3132892720,
@@ -4221,25 +4221,25 @@
     "id": 8371492087,
     "lat": 37.49189912455769,
     "lon": 127.02076724268456,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7610071998,
     "lat": 37.48221831749251,
     "lon": 126.98364588801981,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2198292907,
     "lat": 37.49283421235009,
     "lon": 126.9923709663957,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6083458758,
     "lat": 37.50560874950103,
     "lon": 127.01379528135898,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7305139985,
@@ -4251,13 +4251,13 @@
     "id": 8830146713,
     "lat": 37.501821999128715,
     "lon": 127.02048188751704,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2267921816,
     "lat": 37.49355990639885,
     "lon": 127.00602386956574,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4019834006,
@@ -4275,7 +4275,7 @@
     "id": 8508919469,
     "lat": 37.48261741649355,
     "lon": 127.01755863385634,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8133651639,
@@ -4293,7 +4293,7 @@
     "id": 5107502700,
     "lat": 37.50202739479495,
     "lon": 126.99237465477731,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8031875259,
@@ -4317,25 +4317,25 @@
     "id": 1635158549,
     "lat": 37.501813690853744,
     "lon": 126.99044503714548,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2179012579,
     "lat": 37.471272895958116,
     "lon": 126.99109059755658,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5176617484,
     "lat": 37.46811059078342,
     "lon": 126.98727143174517,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6315537438,
     "lat": 37.468149529976,
     "lon": 127.02672068091199,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9671748004,
@@ -4347,19 +4347,19 @@
     "id": 1664608512,
     "lat": 37.510548646157694,
     "lon": 126.99486819992909,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4258174598,
     "lat": 37.495825082333745,
     "lon": 127.01852068682358,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6740620552,
     "lat": 37.50675076964669,
     "lon": 127.01932227603837,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8292575612,
@@ -4383,19 +4383,19 @@
     "id": 5455113412,
     "lat": 37.47145141836607,
     "lon": 127.02280291594315,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4745625664,
     "lat": 37.49807963194237,
     "lon": 127.01931911737357,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9546614641,
     "lat": 37.474399111281194,
     "lon": 127.03079665866784,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7045007448,
@@ -4407,31 +4407,31 @@
     "id": 8476211882,
     "lat": 37.47039618696153,
     "lon": 127.03620978436659,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2304163239,
     "lat": 37.50966432902892,
     "lon": 127.00581431529396,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7144083136,
     "lat": 37.491127608927684,
     "lon": 127.00995060421768,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2670276277,
     "lat": 37.493597531621354,
     "lon": 126.98391112217433,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3221178731,
     "lat": 37.47199788523943,
     "lon": 127.0235304426922,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1548217584,
@@ -4449,13 +4449,13 @@
     "id": 7528927950,
     "lat": 37.5050825183804,
     "lon": 127.00093357412305,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2550627352,
     "lat": 37.48181624209902,
     "lon": 127.04225186631518,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7734967185,
@@ -4467,7 +4467,7 @@
     "id": 6716077169,
     "lat": 37.49937998884488,
     "lon": 127.01905308782344,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5880330567,
@@ -4479,13 +4479,13 @@
     "id": 4700241832,
     "lat": 37.469819551691934,
     "lon": 127.02643236086227,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2946781930,
     "lat": 37.497202975139295,
     "lon": 127.00059973034921,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9141511007,
@@ -4509,7 +4509,7 @@
     "id": 5961633432,
     "lat": 37.47281605006058,
     "lon": 127.03983897738861,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8410404920,
@@ -4527,31 +4527,31 @@
     "id": 7279148544,
     "lat": 37.48506900786716,
     "lon": 127.03855820943677,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3032962843,
     "lat": 37.50851404972752,
     "lon": 126.99210305481898,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7338691363,
     "lat": 37.51366315876291,
     "lon": 127.0009203038321,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4898042411,
     "lat": 37.49839963153957,
     "lon": 127.00874957852527,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9034017944,
     "lat": 37.475246149814986,
     "lon": 127.04455053574452,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7999352812,
@@ -4569,7 +4569,7 @@
     "id": 7529914606,
     "lat": 37.48796746920268,
     "lon": 127.0263660981483,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8184825832,
@@ -4581,7 +4581,7 @@
     "id": 3659213491,
     "lat": 37.47819076009745,
     "lon": 127.00653230976245,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2807876273,
@@ -4593,7 +4593,7 @@
     "id": 7592769577,
     "lat": 37.49300442494494,
     "lon": 127.00673532005293,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9644770585,
@@ -4617,19 +4617,19 @@
     "id": 8559046485,
     "lat": 37.47822332431784,
     "lon": 127.03834405724098,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1689961556,
     "lat": 37.46718499947212,
     "lon": 127.03509972708227,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5775025630,
     "lat": 37.47432682443917,
     "lon": 127.04813323231517,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1291903913,
@@ -4641,7 +4641,7 @@
     "id": 9753811233,
     "lat": 37.49739329656626,
     "lon": 127.01988483215779,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6119983110,
@@ -4653,13 +4653,13 @@
     "id": 5775586293,
     "lat": 37.49856451141307,
     "lon": 126.99253319545909,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9460979321,
     "lat": 37.48077039755617,
     "lon": 127.03840680372974,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5756758925,
@@ -4671,19 +4671,19 @@
     "id": 9053064089,
     "lat": 37.48690170739858,
     "lon": 127.00480568644466,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1489063858,
     "lat": 37.5026827914234,
     "lon": 127.01174807385962,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7021720004,
     "lat": 37.479786663822,
     "lon": 126.9923113766463,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8185945565,
@@ -4695,13 +4695,13 @@
     "id": 4499167381,
     "lat": 37.502992235189566,
     "lon": 127.00071450457925,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8036778763,
     "lat": 37.48778510364765,
     "lon": 126.99033851755917,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2001972995,
@@ -4713,13 +4713,13 @@
     "id": 5237490195,
     "lat": 37.50413623128071,
     "lon": 127.02372562767196,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6125286409,
     "lat": 37.47986936668078,
     "lon": 127.02050351431998,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7443828069,
@@ -4731,19 +4731,19 @@
     "id": 9085394556,
     "lat": 37.5075743384441,
     "lon": 126.99235723908723,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8078408122,
     "lat": 37.48751714509904,
     "lon": 127.01910157724258,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5482181309,
     "lat": 37.497534447353516,
     "lon": 127.00436872168827,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2030346010,
@@ -4761,19 +4761,19 @@
     "id": 7284469047,
     "lat": 37.46062827149104,
     "lon": 127.03571017916035,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9030314051,
     "lat": 37.48452367923704,
     "lon": 127.03068092916256,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3563132336,
     "lat": 37.48947103730663,
     "lon": 127.02757248850835,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4408264558,
@@ -4785,7 +4785,7 @@
     "id": 6706409349,
     "lat": 37.50736041613194,
     "lon": 126.98924425189738,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3873904518,
@@ -4803,7 +4803,7 @@
     "id": 8804763708,
     "lat": 37.49401276851515,
     "lon": 127.0140451664491,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6243208585,
@@ -4815,13 +4815,13 @@
     "id": 8837476554,
     "lat": 37.49911778490799,
     "lon": 127.0015493499654,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1501877321,
     "lat": 37.507087245925106,
     "lon": 127.02009141626286,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3166716329,
@@ -4845,7 +4845,7 @@
     "id": 5089288768,
     "lat": 37.46625469110694,
     "lon": 126.98909579329063,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6041312386,
@@ -4863,13 +4863,13 @@
     "id": 3073975125,
     "lat": 37.47047737570802,
     "lon": 127.02965298131151,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6645658622,
     "lat": 37.46134748669565,
     "lon": 127.03492361129477,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2147924547,
@@ -4881,7 +4881,7 @@
     "id": 2540769022,
     "lat": 37.48932303951483,
     "lon": 127.01081940420796,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5139311271,
@@ -4893,7 +4893,7 @@
     "id": 5655280166,
     "lat": 37.47688848542163,
     "lon": 126.99101456851129,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5596666493,
@@ -4917,19 +4917,19 @@
     "id": 8416579481,
     "lat": 37.49782437603355,
     "lon": 127.00376738448631,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3416956930,
     "lat": 37.5090722490417,
     "lon": 127.01816458102208,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7534681683,
     "lat": 37.49620503037475,
     "lon": 126.98752100902426,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9777246834,
@@ -4965,7 +4965,7 @@
     "id": 8911765392,
     "lat": 37.49308454472213,
     "lon": 126.98868669190557,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7721305985,
@@ -4989,25 +4989,25 @@
     "id": 2889094593,
     "lat": 37.507097324879915,
     "lon": 126.99403763684353,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4982387075,
     "lat": 37.50970164094852,
     "lon": 127.01696467954429,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1328491784,
     "lat": 37.49869465380244,
     "lon": 127.00143830421084,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3948618962,
     "lat": 37.481585822694775,
     "lon": 126.98675776460088,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8172773602,
@@ -5019,7 +5019,7 @@
     "id": 6062066552,
     "lat": 37.471553874088436,
     "lon": 127.02403528882648,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4349272134,
@@ -5037,25 +5037,25 @@
     "id": 9154305846,
     "lat": 37.500119823056,
     "lon": 127.01171100328965,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6965538107,
     "lat": 37.49758966829348,
     "lon": 127.01901328397643,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1886265773,
     "lat": 37.49363745737743,
     "lon": 127.01796262102785,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1928089520,
     "lat": 37.50528500727728,
     "lon": 127.00945140151991,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7815830073,
@@ -5067,19 +5067,19 @@
     "id": 1520804596,
     "lat": 37.494012471245405,
     "lon": 127.0264152226213,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2896459447,
     "lat": 37.483117734486484,
     "lon": 127.03010318511161,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9643223239,
     "lat": 37.49281766129822,
     "lon": 127.01327295694865,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2649581898,
@@ -5097,19 +5097,19 @@
     "id": 5532212276,
     "lat": 37.505330576415744,
     "lon": 127.00051277259017,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5812502915,
     "lat": 37.49622654725921,
     "lon": 127.02603188106696,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9035532831,
     "lat": 37.485379469705464,
     "lon": 127.01529783567322,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2552126569,
@@ -5121,19 +5121,19 @@
     "id": 7804796697,
     "lat": 37.465427509958914,
     "lon": 126.99003884315991,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2766427016,
     "lat": 37.49723350804288,
     "lon": 127.02003315655888,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1486978266,
     "lat": 37.50041368812247,
     "lon": 126.99679815108301,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9991162515,
@@ -5145,19 +5145,19 @@
     "id": 8854442453,
     "lat": 37.494245197567956,
     "lon": 127.01047714169115,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6488157305,
     "lat": 37.472700724399736,
     "lon": 127.02668597158026,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7767342406,
     "lat": 37.47768263089211,
     "lon": 126.9826638652827,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2229108853,
@@ -5169,7 +5169,7 @@
     "id": 5710907554,
     "lat": 37.46804016855669,
     "lon": 127.03856963400145,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8857251030,
@@ -5187,7 +5187,7 @@
     "id": 9657126543,
     "lat": 37.487362320411115,
     "lon": 126.99635395829799,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9696506523,
@@ -5211,25 +5211,25 @@
     "id": 9691795449,
     "lat": 37.48346713665662,
     "lon": 127.0124342660141,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2137473724,
     "lat": 37.490130782774045,
     "lon": 126.98910930482509,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9507038750,
     "lat": 37.48870429858788,
     "lon": 127.02798485341398,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5833673992,
     "lat": 37.47788455958608,
     "lon": 127.03911843809203,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3304479944,
@@ -5241,7 +5241,7 @@
     "id": 7876410591,
     "lat": 37.464488790472316,
     "lon": 126.99126865254122,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8065403074,
@@ -5253,7 +5253,7 @@
     "id": 4755266659,
     "lat": 37.493551877147205,
     "lon": 127.00644544749748,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4966022181,
@@ -5265,13 +5265,13 @@
     "id": 9802963344,
     "lat": 37.48186812588964,
     "lon": 126.98822746911631,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9234719403,
     "lat": 37.49773376078712,
     "lon": 127.02325268026374,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1397241434,
@@ -5289,13 +5289,13 @@
     "id": 7648637400,
     "lat": 37.50002814276139,
     "lon": 127.00031320498138,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6917645411,
     "lat": 37.48849104639503,
     "lon": 127.02176897759834,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3978168842,
@@ -5307,13 +5307,13 @@
     "id": 4186923816,
     "lat": 37.482202307408336,
     "lon": 126.98660123011317,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2882717194,
     "lat": 37.48822294395418,
     "lon": 127.02247944586885,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6636495491,
@@ -5331,7 +5331,7 @@
     "id": 8087712281,
     "lat": 37.491535346337535,
     "lon": 127.00378277283744,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2495757635,
@@ -5355,7 +5355,7 @@
     "id": 5403702154,
     "lat": 37.50681016610738,
     "lon": 126.99313464637633,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4626073706,
@@ -5367,13 +5367,13 @@
     "id": 5330021208,
     "lat": 37.48530664655897,
     "lon": 127.02485819067196,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4257998893,
     "lat": 37.49373495971572,
     "lon": 127.02362079382375,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7315473709,
@@ -5397,7 +5397,7 @@
     "id": 7606690069,
     "lat": 37.4935782495839,
     "lon": 127.0278148495595,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6754407028,
@@ -5409,7 +5409,7 @@
     "id": 9139375143,
     "lat": 37.4941071375433,
     "lon": 127.02571217199024,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5703148251,
@@ -5421,7 +5421,7 @@
     "id": 2995173957,
     "lat": 37.49177090979646,
     "lon": 127.01368475950673,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9064748708,
@@ -5433,31 +5433,31 @@
     "id": 2273636010,
     "lat": 37.487607430767355,
     "lon": 126.9885908615994,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5390087845,
     "lat": 37.49175900004887,
     "lon": 127.00036560072773,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6727966345,
     "lat": 37.48825778564705,
     "lon": 127.01979393915119,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1765832368,
     "lat": 37.47940320679186,
     "lon": 127.03712834768838,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8791174582,
     "lat": 37.47922035438891,
     "lon": 127.03837675687929,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7280862914,
@@ -5475,19 +5475,19 @@
     "id": 5303085290,
     "lat": 37.494399577718546,
     "lon": 127.01284746531752,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4244639166,
     "lat": 37.48842781295335,
     "lon": 126.98817004759373,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6420222833,
     "lat": 37.465582673377746,
     "lon": 127.03841780748608,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5688161404,
@@ -5499,13 +5499,13 @@
     "id": 1730984120,
     "lat": 37.47361541791408,
     "lon": 127.0455554034562,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7045008802,
     "lat": 37.48693231668734,
     "lon": 127.01573503390188,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3504311765,
@@ -5523,19 +5523,19 @@
     "id": 2602912369,
     "lat": 37.49401703770893,
     "lon": 126.98622919746006,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7349009177,
     "lat": 37.48381662137357,
     "lon": 127.00377909152294,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2656746616,
     "lat": 37.49476590510725,
     "lon": 127.02256957904314,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8329918117,
@@ -5547,13 +5547,13 @@
     "id": 4258189194,
     "lat": 37.50601959629766,
     "lon": 126.99460967071303,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3400800759,
     "lat": 37.47001805971777,
     "lon": 127.02335057591586,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8331287351,
@@ -5571,7 +5571,7 @@
     "id": 1268633824,
     "lat": 37.474349886099276,
     "lon": 127.03349642887171,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5088487160,
@@ -5583,49 +5583,49 @@
     "id": 3673881012,
     "lat": 37.479981834223736,
     "lon": 127.02735808113277,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4982245030,
     "lat": 37.48927659622408,
     "lon": 127.01717645424354,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9553522576,
     "lat": 37.50772724971327,
     "lon": 127.01886311695631,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5129498855,
     "lat": 37.504398879241705,
     "lon": 127.01456526632569,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1032395542,
     "lat": 37.497173192949354,
     "lon": 127.0194729899021,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6128253617,
     "lat": 37.49165583867027,
     "lon": 126.98610303867784,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1711758243,
     "lat": 37.467876140676495,
     "lon": 127.04037847502732,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2153598760,
     "lat": 37.49470371712468,
     "lon": 127.02405743054418,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9426060670,
@@ -5643,7 +5643,7 @@
     "id": 2287468363,
     "lat": 37.473161599910625,
     "lon": 127.0254450399702,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8576098074,
@@ -5667,7 +5667,7 @@
     "id": 4376382897,
     "lat": 37.46585622917843,
     "lon": 127.02206849965152,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8108039280,
@@ -5679,19 +5679,19 @@
     "id": 3170509436,
     "lat": 37.48147303820887,
     "lon": 127.01199066711102,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3552533024,
     "lat": 37.48791833218163,
     "lon": 126.99285416147085,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5310667846,
     "lat": 37.50570686837212,
     "lon": 127.02083286053383,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6061324275,
@@ -5703,7 +5703,7 @@
     "id": 8435314722,
     "lat": 37.47809316338089,
     "lon": 127.02944873163625,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5226375636,
@@ -5727,19 +5727,19 @@
     "id": 2490402548,
     "lat": 37.47482754741339,
     "lon": 126.99131244700635,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2435100857,
     "lat": 37.47209202483679,
     "lon": 127.02784812252271,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9642612520,
     "lat": 37.50379782251372,
     "lon": 127.0245733407713,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9700999688,
@@ -5775,13 +5775,13 @@
     "id": 7341795808,
     "lat": 37.4786000745241,
     "lon": 126.99180399329585,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6752461811,
     "lat": 37.49556496067332,
     "lon": 126.98545863229938,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4781033131,
@@ -5793,7 +5793,7 @@
     "id": 3686197385,
     "lat": 37.50105200080778,
     "lon": 127.02608086514635,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2424363027,
@@ -5805,7 +5805,7 @@
     "id": 5876726544,
     "lat": 37.48868589344939,
     "lon": 127.0122759517607,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1949906353,
@@ -5817,7 +5817,7 @@
     "id": 9591388147,
     "lat": 37.497671085187605,
     "lon": 127.00365562127534,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8226692021,
@@ -5829,7 +5829,7 @@
     "id": 7078502826,
     "lat": 37.474942307327005,
     "lon": 127.03189370488653,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3067442870,
@@ -5841,7 +5841,7 @@
     "id": 7471889026,
     "lat": 37.509500046865604,
     "lon": 126.9953304286575,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3292012044,
@@ -5865,7 +5865,7 @@
     "id": 8114029826,
     "lat": 37.48220706223763,
     "lon": 127.01025284969144,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4642578965,
@@ -5877,13 +5877,13 @@
     "id": 8031713331,
     "lat": 37.47196055456469,
     "lon": 126.98741001476701,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7962385689,
     "lat": 37.48921465242007,
     "lon": 127.02794162265167,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4964128699,
@@ -5925,19 +5925,19 @@
     "id": 2496221101,
     "lat": 37.4834984203106,
     "lon": 127.03546002239692,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8353525107,
     "lat": 37.50983381404554,
     "lon": 126.99527790555035,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5692853663,
     "lat": 37.48531995217117,
     "lon": 127.00618034767315,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6120743057,
@@ -5949,13 +5949,13 @@
     "id": 7828655689,
     "lat": 37.48358107599046,
     "lon": 127.02782578718357,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4380887867,
     "lat": 37.467072748261444,
     "lon": 127.03793819527412,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8424505782,
@@ -5967,7 +5967,7 @@
     "id": 7668121728,
     "lat": 37.50296490565755,
     "lon": 126.99914105091592,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9306117501,
@@ -5979,7 +5979,7 @@
     "id": 7446065114,
     "lat": 37.48820561560185,
     "lon": 127.02062355727475,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6386581641,
@@ -5997,13 +5997,13 @@
     "id": 8284085882,
     "lat": 37.49065955384878,
     "lon": 126.9852103974645,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1964919734,
     "lat": 37.5111844242138,
     "lon": 126.9948518445256,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7364567350,
@@ -6015,7 +6015,7 @@
     "id": 4372491182,
     "lat": 37.48472935011698,
     "lon": 127.03270729725779,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3620533367,
@@ -6033,7 +6033,7 @@
     "id": 3668386866,
     "lat": 37.47020072715965,
     "lon": 127.03509176495005,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1688878439,
@@ -6075,13 +6075,13 @@
     "id": 5650949662,
     "lat": 37.475679508097976,
     "lon": 126.9882122004237,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4279117063,
     "lat": 37.50796867971446,
     "lon": 127.01783739163588,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6412259676,
@@ -6099,7 +6099,7 @@
     "id": 1006979612,
     "lat": 37.50066303645884,
     "lon": 127.02011168471904,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9405535026,
@@ -6117,7 +6117,7 @@
     "id": 5057598895,
     "lat": 37.473218551130735,
     "lon": 127.0447944834705,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5682567925,
@@ -6141,25 +6141,25 @@
     "id": 9332906551,
     "lat": 37.48311223176871,
     "lon": 127.02711333195563,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8272492009,
     "lat": 37.51430986289232,
     "lon": 127.0161261880049,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2305067209,
     "lat": 37.50106028201617,
     "lon": 127.02198050789559,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3949332055,
     "lat": 37.50130140278802,
     "lon": 127.02257166785769,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5566681939,
@@ -6171,7 +6171,7 @@
     "id": 3002222866,
     "lat": 37.48018218661205,
     "lon": 126.99582797742623,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5607986488,
@@ -6189,19 +6189,19 @@
     "id": 4006511204,
     "lat": 37.49893342385716,
     "lon": 127.01231980807485,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7919312985,
     "lat": 37.49426692121566,
     "lon": 127.02808883033515,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5549375591,
     "lat": 37.47591520841067,
     "lon": 127.04557917168918,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7374619802,
@@ -6213,7 +6213,7 @@
     "id": 5403279430,
     "lat": 37.499638865686215,
     "lon": 127.01770825562329,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5615137204,
@@ -6225,31 +6225,31 @@
     "id": 8437030381,
     "lat": 37.47837871136758,
     "lon": 127.03943587807721,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1151456192,
     "lat": 37.50640126473359,
     "lon": 126.98618991557497,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7826063182,
     "lat": 37.487967867628676,
     "lon": 127.02207663783149,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8848318627,
     "lat": 37.503994056332736,
     "lon": 127.02087452845444,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4484954891,
     "lat": 37.48744311920111,
     "lon": 127.01829841312191,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1224649552,
@@ -6267,13 +6267,13 @@
     "id": 9526991313,
     "lat": 37.491869225479455,
     "lon": 126.99610474673861,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7306649510,
     "lat": 37.49067541253479,
     "lon": 127.02707931981976,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9994852538,
@@ -6285,7 +6285,7 @@
     "id": 7796524950,
     "lat": 37.4959683485625,
     "lon": 126.98717246728715,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8569738847,
@@ -6297,7 +6297,7 @@
     "id": 1872063166,
     "lat": 37.49625628917387,
     "lon": 127.00200012723342,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4312254785,
@@ -6309,7 +6309,7 @@
     "id": 7964311826,
     "lat": 37.496693962585475,
     "lon": 127.01778327270684,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8666078160,
@@ -6333,7 +6333,7 @@
     "id": 4993857951,
     "lat": 37.47496690199905,
     "lon": 127.04547097623868,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4820894957,
@@ -6345,13 +6345,13 @@
     "id": 5487461176,
     "lat": 37.49843097845576,
     "lon": 127.01011575872279,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6052910055,
     "lat": 37.49645313461394,
     "lon": 127.00369522800332,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2468303270,
@@ -6363,13 +6363,13 @@
     "id": 4248047211,
     "lat": 37.486280120199524,
     "lon": 127.02956554571746,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4356551568,
     "lat": 37.483078711588654,
     "lon": 127.01996913987442,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1496741162,
@@ -6381,7 +6381,7 @@
     "id": 2384765970,
     "lat": 37.49290417620223,
     "lon": 127.00513683288374,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8728566119,
@@ -6405,19 +6405,19 @@
     "id": 6412219160,
     "lat": 37.48814966718462,
     "lon": 126.98303472940148,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1202812193,
     "lat": 37.49239650100592,
     "lon": 127.01129881792502,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2826988659,
     "lat": 37.49219693942895,
     "lon": 127.01507401651325,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9667345023,
@@ -6429,7 +6429,7 @@
     "id": 8113737526,
     "lat": 37.49120881180877,
     "lon": 127.0080540319062,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1207004349,
@@ -6441,13 +6441,13 @@
     "id": 6501214819,
     "lat": 37.48713181263251,
     "lon": 127.01877203458422,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6324343841,
     "lat": 37.51245109865676,
     "lon": 127.02064309932315,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8691527765,
@@ -6483,13 +6483,13 @@
     "id": 1012206503,
     "lat": 37.47170749171507,
     "lon": 127.03750562158903,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6066702878,
     "lat": 37.480418702934266,
     "lon": 127.00749710832288,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1050775158,
@@ -6507,19 +6507,19 @@
     "id": 3326020120,
     "lat": 37.48379235045753,
     "lon": 127.02995061923109,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4772911570,
     "lat": 37.46662683080977,
     "lon": 127.0191970573725,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4422798661,
     "lat": 37.4818545569954,
     "lon": 127.00803271891813,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6211054455,
@@ -6537,7 +6537,7 @@
     "id": 4414566678,
     "lat": 37.480865550928996,
     "lon": 126.98372505587575,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2486157178,
@@ -6555,7 +6555,7 @@
     "id": 9761483013,
     "lat": 37.511608597639714,
     "lon": 126.99526154646539,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4838771166,
@@ -6567,19 +6567,19 @@
     "id": 5322424537,
     "lat": 37.48022413817725,
     "lon": 126.9958634312987,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8715689045,
     "lat": 37.48422648299067,
     "lon": 127.03873451665928,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6870931635,
     "lat": 37.49492882414616,
     "lon": 127.00604719453956,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8363192236,
@@ -6591,25 +6591,25 @@
     "id": 1740360692,
     "lat": 37.48480064995575,
     "lon": 127.03717132410796,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7716842484,
     "lat": 37.47521524013171,
     "lon": 127.04533488578176,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8030532001,
     "lat": 37.51576208944161,
     "lon": 127.01823041249109,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7981577444,
     "lat": 37.49684212335277,
     "lon": 127.02561581656853,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3531565410,
@@ -6627,19 +6627,19 @@
     "id": 7050069766,
     "lat": 37.47021967759488,
     "lon": 127.00783415234726,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2654262305,
     "lat": 37.469595169547986,
     "lon": 127.03875799555428,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5224839803,
     "lat": 37.49218923123605,
     "lon": 127.01915837845388,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4372968085,
@@ -6657,7 +6657,7 @@
     "id": 7113083827,
     "lat": 37.50969605943658,
     "lon": 127.01880202130103,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6648631048,
@@ -6669,25 +6669,25 @@
     "id": 2721206556,
     "lat": 37.495770355313184,
     "lon": 126.99725138153516,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8216617484,
     "lat": 37.461456243887866,
     "lon": 126.98842796044369,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2882310998,
     "lat": 37.4781799255033,
     "lon": 127.00906767166829,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5390725788,
     "lat": 37.48377803362543,
     "lon": 127.02117298240454,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5864953079,
@@ -6711,19 +6711,19 @@
     "id": 8915509280,
     "lat": 37.4775137524005,
     "lon": 127.0350280072534,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2827695854,
     "lat": 37.50487785382992,
     "lon": 126.99592849855539,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1360178700,
     "lat": 37.464310068085176,
     "lon": 126.99225549567377,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4809501845,
@@ -6741,13 +6741,13 @@
     "id": 3133554788,
     "lat": 37.46383802695219,
     "lon": 127.0350977389862,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2141074014,
     "lat": 37.5042038989241,
     "lon": 127.02390116807044,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7564598278,
@@ -6759,7 +6759,7 @@
     "id": 5089288013,
     "lat": 37.47830372735647,
     "lon": 127.00247176359979,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6672017254,
@@ -6783,7 +6783,7 @@
     "id": 6975408966,
     "lat": 37.51422805041868,
     "lon": 127.02043505080675,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3999963969,
@@ -6795,7 +6795,7 @@
     "id": 6053129992,
     "lat": 37.48219564588453,
     "lon": 127.01901394828974,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8157449952,
@@ -6807,7 +6807,7 @@
     "id": 4828054251,
     "lat": 37.50872491463149,
     "lon": 127.00313241091567,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5989580960,
@@ -6843,31 +6843,31 @@
     "id": 6788994850,
     "lat": 37.482998044616224,
     "lon": 127.01004720717049,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5794524984,
     "lat": 37.47192646575868,
     "lon": 127.03098794528626,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9972579943,
     "lat": 37.49437002355471,
     "lon": 127.01168049082158,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4356553238,
     "lat": 37.486458618149626,
     "lon": 127.0279615806757,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4959547778,
     "lat": 37.4890231481704,
     "lon": 127.01106111809794,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8573399600,
@@ -6891,13 +6891,13 @@
     "id": 3780863569,
     "lat": 37.4922840152779,
     "lon": 127.02463303796647,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5354187276,
     "lat": 37.49306552293035,
     "lon": 127.02655307767819,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2977696873,
@@ -6909,13 +6909,13 @@
     "id": 4352597591,
     "lat": 37.49663200030435,
     "lon": 127.01983735677553,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6608468282,
     "lat": 37.48678245759998,
     "lon": 127.01593390124299,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5906225450,
@@ -6927,7 +6927,7 @@
     "id": 6976218476,
     "lat": 37.50582275694208,
     "lon": 127.01896823241702,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9440657019,
@@ -6939,13 +6939,13 @@
     "id": 9759837434,
     "lat": 37.50034411088919,
     "lon": 126.99658147248024,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6287572304,
     "lat": 37.46219222559347,
     "lon": 127.02599450193019,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2184221736,
@@ -6957,7 +6957,7 @@
     "id": 1320951661,
     "lat": 37.49717234304699,
     "lon": 127.02359031046079,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1919652220,
@@ -6969,13 +6969,13 @@
     "id": 2496697828,
     "lat": 37.479782753373804,
     "lon": 126.98633766723376,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3929774308,
     "lat": 37.50780181750707,
     "lon": 127.01912665313701,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4037735777,
@@ -6987,31 +6987,31 @@
     "id": 7243561408,
     "lat": 37.49544502975809,
     "lon": 127.01373377693605,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5469531405,
     "lat": 37.49401104102798,
     "lon": 127.010948274569,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3435827607,
     "lat": 37.508445526834855,
     "lon": 126.99075654070167,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6503334621,
     "lat": 37.496568113601086,
     "lon": 127.01899775502874,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5976771264,
     "lat": 37.48427613004325,
     "lon": 127.0382112264952,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1501791005,
@@ -7029,13 +7029,13 @@
     "id": 5211582535,
     "lat": 37.47342544053679,
     "lon": 127.04522161808566,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2108295120,
     "lat": 37.47761722695887,
     "lon": 127.00311010470713,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6884429878,
@@ -7059,7 +7059,7 @@
     "id": 9926226432,
     "lat": 37.49053120310081,
     "lon": 127.01863652573377,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1857979016,
@@ -7071,13 +7071,13 @@
     "id": 2344333734,
     "lat": 37.49772632225438,
     "lon": 127.02511570901753,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2931026891,
     "lat": 37.4809102855841,
     "lon": 127.0066740007607,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2377072068,
@@ -7089,13 +7089,13 @@
     "id": 7327581091,
     "lat": 37.497376265977806,
     "lon": 126.98652714388435,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9908091497,
     "lat": 37.472345807446914,
     "lon": 127.02577915278286,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7455481961,
@@ -7107,25 +7107,25 @@
     "id": 6957188925,
     "lat": 37.478485459803736,
     "lon": 127.00381165199961,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9584393524,
     "lat": 37.48665540312908,
     "lon": 127.00573292810655,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1940156422,
     "lat": 37.487109556192266,
     "lon": 127.01843613244424,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4850156145,
     "lat": 37.46973234544487,
     "lon": 127.03871889651064,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4953611007,
@@ -7137,7 +7137,7 @@
     "id": 5618867911,
     "lat": 37.49806593731345,
     "lon": 127.02324124067864,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7090861112,
@@ -7155,19 +7155,19 @@
     "id": 6466165464,
     "lat": 37.497526488415566,
     "lon": 127.02401408695584,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2517363946,
     "lat": 37.48434896116535,
     "lon": 127.03557545144436,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5206143690,
     "lat": 37.488439798938565,
     "lon": 127.012193102566,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2522219907,
@@ -7179,7 +7179,7 @@
     "id": 3344724955,
     "lat": 37.51174686244486,
     "lon": 127.01593958819886,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3157424309,
@@ -7191,25 +7191,25 @@
     "id": 4317352064,
     "lat": 37.487483221988654,
     "lon": 127.01843325791806,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6832714782,
     "lat": 37.50840243443803,
     "lon": 126.99313769214609,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6530261033,
     "lat": 37.5077695616205,
     "lon": 127.02237610700806,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8356555763,
     "lat": 37.49252678521946,
     "lon": 127.0166717963693,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3737577446,
@@ -7245,13 +7245,13 @@
     "id": 4464288518,
     "lat": 37.49024717695125,
     "lon": 127.01374719703733,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3899409296,
     "lat": 37.47519667666456,
     "lon": 127.03014991762394,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2796063622,
@@ -7263,7 +7263,7 @@
     "id": 3949829727,
     "lat": 37.498197679754306,
     "lon": 126.99329086337497,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1856951730,
@@ -7275,7 +7275,7 @@
     "id": 8615146381,
     "lat": 37.46965342695294,
     "lon": 127.02400830987239,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9722907239,
@@ -7287,37 +7287,37 @@
     "id": 5949087417,
     "lat": 37.485537641596544,
     "lon": 126.99213292686753,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6431051141,
     "lat": 37.479115874546736,
     "lon": 127.01290734858054,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6106222210,
     "lat": 37.49177033825969,
     "lon": 126.99973977771303,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3394676270,
     "lat": 37.489264254257556,
     "lon": 126.98562742872278,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4591330726,
     "lat": 37.47534002673592,
     "lon": 126.98677416346777,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 5093666477,
     "lat": 37.48975973628417,
     "lon": 127.02862711116035,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6732298397,
@@ -7329,7 +7329,7 @@
     "id": 3827840137,
     "lat": 37.47706530733241,
     "lon": 127.03451323647404,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1760187460,
@@ -7341,31 +7341,31 @@
     "id": 3933362398,
     "lat": 37.488652853896305,
     "lon": 127.02648197866397,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1149131892,
     "lat": 37.49343564926546,
     "lon": 127.01759621464623,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6307266705,
     "lat": 37.492680382191665,
     "lon": 127.00823154894394,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1743170509,
     "lat": 37.503481112012324,
     "lon": 127.00658999280115,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 1607095960,
     "lat": 37.473363927569494,
     "lon": 126.98383852507023,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1668724589,
@@ -7377,7 +7377,7 @@
     "id": 6421999402,
     "lat": 37.49778625551079,
     "lon": 127.02423051575948,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2266373914,
@@ -7401,7 +7401,7 @@
     "id": 4227209847,
     "lat": 37.493328827668435,
     "lon": 126.98597499261038,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8236393270,
@@ -7419,7 +7419,7 @@
     "id": 3263874240,
     "lat": 37.481695812580206,
     "lon": 127.0409731889903,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4778110488,
@@ -7437,13 +7437,13 @@
     "id": 8748250069,
     "lat": 37.497983259775765,
     "lon": 127.02688306426425,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2393210811,
     "lat": 37.47699192698791,
     "lon": 126.98440738284523,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 4973947551,
@@ -7461,13 +7461,13 @@
     "id": 4472188481,
     "lat": 37.48277672296709,
     "lon": 127.03725919428828,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8444068779,
     "lat": 37.4814277444217,
     "lon": 126.98578088375432,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7254447453,
@@ -7479,13 +7479,13 @@
     "id": 6887468794,
     "lat": 37.46541926749738,
     "lon": 127.019665315353,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7429937419,
     "lat": 37.48493320710837,
     "lon": 127.0326892028896,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4270584884,
@@ -7503,13 +7503,13 @@
     "id": 9528527254,
     "lat": 37.48524592398323,
     "lon": 127.02180971288254,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8325288105,
     "lat": 37.50356984407905,
     "lon": 127.01961446928759,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3442301401,
@@ -7527,7 +7527,7 @@
     "id": 6898837040,
     "lat": 37.483742839250795,
     "lon": 126.995314754194,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6119693448,
@@ -7539,19 +7539,19 @@
     "id": 4407665881,
     "lat": 37.50112730531135,
     "lon": 127.02047114371634,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2701745696,
     "lat": 37.49163813560826,
     "lon": 126.98704411865818,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 2169638637,
     "lat": 37.48041780134866,
     "lon": 127.00715210353943,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1999881961,
@@ -7563,7 +7563,7 @@
     "id": 8496262497,
     "lat": 37.497359996358526,
     "lon": 127.02377015182984,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2239573160,
@@ -7581,7 +7581,7 @@
     "id": 6666144075,
     "lat": 37.48297055540204,
     "lon": 127.02036031482194,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7861276036,
@@ -7593,13 +7593,13 @@
     "id": 9554741648,
     "lat": 37.488576379418554,
     "lon": 127.01117413367085,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 7077276246,
     "lat": 37.47527880522705,
     "lon": 127.03044509266489,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2446466227,
@@ -7611,7 +7611,7 @@
     "id": 2324999681,
     "lat": 37.489195120034914,
     "lon": 126.99467693931673,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2117370944,
@@ -7623,13 +7623,13 @@
     "id": 9662148693,
     "lat": 37.495374436427014,
     "lon": 127.02520408310274,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6166625854,
     "lat": 37.4895069997802,
     "lon": 127.0285916218558,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 9820747853,
@@ -7653,13 +7653,13 @@
     "id": 4896291209,
     "lat": 37.50853493852745,
     "lon": 126.99069139869604,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 7985133804,
     "lat": 37.481613453708796,
     "lon": 127.00910758417413,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4245671962,
@@ -7677,13 +7677,13 @@
     "id": 5891247337,
     "lat": 37.505761674714215,
     "lon": 127.02080255039682,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 3769530789,
     "lat": 37.4982159527025,
     "lon": 127.00865694654918,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 8769599573,
@@ -7701,7 +7701,7 @@
     "id": 4418281720,
     "lat": 37.500481830271404,
     "lon": 127.02202103389406,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 8798998540,
@@ -7713,19 +7713,19 @@
     "id": 6009036605,
     "lat": 37.47684288252185,
     "lon": 126.99124116594169,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 4153599093,
     "lat": 37.49473669109793,
     "lon": 126.99933694580609,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 6214611327,
     "lat": 37.484560738617134,
     "lon": 127.03660932256928,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 9093992479,
@@ -7761,7 +7761,7 @@
     "id": 8435651304,
     "lat": 37.47646544261545,
     "lon": 127.01245914359181,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 6695010058,
@@ -7797,7 +7797,7 @@
     "id": 4472150085,
     "lat": 37.46408464159204,
     "lon": 127.034495863873,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 5739787967,
@@ -7809,25 +7809,25 @@
     "id": 2868547219,
     "lat": 37.507110426825875,
     "lon": 126.98756747388926,
-    "type": "WHEELCHAIR_CHARGER"
+    "type": "RAMP"
   },
   {
     "id": 3105723889,
     "lat": 37.49392961162734,
     "lon": 126.98316391594896,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 1376357430,
     "lat": 37.511618780320916,
     "lon": 127.01746720985938,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2743244912,
     "lat": 37.48234304098743,
     "lon": 127.01193429134001,
-    "type": "WHEELCHAIR_LIFT"
+    "type": "ELEVATOR"
   },
   {
     "id": 2713949256,
