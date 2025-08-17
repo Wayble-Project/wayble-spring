@@ -30,11 +30,11 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void registerReview(Long zoneId, ReviewRegisterDto dto, String token) {
+    public void registerReview(Long zoneId, Long userId, ReviewRegisterDto dto) {
         WaybleZone zone = waybleZoneRepository.findById(zoneId)
                 .orElseThrow(() -> new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_NOT_FOUND));
 
-        User user = userRepository.findById(dto.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
         Review review = Review.of(user, zone, dto.content(), dto.rating());
@@ -44,14 +44,13 @@ public class ReviewService {
         zone.updateRating(newRating);
         zone.addReviewCount(1);
 
-        if (dto.images() != null) {
+        if (dto.images() != null && !dto.images().isEmpty()) {
             for (String imageUrl : dto.images()) {
                 reviewImageRepository.save(ReviewImage.of(review, imageUrl));
             }
         }
-        waybleZoneRepository.save(zone);
 
-        // visitDate 및 facilities 저장은 필요시 추가 구현
+        waybleZoneRepository.save(zone);
     }
 
     @Transactional(readOnly = true)

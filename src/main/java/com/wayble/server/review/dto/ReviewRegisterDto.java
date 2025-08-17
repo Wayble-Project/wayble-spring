@@ -7,11 +7,6 @@ import java.util.List;
 
 @Schema(description = "리뷰 등록 요청 DTO")
 public record ReviewRegisterDto(
-
-        @Schema(description = "작성자 ID", example = "1")
-        @NotNull(message = "작성자 ID는 필수입니다.")
-        Long userId,
-
         @Schema(description = "리뷰 내용", example = "뷰가 좋고 접근성이 좋은 카페예요.")
         @NotBlank(message = "리뷰 내용은 비어 있을 수 없습니다.")
         String content,
