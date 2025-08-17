@@ -729,7 +729,82 @@ public class TransportationService {
             i = j;
         }
         
-        return mergedSteps;
+        // 환승 시 walk step 추가
+        return addTransferWalkSteps(mergedSteps, pathEdges);
+    }
+    
+    private List<TransportationResponseDto.Step> addTransferWalkSteps(List<TransportationResponseDto.Step> steps, List<Edge> pathEdges) {
+        List<TransportationResponseDto.Step> result = new ArrayList<>();
+        
+        for (int i = 0; i < steps.size(); i++) {
+            TransportationResponseDto.Step currentStep = steps.get(i);
+            result.add(currentStep);
+            
+            // 마지막 step이 아니고, 현재 step이 walk가 아닌 경우
+            if (i < steps.size() - 1 && currentStep.mode() != DirectionType.WALK) {
+                TransportationResponseDto.Step nextStep = steps.get(i + 1);
+                
+                // 다음 step도 walk가 아닌 경우 (bus -> subway, subway -> bus 등)
+                if (nextStep.mode() != DirectionType.WALK) {
+                    // 환승 walk step 추가
+                    String transferFrom = currentStep.to();
+                    String transferTo = nextStep.from();
+                    
+                    // 이전 step의 도착지와 다음 step의 출발지 사이의 직선거리 계산
+                    int walkDistance = calculateTransferWalkDistance(transferFrom, transferTo, pathEdges);
+                    
+                    TransportationResponseDto.Step walkStep = new TransportationResponseDto.Step(
+                        DirectionType.WALK,
+                        null,
+                        null,
+                        walkDistance,
+                        null,
+                        null,
+                        transferFrom,
+                        transferTo
+                    );
+                    
+                    result.add(walkStep);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private int calculateTransferWalkDistance(String fromStation, String toStation, List<Edge> pathEdges) {
+        // pathEdges에서 해당 정류장의 노드 정보 찾기
+        Node fromNode = null;
+        Node toNode = null;
+        
+        for (Edge edge : pathEdges) {
+            if (edge.getStartNode() != null && edge.getStartNode().getStationName() != null && 
+                edge.getStartNode().getStationName().equals(fromStation)) {
+                fromNode = edge.getStartNode();
+            }
+            if (edge.getEndNode() != null && edge.getEndNode().getStationName() != null && 
+                edge.getEndNode().getStationName().equals(fromStation)) {
+                fromNode = edge.getEndNode();
+            }
+            if (edge.getStartNode() != null && edge.getStartNode().getStationName() != null && 
+                edge.getStartNode().getStationName().equals(toStation)) {
+                toNode = edge.getStartNode();
+            }
+            if (edge.getEndNode() != null && edge.getEndNode().getStationName() != null && 
+                edge.getEndNode().getStationName().equals(toStation)) {
+                toNode = edge.getEndNode();
+            }
+        }
+        
+        if (fromNode != null && toNode != null) {
+            double distanceKm = haversine(
+                fromNode.getLatitude(), fromNode.getLongitude(),
+                toNode.getLatitude(), toNode.getLongitude()
+            );
+            return (int) (distanceKm * 1000); // km를 m로 변환
+        }
+        
+        return 0; // 노드를 찾지 못한 경우
     }
     
     private String getNodeName(Node node) {
