@@ -689,7 +689,7 @@ public class TransportationService {
             } else if (currentType == DirectionType.SUBWAY) {
                 try {
                     if (currentEdge.getStartNode() != null) {
-                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId(), currentEdge.getRoute().getRouteId(), null);
+                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId(), currentEdge.getRoute().getRouteId());
                         
                         subwayInfo = new TransportationResponseDto.SubwayInfo(
                             nodeInfo.wheelchair(), 
