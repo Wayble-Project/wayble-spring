@@ -152,6 +152,8 @@ public class FacilityService {
                 }
             }
             
+            elevatorLocations.sort(String::compareTo);
+            
         } catch(Exception e) {
             log.error("엘리베이터 정보 조회 실패 - facilityId: {}, error: {}", 
                 facility.getId(), e.getMessage(), e);
