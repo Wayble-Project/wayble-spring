@@ -4,10 +4,15 @@ import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.entity.transportation.Facility;
 import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.entity.transportation.Wheelchair;
+import com.wayble.server.direction.entity.transportation.Elevator;
+
 import com.wayble.server.direction.external.kric.dto.KricToiletRawItem;
 import com.wayble.server.direction.external.kric.dto.KricToiletRawResponse;
+
+import com.wayble.server.direction.repository.ElevatorRepository;
 import com.wayble.server.direction.repository.FacilityRepository;
 import com.wayble.server.direction.repository.NodeRepository;
+import com.wayble.server.direction.repository.RouteRepository;
 import com.wayble.server.direction.repository.WheelchairInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +33,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class FacilityService {
+    private final ElevatorRepository elevatorRepository;
     private final FacilityRepository facilityRepository;
     private final NodeRepository nodeRepository;
     private final WheelchairInfoRepository wheelchairInfoRepository;
@@ -54,8 +60,6 @@ public class FacilityService {
                 }
             }
             
-            elevator = new ArrayList<>();
-            
             Facility facility = facilityRepository.findByNodeId(nodeId).orElse(null);
             if (facility != null) {
                 String stinCd = facility.getStinCd();
@@ -65,6 +69,8 @@ public class FacilityService {
                 if (stinCd != null && railOprLsttCd != null && lnCd != null) {
                     Map<String, Boolean> toiletInfo = getToiletInfo(facility);
                     accessibleRestroom = toiletInfo.getOrDefault(stinCd, false);
+                    
+                    elevator = getElevatorInfo(facility, routeId);
                 } else {
                     log.error("Facility 정보 누락 - nodeId: {}, stinCd: {}, railOprLsttCd: {}, lnCd: {}", 
                         nodeId, stinCd, railOprLsttCd, lnCd);
@@ -132,4 +138,27 @@ public class FacilityService {
 
         return stationToiletMap;
     }
+
+    private List<String> getElevatorInfo(Facility facility, Long routeId) {
+        List<String> elevatorLocations = new ArrayList<>();
+        
+        try {
+            List<Elevator> elevators = elevatorRepository.findByFacility(facility);
+        
+            for (Elevator elevator : elevators) {
+                String location = elevator.getLocation();
+                if (location != null && !location.trim().isEmpty()) {
+                    elevatorLocations.add(location.trim());
+                }
+            }
+            
+        } catch(Exception e) {
+            log.error("엘리베이터 정보 조회 실패 - facilityId: {}, error: {}", 
+                facility.getId(), e.getMessage(), e);
+        }
+        
+        return elevatorLocations;
+    }
+
+
 }
