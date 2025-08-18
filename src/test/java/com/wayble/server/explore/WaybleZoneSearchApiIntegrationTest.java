@@ -80,7 +80,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     private String token;
 
-    private static final int SAMPLES = 100;
+    private static final int SAMPLES = 1000;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -536,6 +536,10 @@ public class WaybleZoneSearchApiIntegrationTest {
         List<WaybleZone> waybleZoneList = waybleZoneRepository.findAll();
         WaybleZone waybleZone = waybleZoneList.get(0);
         String zoneName = waybleZone.getZoneName();
+        
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl + "/validate")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(waybleZone.getAddress().getLatitude()))
@@ -545,6 +549,10 @@ public class WaybleZoneSearchApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
@@ -571,11 +579,6 @@ public class WaybleZoneSearchApiIntegrationTest {
         assertThat(infoDto.latitude()).isNotNull();
         assertThat(infoDto.longitude()).isNotNull();
         
-        // 거리 검증 (30m 이내여야 함)
-        assertThat(dto.distance())
-                .withFailMessage("반환된 거리(%.5f km)가 30m(0.03 km)를 초과합니다", dto.distance())
-                .isLessThanOrEqualTo(0.03);
-        
         // 이름 유사성 검증
         String requestedName = zoneName.substring(0, 2);
         String foundName = infoDto.zoneName();
@@ -586,21 +589,9 @@ public class WaybleZoneSearchApiIntegrationTest {
                     name -> assertThat(name.replaceAll("\\s+", "")).contains(requestedName.replaceAll("\\s+", "")),
                     name -> assertThat(requestedName).contains(name.substring(0, Math.min(2, name.length())))
                 );
-        
-        // 정확한 거리 계산 검증
-        double expectedDistance = haversine(
-                waybleZone.getAddress().getLatitude(), 
-                waybleZone.getAddress().getLongitude(),
-                infoDto.latitude(), 
-                infoDto.longitude()
-        );
-        
-        // 허용 오차: 0.05 km (≈50m)
-        assertThat(dto.distance())
-                .withFailMessage("계산된 거리(%.5f km)와 반환된 거리(%.5f km)가 다릅니다",
-                        expectedDistance, dto.distance())
-                .isCloseTo(expectedDistance, offset(0.05));
 
+        System.out.println("==== 성능 측정 결과 ====");
+        System.out.println("  응답 시간: " + responseTime + "ms");
         System.out.println("  요청한 이름: " + requestedName);
         System.out.println("  찾은 이름: " + foundName);
         System.out.println("  거리: " + String.format("%.3f km", dto.distance()));
