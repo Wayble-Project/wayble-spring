@@ -41,17 +41,18 @@ public class UserPlaceService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
-        userPlaceRepository.findByUser_IdAndTitle(userId, request.title())
+        String normalizedTitle = request.title().trim();
+        userPlaceRepository.findByUser_IdAndTitle(userId, normalizedTitle)
                 .ifPresent(p -> { throw new ApplicationException(UserErrorCase.PLACE_TITLE_DUPLICATED); });
 
-        String color = (request.color() == null || request.color().isBlank()) ? "GRAY" : request.color();
+        String color = request.color() == null ? null : request.color().trim();
+        color = (color == null || color.isEmpty()) ? "GRAY" : color.toUpperCase();
 
         UserPlace saved = userPlaceRepository.save(
                 UserPlace.builder()
-                        .title(request.title())
+                        .title(normalizedTitle)
                         .color(color)
                         .user(user)
-                        .savedCount(0)
                         .build()
         );
         return saved.getId();
