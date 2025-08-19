@@ -66,7 +66,7 @@ class ReviewServiceTest {
 
         assertEquals(4.5, ratingCaptor.getValue(), 1e-6);
 
-        verify(zone, times(1)).addReviewCount(1L);
+        verify(zone, times(1)).addReviewCount(1);
         verify(reviewImageRepository, times(1)).save(any(ReviewImage.class));
         verify(waybleZoneRepository, times(1)).save(zone);
     }

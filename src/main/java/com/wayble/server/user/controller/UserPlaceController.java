@@ -9,6 +9,7 @@ import com.wayble.server.user.dto.UserPlaceSummaryDto;
 import com.wayble.server.user.service.UserPlaceService;
 import com.wayble.server.wayblezone.dto.WaybleZoneListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<String> saveUserPlace(
-            @CurrentUser Long userId,
+            @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestBody @Valid UserPlaceRequestDto request
     ) {
         userPlaceService.saveUserPlace(userId, request); // userId 파라미터로 넘김
@@ -49,7 +50,7 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<List<UserPlaceSummaryDto>> getMyPlaceSummaries(
-            @CurrentUser Long userId,
+            @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestParam(name = "sort", defaultValue = "latest") String sort
     ) {
         List<UserPlaceSummaryDto> summaries = userPlaceService.getMyPlaceSummaries(userId, sort);
@@ -66,7 +67,7 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
-            @CurrentUser Long userId,
+            @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestParam Long placeId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer size
@@ -86,7 +87,7 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
     })
     public CommonResponse<String> removeZoneFromPlace(
-            @CurrentUser Long userId,
+            @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestBody @Valid UserPlaceRemoveRequestDto request
     ) {
         userPlaceService.removeZoneFromPlace(userId, request.placeId(), request.waybleZoneId());
