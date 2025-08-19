@@ -38,11 +38,15 @@ public class UserPlaceController {
             @RequestBody @Valid UserPlaceCreateRequestDto request
     ) {
         Long placeId = userPlaceService.createPlaceList(userId, request);
+        String normalizedTitle = request.title().trim();
+        String normalizedColor = (request.color() == null || request.color().isBlank())
+                ? "GRAY"
+                : request.color().trim().toUpperCase();
         return CommonResponse.success(
                 UserPlaceCreateResponseDto.builder()
                         .placeId(placeId)
-                        .title(request.title())
-                        .color((request.color() == null || request.color().isBlank()) ? "GRAY" : request.color())
+                        .title(normalizedTitle)
+                        .color(normalizedColor)
                         .message("리스트가 생성되었습니다.")
                         .build()
         );
