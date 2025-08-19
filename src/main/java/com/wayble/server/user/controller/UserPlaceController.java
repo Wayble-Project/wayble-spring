@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -96,7 +98,7 @@ public class UserPlaceController {
 
     @GetMapping("/zones")
     @Operation(summary = "특정 장소 내 웨이블존 목록 조회(페이징)",
-            description = "placeId로 해당 장소 내부의 웨이블존 카드 목록을 반환합니다. (page는 1부터 시작.)")
+            description = "placeId로 해당 장소 내부의 웨이블존 카드 목록을 반환합니다. (page는 0부터 시작.)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저/장소를 찾을 수 없음"),
@@ -105,8 +107,8 @@ public class UserPlaceController {
     public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
             @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestParam Long placeId,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "20") Integer size
+            @RequestParam(defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer size
     ) {
         Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
         return CommonResponse.success(zones);
