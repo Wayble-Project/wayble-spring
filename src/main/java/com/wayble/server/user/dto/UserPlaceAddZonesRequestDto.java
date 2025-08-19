@@ -6,5 +6,5 @@ import java.util.List;
 
 public record UserPlaceAddZonesRequestDto(
         @NotNull Long placeId,
-        @NotEmpty List<Long> waybleZoneId
+        @NotEmpty List<Long> waybleZoneIds
 ) {}
