@@ -52,8 +52,12 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         String authz = request != null ? request.getHeader("Authorization") : null;
         if (StringUtils.hasText(authz) && authz.startsWith("Bearer ")) {
             String token = authz.substring(7);
-            Long userId = jwtTokenProvider.getUserId(token);
-            if (userId != null) { return userId; }
+            try {
+                Long userId = jwtTokenProvider.getUserId(token);
+                if (userId != null) { return userId; }
+            } catch (IllegalArgumentException e) {
+                throw new ApplicationException(AuthErrorCase.UNAUTHORIZED);
+            }
         }
 
         throw new ApplicationException(AuthErrorCase.UNAUTHORIZED);
