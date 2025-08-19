@@ -1,6 +1,8 @@
 package com.wayble.server.auth.resolver;
 
+import com.wayble.server.auth.exception.AuthErrorCase;
 import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
+import com.wayble.server.common.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -54,6 +56,6 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             if (userId != null) { return userId; }
         }
 
-        throw new IllegalStateException("인증 정보가 없거나 userId를 추출할 수 없습니다.");
+        throw new ApplicationException(AuthErrorCase.UNAUTHORIZED);
     }
 }
