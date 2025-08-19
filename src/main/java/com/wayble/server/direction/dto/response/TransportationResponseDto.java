@@ -1,7 +1,9 @@
 package com.wayble.server.direction.dto.response;
 
-import com.wayble.server.direction.entity.DirectionType;
 import org.springframework.lang.Nullable;
+
+import com.wayble.server.direction.entity.type.DirectionType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
