@@ -96,7 +96,7 @@ public class UserPlaceController {
     public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
             @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestParam Long placeId,
-            @RequestParam(defaultValue = "1") @Min(0) Integer page,
+            @RequestParam(defaultValue = "1") @Min(1) Integer page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer size
     ) {
         Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
