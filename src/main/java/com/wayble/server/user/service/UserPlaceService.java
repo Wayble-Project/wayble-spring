@@ -117,7 +117,7 @@ public class UserPlaceService {
         UserPlace place = userPlaceRepository.findByIdAndUser_Id(placeId, userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.PLACE_NOT_FOUND));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<WaybleZone> zones = mappingRepository.findZonesByPlaceId(place.getId(), pageable);
 
         return zones.map(z ->
