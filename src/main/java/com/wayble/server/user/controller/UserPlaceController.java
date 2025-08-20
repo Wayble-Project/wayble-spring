@@ -94,7 +94,7 @@ public class UserPlaceController {
             @ApiResponse(responseCode = "200", description = "웨이블존에 리스트 추가 성공"),
             @ApiResponse(responseCode = "404", description = "유저/리스트/웨이블존을 찾을 수 없음")
     })
-    public CommonResponse<String> addZonesToPlace(
+    public CommonResponse<String> addZoneToPlaces(
             @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestBody @Valid UserPlaceAddZonesRequestDto request
     ) {
