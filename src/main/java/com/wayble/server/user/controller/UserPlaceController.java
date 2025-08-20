@@ -69,7 +69,7 @@ public class UserPlaceController {
         return CommonResponse.success(summaries);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/zones")
     @Operation(
             summary = "내가 저장한 리스트에서 웨이블존 제거",
             description = "RequestBody로 placeId, waybleZoneId를 받아 지정한 장소에서 웨이블존을 제거합니다."
@@ -88,18 +88,18 @@ public class UserPlaceController {
     }
 
     @PostMapping("/zones")
-    @Operation(summary = "리스트에 웨이블존 추가",
-            description = "placeId와 waybleZoneId 배열을 받아 여러 웨이블존을 리스트에 추가합니다.")
+    @Operation(summary = "웨이블존에 저장한 리스트 추가 (여러개 가능)",
+            description = "웨이블존에 사용자가 요청한 리스트들을 추가합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "웨이블존 추가 성공"),
+            @ApiResponse(responseCode = "200", description = "웨이블존에 리스트 추가 성공"),
             @ApiResponse(responseCode = "404", description = "유저/리스트/웨이블존을 찾을 수 없음")
     })
     public CommonResponse<String> addZonesToPlace(
             @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestBody @Valid UserPlaceAddZonesRequestDto request
     ) {
-        userPlaceService.addZonesToPlace(userId, request.placeId(), request.waybleZoneIds());
-        return CommonResponse.success("리스트에 웨이블존이 추가되었습니다.");
+        int added = userPlaceService.addZoneToPlaces(userId, request.placeIds(), request.waybleZoneId());
+        return CommonResponse.success(String.format("%d개 리스트에 추가되었습니다.", added));
     }
 
     @GetMapping("/zones")
