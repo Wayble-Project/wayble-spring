@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record UserPlaceAddZonesRequestDto(
-        @NotNull Long placeId,
-        @NotEmpty List<Long> waybleZoneIds
+        @NotEmpty List<@NotNull Long> placeIds,
+        @NotNull Long waybleZoneId
 ) {}

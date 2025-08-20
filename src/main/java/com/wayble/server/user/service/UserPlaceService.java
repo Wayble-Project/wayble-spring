@@ -3,7 +3,6 @@ package com.wayble.server.user.service;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.user.dto.UserPlaceCreateRequestDto;
-import com.wayble.server.user.dto.UserPlaceRequestDto;
 import com.wayble.server.user.dto.UserPlaceSummaryDto;
 import com.wayble.server.user.entity.User;
 import com.wayble.server.user.entity.UserPlace;
@@ -59,18 +58,21 @@ public class UserPlaceService {
     }
 
     @Transactional
-    public void addZonesToPlace(Long userId, Long placeId, List<Long> waybleZoneIds) {
-        UserPlace place = userPlaceRepository.findByIdAndUser_Id(placeId, userId)
-                .orElseThrow(() -> new ApplicationException(UserErrorCase.PLACE_NOT_FOUND));
+    public int addZoneToPlaces(Long userId, List<Long> placeIds, Long waybleZoneId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(UserErrorCase.USER_NOT_FOUND));
 
-        Set<Long> uniqueIds = new LinkedHashSet<>(waybleZoneIds);
+        WaybleZone zone = waybleZoneRepository.findById(waybleZoneId)
+                .orElseThrow(() -> new ApplicationException(UserErrorCase.WAYBLE_ZONE_NOT_FOUND));
+
+        Set<Long> uniquePlaceIds = new LinkedHashSet<>(placeIds);
 
         int added = 0;
-        for (Long zoneId : uniqueIds) {
-            WaybleZone zone = waybleZoneRepository.findById(zoneId)
-                    .orElseThrow(() -> new ApplicationException(UserErrorCase.WAYBLE_ZONE_NOT_FOUND));
+        for (Long placeId : uniquePlaceIds) {
+            UserPlace place = userPlaceRepository.findByIdAndUser_Id(placeId, user.getId())
+                    .orElseThrow(() -> new ApplicationException(UserErrorCase.PLACE_NOT_FOUND));
 
-            boolean exists = mappingRepository.existsByUserPlace_IdAndWaybleZone_Id(placeId, zoneId);
+            boolean exists = mappingRepository.existsByUserPlace_IdAndWaybleZone_Id(placeId, waybleZoneId);
             if (exists) continue;
 
             mappingRepository.save(UserPlaceWaybleZoneMapping.builder()
@@ -79,15 +81,17 @@ public class UserPlaceService {
                     .build());
 
             place.increaseCount();
-            zone.addLikes(1);
-            waybleZoneRepository.save(zone);
+            userPlaceRepository.save(place);
 
+            zone.addLikes(1); // 리스트 하나에 추가될 때마다 +1
             added++;
         }
 
-        if (added > 0) userPlaceRepository.save(place);
+        if (added > 0) {
+            waybleZoneRepository.save(zone);
+        }
+        return added;
     }
-
 
     @Transactional(readOnly = true)
     public List<UserPlaceSummaryDto> getMyPlaceSummaries(Long userId, String sort) {
@@ -113,7 +117,7 @@ public class UserPlaceService {
         UserPlace place = userPlaceRepository.findByIdAndUser_Id(placeId, userId)
                 .orElseThrow(() -> new ApplicationException(UserErrorCase.PLACE_NOT_FOUND));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<WaybleZone> zones = mappingRepository.findZonesByPlaceId(place.getId(), pageable);
 
         return zones.map(z ->

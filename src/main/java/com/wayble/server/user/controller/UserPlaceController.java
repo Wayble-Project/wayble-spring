@@ -55,7 +55,7 @@ public class UserPlaceController {
     }
 
     @GetMapping
-    @Operation(summary = "내 장소 리스트 요약 조회", description = "장소 관련 목록(리스트)만 반환합니다(개수 포함).")
+    @Operation(summary = "내가 저장한 리스트 요약 조회", description = "장소 관련 목록(리스트)만 반환합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음"),
@@ -69,9 +69,43 @@ public class UserPlaceController {
         return CommonResponse.success(summaries);
     }
 
-    @DeleteMapping
+
+    @PostMapping("/zones")
+    @Operation(summary = "웨이블존에 저장한 리스트 추가 (여러 개 가능)",
+            description = "웨이블존에 사용자가 요청한 리스트들을 추가합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "웨이블존에 리스트 추가 성공"),
+            @ApiResponse(responseCode = "404", description = "유저/리스트/웨이블존을 찾을 수 없음")
+    })
+    public CommonResponse<String> addZoneToPlaces(
+            @Parameter(hidden = true) @CurrentUser Long userId,
+            @RequestBody @Valid UserPlaceAddZonesRequestDto request
+    ) {
+        int added = userPlaceService.addZoneToPlaces(userId, request.placeIds(), request.waybleZoneId());
+        return CommonResponse.success(String.format("%d개 리스트에 추가되었습니다.", added));
+    }
+
+    @GetMapping("/zones")
+    @Operation(summary = "저장한 리스트 내 웨이블존 목록 조회(페이징)",
+            description = "placeId로 해당 장소 내부의 웨이블존 목록을 반환합니다. (page는 1부터 시작.)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "유저/장소를 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
+    })
+    public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
+            @Parameter(hidden = true) @CurrentUser Long userId,
+            @RequestParam Long placeId,
+            @RequestParam(defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer size
+    ) {
+        Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
+        return CommonResponse.success(zones);
+    }
+
+    @DeleteMapping("/zones")
     @Operation(
-            summary = "장소에서 웨이블존 제거",
+            summary = "내가 저장한 리스트에서 웨이블존 제거",
             description = "RequestBody로 placeId, waybleZoneId를 받아 지정한 장소에서 웨이블존을 제거합니다."
     )
     @ApiResponses({
@@ -84,39 +118,6 @@ public class UserPlaceController {
             @RequestBody @Valid UserPlaceRemoveRequestDto request
     ) {
         userPlaceService.removeZoneFromPlace(userId, request.placeId(), request.waybleZoneId());
-        return CommonResponse.success("제거되었습니다.");
-    }
-
-    @PostMapping("/zones")
-    @Operation(summary = "리스트에 웨이블존 추가",
-            description = "placeId와 waybleZoneId 배열을 받아 여러 웨이블존을 리스트에 추가합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "웨이블존 추가 성공"),
-            @ApiResponse(responseCode = "404", description = "유저/리스트/웨이블존을 찾을 수 없음")
-    })
-    public CommonResponse<String> addZonesToPlace(
-            @Parameter(hidden = true) @CurrentUser Long userId,
-            @RequestBody @Valid UserPlaceAddZonesRequestDto request
-    ) {
-        userPlaceService.addZonesToPlace(userId, request.placeId(), request.waybleZoneIds());
-        return CommonResponse.success("리스트에 웨이블존이 추가되었습니다.");
-    }
-
-    @GetMapping("/zones")
-    @Operation(summary = "특정 장소 내 웨이블존 목록 조회(페이징)",
-            description = "placeId로 해당 장소 내부의 웨이블존 카드 목록을 반환합니다. (page는 0부터 시작.)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "유저/장소를 찾을 수 없음"),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.")
-    })
-    public CommonResponse<Page<WaybleZoneListResponseDto>> getZonesInPlace(
-            @Parameter(hidden = true) @CurrentUser Long userId,
-            @RequestParam Long placeId,
-            @RequestParam(defaultValue = "0") @Min(0) Integer page,
-            @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer size
-    ) {
-        Page<WaybleZoneListResponseDto> zones = userPlaceService.getZonesInPlace(userId, placeId, page, size);
-        return CommonResponse.success(zones);
+        return CommonResponse.success("성공적으로 제거되었습니다.");
     }
 }
