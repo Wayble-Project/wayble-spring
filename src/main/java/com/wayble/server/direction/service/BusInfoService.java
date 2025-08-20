@@ -29,11 +29,7 @@ public class BusInfoService {
     private final RouteRepository routeRepository;
 
     public TransportationResponseDto.BusInfo getBusInfo(String stationName, Long busId, Double x, Double y) {
-        // 나중에 서비스키 문제 해결되면 이 함수 호출 제거
-        return createDummyBusInfo(stationName, busId, x, y);
         
-        // 실제 API 호출 코드 (현재 주석 처리)
-        /*
         List<Boolean> isLowFloor = new ArrayList<>();
         Integer dispatchInterval = null;
 
@@ -55,18 +51,18 @@ public class BusInfoService {
 
             // 2. 여러 정류소가 나올 때, 가장 가까운 정류소 찾기
             StationSearchResponse.StationItem closestStation = findClosestStation(
-                    stationSearchResponse.msgBody().itemList(), x, y);
+                    stationSearchResponse.msgBody().itemList(), x, y, busId);
 
             if (closestStation == null) {
                 log.warn("가장 가까운 정류소를 찾을 수 없습니다: {}", stationName);
                 return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
             }
-
+            
             // 3. 정류소 ID로 버스 도착 정보 조회
-            OpenDataResponse openDataResponse = fetchArrivals(Long.parseLong(closestStation.stId()), busId);
+            OpenDataResponse openDataResponse = fetchArrivals(closestStation.arsId(), busId);
             if (openDataResponse == null || openDataResponse.msgBody() == null || 
                 openDataResponse.msgBody().itemList() == null) {
-                log.warn("버스 도착 정보를 찾을 수 없습니다: {}", closestStation.stId());
+                log.warn("정류소 {}의 버스 도착 정보를 찾을 수 없습니다: {}", stationName, closestStation.arsId());
                 return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
             }
             
@@ -89,47 +85,23 @@ public class BusInfoService {
                 
                 count++;
             }
-
+        
         } catch (Exception e) {
             log.error("버스 정보 조회 중 오류 발생: {}", e.getMessage());
             return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
         }
 
         return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
-        */
-        
     }
 
-    // 나중에 이 함수 제거
-    private TransportationResponseDto.BusInfo createDummyBusInfo(String stationName, Long busId, Double x, Double y) {
-        log.info("🎭 더미 BusInfo 생성 - stationName: {}, busId: {}, x: {}, y: {}", stationName, busId, x, y);
-        
-        // 셔틀버스 여부 확인 (기존 로직 유지)
-        boolean isShuttleBus = false;
-        if (busId != null) {
-            var route = routeRepository.findById(busId);
-            isShuttleBus = route.isPresent() && route.get().getRouteName().contains("마포");
-        }
-        
-        // 랜덤 더미 데이터 생성
-        List<Boolean> isLowFloor = new ArrayList<>();
-        isLowFloor.add(Math.random() < 0.7);
-        isLowFloor.add(Math.random() < 0.5);
-        
-        Integer dispatchInterval = (int) (Math.random() * 15) + 1;
-        
-        
-        return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
-    }
-
-    private OpenDataResponse fetchArrivals(Long stationId, Long busId) {
+    private OpenDataResponse fetchArrivals(String stationId, Long busId) {
         try {
             String serviceKey = openDataProperties.encodedKey();
 
             String uri = openDataProperties.baseUrl() + 
                     openDataProperties.endpoints().arrivals() +
                     "?serviceKey=" + serviceKey +
-                    "&stId=" + stationId +
+                    "&arsId=" + stationId +
                     "&resultType=json";
             
             HttpRequest request = HttpRequest.newBuilder()
@@ -147,8 +119,17 @@ public class BusInfoService {
             if (busId != null && originalResponse != null && originalResponse.msgBody() != null && 
                 originalResponse.msgBody().itemList() != null) {
                 
+                // busId로 route 정보 조회
+                var route = routeRepository.findById(busId);
+                String projectRouteName = route.isPresent() ? route.get().getRouteName() : null;
+                
                 List<OpenDataResponse.Item> filteredItems = originalResponse.msgBody().itemList().stream()
-                    .filter(item -> busId.toString().equals(item.busRouteId()))
+                    .filter(item -> {
+                        if (projectRouteName == null || item.rtNm() == null) {
+                            return false;
+                        }
+                        return projectRouteName.contains(item.rtNm()) || item.rtNm().contains(projectRouteName);
+                    })
                     .collect(Collectors.toList());
                 
                 return new OpenDataResponse(
@@ -193,12 +174,40 @@ public class BusInfoService {
         }
     }
 
-    private StationSearchResponse.StationItem findClosestStation(List<StationSearchResponse.StationItem> stations, Double x, Double y) {
+    private StationSearchResponse.StationItem findClosestStation(List<StationSearchResponse.StationItem> stations, Double x, Double y, Long routeId) {
         if (stations == null || stations.isEmpty()) {
             log.warn("❌ 정류소 목록이 비어있음");
             return null;
         }
 
+        // routeId가 있으면 해당 버스가 운행되는 정류소를 우선적으로 찾기
+        if (routeId != null) {
+            var route = routeRepository.findById(routeId);
+            String projectRouteName = route.isPresent() ? route.get().getRouteName() : null;
+            
+            if (projectRouteName != null) {
+                for (StationSearchResponse.StationItem station : stations) {
+                    try {
+                        // 각 정류소에서 버스 정보 조회
+                        OpenDataResponse busResponse = fetchArrivals(station.arsId(), null);
+                        if (busResponse != null && busResponse.msgBody() != null && busResponse.msgBody().itemList() != null) {
+                            for (OpenDataResponse.Item item : busResponse.msgBody().itemList()) {
+                                if (item.rtNm() != null && 
+                                    (projectRouteName.contains(item.rtNm()) || item.rtNm().contains(projectRouteName))) {
+
+                                    return station;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.warn("정류소 {}에서 버스 정보 조회 실패: {}", station.stNm(), e.getMessage());
+                        continue;
+                    }
+                }
+            }
+        }
+
+        // 해당 버스가 운행되는 정류소가 없으면 기존 로직으로 가장 가까운 정류소 선택
         StationSearchResponse.StationItem closestStation = null;
         double minDistance = Double.MAX_VALUE;
 
@@ -210,6 +219,12 @@ public class BusInfoService {
                 
                 if (tmXStr == null || tmYStr == null || tmXStr.trim().isEmpty() || tmYStr.trim().isEmpty()) {
                     log.warn("정류소 좌표가 null이거나 비어있음: {}", station.stNm());
+                    continue;
+                }
+                
+                // 추가 null 체크
+                if ("null".equalsIgnoreCase(tmXStr.trim()) || "null".equalsIgnoreCase(tmYStr.trim())) {
+                    log.warn("정류소 좌표가 'null' 문자열: {}", station.stNm());
                     continue;
                 }
                 

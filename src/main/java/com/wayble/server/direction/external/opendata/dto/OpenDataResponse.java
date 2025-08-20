@@ -34,6 +34,9 @@ public record OpenDataResponse ( // 버스 정류장 id를 기반으로 배차�
         @JsonProperty("busType1") String busType1,
         @JsonProperty("busType2") String busType2,
         @JsonProperty("term") String term,
-        @JsonProperty("busRouteId") String busRouteId
+        @JsonProperty("busRouteId") String busRouteId,
+        @JsonProperty("rtNm") String rtNm,
+        @JsonProperty("stNm") String stNm,
+        @JsonProperty("arsId") String arsId
     ) {}
 }

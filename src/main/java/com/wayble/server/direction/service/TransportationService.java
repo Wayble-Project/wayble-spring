@@ -169,7 +169,8 @@ public class TransportationService {
         List<List<TransportationResponseDto.Step>> allRoutes = findMultipleRoutes(graph, startNode, endNode, weightMap, nodes);
         
         // 3. 경로 필터링 및 정렬
-        return filterAndSortRoutes(allRoutes);
+        List<List<TransportationResponseDto.Step>> result = filterAndSortRoutes(allRoutes);
+        return result;
     }
 
     private List<List<TransportationResponseDto.Step>> findMultipleRoutes(
@@ -231,7 +232,7 @@ public class TransportationService {
             // 새로운 경로에서 사용된 엣지들도 추가
             Set<Pair<Long, Long>> newUsedEdges = extractActualEdgesFromRoute(newRoute, graph);
             usedEdges.addAll(newUsedEdges);
-            
+
             alternativeRoutes.add(newRoute);
         }
         
@@ -309,7 +310,7 @@ public class TransportationService {
     }
 
     private List<List<TransportationResponseDto.Step>> filterAndSortRoutes(List<List<TransportationResponseDto.Step>> routes) {
-                return routes.stream()
+        List<List<TransportationResponseDto.Step>> filteredRoutes = routes.stream()
                 .filter(route -> {
                     // 대중교통 포함 여부 확인
                     boolean hasPublicTransport = route.stream()
@@ -328,6 +329,8 @@ public class TransportationService {
                         .thenComparingInt(this::calculateWalkDistance))
                 .limit(MAX_ROUTES)
                 .collect(Collectors.toList());
+        
+        return filteredRoutes;
     }
 
     private int calculateWalkDistance(List<TransportationResponseDto.Step> route) {
@@ -582,6 +585,9 @@ public class TransportationService {
         List<Edge> pathEdges = new ArrayList<>();
         Node current = end;
         Set<Long> backtrackVisited = new HashSet<>();
+        
+        long requestId = System.currentTimeMillis();
+
 
         while (current != null && !current.equals(start)) {
             if (backtrackVisited.contains(current.getId())) break;
@@ -594,10 +600,10 @@ public class TransportationService {
             current = prevNode.get(current.getId());
         }
 
-        return mergeConsecutiveRoutes(pathEdges);
+        return mergeConsecutiveRoutes(pathEdges, requestId);
     }
 
-    private List<TransportationResponseDto.Step> mergeConsecutiveRoutes(List<Edge> pathEdges) {
+    private List<TransportationResponseDto.Step> mergeConsecutiveRoutes(List<Edge> pathEdges, long requestId) {
         List<TransportationResponseDto.Step> mergedSteps = new ArrayList<>();
         
         if (pathEdges.isEmpty()) {
@@ -637,6 +643,7 @@ public class TransportationService {
             // 2. 노드명 및 기본 정보 설정
             String fromName = getNodeName(currentEdge.getStartNode());
             String toName = getNodeName(pathEdges.get(j - 1).getEndNode());
+
             
             if (currentType == DirectionType.WALK) {
                 int walkDistance = 0; // 미터 단위
@@ -660,7 +667,6 @@ public class TransportationService {
             
             // 3. 교통수단 상세 정보 (moveInfo) 설정
             List<TransportationResponseDto.MoveInfo> moveInfoList = createMoveInfoList(pathEdges, i, j);
-            String routeName = getRouteName(pathEdges, i, j);
             // busInfo / subwayInfo 설정
             TransportationResponseDto.BusInfo busInfo = null;
             TransportationResponseDto.SubwayInfo subwayInfo = null;
@@ -668,8 +674,9 @@ public class TransportationService {
             if (currentType == DirectionType.BUS) {
                 try {
                     if (currentEdge.getStartNode() != null && currentEdge.getRoute() != null) {
+
                         busInfo = busInfoService.getBusInfo(
-                            currentEdge.getStartNode().getStationName(), 
+                            fromName, 
                             currentEdge.getRoute().getRouteId(), 
                             currentEdge.getStartNode().getLatitude(), 
                             currentEdge.getStartNode().getLongitude()
@@ -715,6 +722,8 @@ public class TransportationService {
 
             int moveNumber = j - i - 1;
             
+            String routeName = getRouteName(pathEdges, i, j);
+
             mergedSteps.add(new TransportationResponseDto.Step(
                 currentType,
                 moveInfoList,
