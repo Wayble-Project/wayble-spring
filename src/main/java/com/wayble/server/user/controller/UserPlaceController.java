@@ -55,7 +55,7 @@ public class UserPlaceController {
     }
 
     @GetMapping
-    @Operation(summary = "내 장소 리스트 요약 조회", description = "장소 관련 목록(리스트)만 반환합니다(개수 포함).")
+    @Operation(summary = "내가 저장한 리스트 요약 조회", description = "장소 관련 목록(리스트)만 반환합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음"),
@@ -71,7 +71,7 @@ public class UserPlaceController {
 
     @DeleteMapping
     @Operation(
-            summary = "장소에서 웨이블존 제거",
+            summary = "내가 저장한 리스트에서 웨이블존 제거",
             description = "RequestBody로 placeId, waybleZoneId를 받아 지정한 장소에서 웨이블존을 제거합니다."
     )
     @ApiResponses({
@@ -84,7 +84,7 @@ public class UserPlaceController {
             @RequestBody @Valid UserPlaceRemoveRequestDto request
     ) {
         userPlaceService.removeZoneFromPlace(userId, request.placeId(), request.waybleZoneId());
-        return CommonResponse.success("제거되었습니다.");
+        return CommonResponse.success("성공적으로 제거되었습니다.");
     }
 
     @PostMapping("/zones")
@@ -103,8 +103,8 @@ public class UserPlaceController {
     }
 
     @GetMapping("/zones")
-    @Operation(summary = "특정 장소 내 웨이블존 목록 조회(페이징)",
-            description = "placeId로 해당 장소 내부의 웨이블존 카드 목록을 반환합니다. (page는 0부터 시작.)")
+    @Operation(summary = "저장한 리스트 내 웨이블존 목록 조회(페이징)",
+            description = "placeId로 해당 장소 내부의 웨이블존 목록을 반환합니다. (page는 0부터 시작.)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "유저/장소를 찾을 수 없음"),
