@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Parameter;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class ReviewController {
     })
     public CommonResponse<String> registerReview(
             @PathVariable Long waybleZoneId,
-            @CurrentUser Long userId,
+            @Parameter(hidden = true) @CurrentUser Long userId,
             @RequestBody @Valid ReviewRegisterDto dto
     ) {
         reviewService.registerReview(waybleZoneId, userId, dto);
