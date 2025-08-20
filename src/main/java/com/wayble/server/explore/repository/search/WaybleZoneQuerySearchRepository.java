@@ -19,6 +19,7 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -125,7 +126,7 @@ public class WaybleZoneQuerySearchRepository{
     }
 
     /**
-     * 30m 이내이고 이름이 유사한 WaybleZone 찾기
+     * 30m 이내이고 이름이 유사한 WaybleZone 찾기 (최적화된 버전)
      * @param cond 검색 조건 (위도, 경도, 이름 포함)
      * @return 조건에 맞는 첫 번째 결과 또는 null
      */
@@ -134,88 +135,144 @@ public class WaybleZoneQuerySearchRepository{
             return null;
         }
 
-        // 30m 이내 검색
-        Query query = Query.of(q -> q
-                .bool(b -> {
-                    // 이름 유사도 검색 (fuzzy + match 조합)
-                    b.should(s -> s
-                            .match(m -> m
-                                    .field("zoneName")
-                                    .query(cond.zoneName())
-                                    .boost(2.0f) // 정확한 매치에 높은 점수
-                            )
-                    );
-                    b.should(s -> s
-                            .fuzzy(f -> f
-                                    .field("zoneName")
-                                    .value(cond.zoneName())
-                                    .fuzziness("AUTO") // 오타 허용
-                                    .boost(1.5f)
-                            )
-                    );
-                    // 부분 매치도 포함 (공백 제거 후 검색)
-                    String cleanedName = cond.zoneName().replaceAll("\\s+", "");
-                    b.should(s -> s
-                            .wildcard(w -> w
-                                    .field("zoneName")
-                                    .value("*" + cleanedName + "*")
-                                    .boost(1.0f)
-                            )
-                    );
-                    
-                    // 최소 하나의 should 조건은 만족해야 함
-                    b.minimumShouldMatch("1");
-                    
-                    // 30m 이내 필터
-                    b.filter(f -> f
-                            .geoDistance(gd -> gd
-                                    .field("address.location")
-                                    .location(loc -> loc
-                                            .latlon(ll -> ll
-                                                    .lat(cond.latitude())
-                                                    .lon(cond.longitude())
-                                            )
-                                    )
-                                    .distance("30m")
-                            )
-                    );
-                    return b;
-                })
-        );
+        // Step 1: 30m 이내 모든 후보 조회 (지리적 필터만)
+        List<WaybleZoneDocument> candidates = findNearbyZones(cond);
 
-        // 정렬: 점수 + 거리 조합
-        SortOptions scoreSort = SortOptions.of(s -> s.score(sc -> sc.order(SortOrder.Desc)));
-        SortOptions geoSort = SortOptions.of(s -> s
-                .geoDistance(gds -> gds
+        // Step 2: 메모리에서 텍스트 유사도 검사
+        return candidates.stream()
+                .filter(zone -> isTextSimilar(zone.getZoneName(), cond.zoneName()))
+                .findFirst()
+                .map(doc -> WaybleZoneSearchResponseDto.from(doc, null))
+                .orElse(null);
+    }
+
+    /**
+     * 30m 이내 모든 WaybleZone 후보 조회
+     */
+    private List<WaybleZoneDocument> findNearbyZones(WaybleZoneSearchConditionDto cond) {
+        Query geoQuery = Query.of(q -> q
+                .geoDistance(gd -> gd
                         .field("address.location")
-                        .location(GeoLocation.of(gl -> gl
-                                .latlon(ll -> ll
-                                        .lat(cond.latitude())
-                                        .lon(cond.longitude())
-                                )
+                        .location(loc -> loc.latlon(ll -> ll
+                                .lat(cond.latitude())
+                                .lon(cond.longitude())
                         ))
-                        .order(SortOrder.Asc)
+                        .distance("30m")
                 )
         );
 
         NativeQuery nativeQuery = NativeQuery.builder()
-                .withQuery(query)
-                .withSort(scoreSort)
-                .withSort(geoSort)
-                .withPageable(PageRequest.of(0, 1)) // 첫 번째 결과만
+                .withQuery(geoQuery)
+                .withPageable(PageRequest.of(0, 10)) // 30m 이내는 보통 10개 미만
                 .build();
 
         SearchHits<WaybleZoneDocument> hits =
                 operations.search(nativeQuery, WaybleZoneDocument.class, INDEX);
 
-        if (hits.isEmpty()) {
-            return null;
+        return hits.stream()
+                .map(hit -> hit.getContent())
+                .toList();
+    }
+
+    /**
+     * 텍스트 유사도 검사 (메모리 기반)
+     */
+    private boolean isTextSimilar(String zoneName, String searchName) {
+        if (zoneName == null || searchName == null) {
+            return false;
         }
 
-        WaybleZoneDocument doc = hits.getSearchHit(0).getContent();
-        Double distanceInMeters = (Double) hits.getSearchHit(0).getSortValues().get(1); // 거리는 두 번째 정렬값
-        Double distanceInKm = distanceInMeters / 1000.0;
-        
-        return WaybleZoneSearchResponseDto.from(doc, distanceInKm);
+        String normalizedZone = normalize(zoneName);
+        String normalizedSearch = normalize(searchName);
+
+        // 1. 완전 일치
+        if (normalizedZone.equals(normalizedSearch)) {
+            return true;
+        }
+
+        // 2. 포함 관계 (기존 wildcard와 유사)
+        if (normalizedZone.contains(normalizedSearch) ||
+            normalizedSearch.contains(normalizedZone)) {
+            return true;
+        }
+
+        // 3. 편집 거리 (기존 fuzzy와 유사) - 70% 이상 유사
+        if (calculateLevenshteinSimilarity(normalizedZone, normalizedSearch) > 0.7) {
+            return true;
+        }
+
+        // 4. 자카드 유사도 (토큰 기반, 기존 match와 유사) - 60% 이상 유사
+        return calculateJaccardSimilarity(normalizedZone, normalizedSearch) > 0.6;
+    }
+
+    /**
+     * 텍스트 정규화 (공백, 특수문자 제거)
+     */
+    private String normalize(String text) {
+        return text.replaceAll("\\s+", "")           // 공백 제거
+                  .replaceAll("[^가-힣a-zA-Z0-9]", "") // 특수문자 제거
+                  .toLowerCase();
+    }
+
+    /**
+     * 레벤슈타인 거리 기반 유사도 (0.0 ~ 1.0)
+     */
+    private double calculateLevenshteinSimilarity(String s1, String s2) {
+        if (s1.isEmpty() || s2.isEmpty()) {
+            return 0.0;
+        }
+
+        int distance = levenshteinDistance(s1, s2);
+        int maxLength = Math.max(s1.length(), s2.length());
+        return 1.0 - (double) distance / maxLength;
+    }
+
+    /**
+     * 레벤슈타인 거리 계산
+     */
+    private int levenshteinDistance(String s1, String s2) {
+        int[][] dp = new int[s1.length() + 1][s2.length() + 1];
+
+        for (int i = 0; i <= s1.length(); i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j <= s2.length(); j++) {
+            dp[0][j] = j;
+        }
+
+        for (int i = 1; i <= s1.length(); i++) {
+            for (int j = 1; j <= s2.length(); j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = 1 + Math.min(Math.min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]);
+                }
+            }
+        }
+
+        return dp[s1.length()][s2.length()];
+    }
+
+    /**
+     * 자카드 유사도 (문자 집합 기반, 0.0 ~ 1.0)
+     */
+    private double calculateJaccardSimilarity(String s1, String s2) {
+        if (s1.isEmpty() && s2.isEmpty()) {
+            return 1.0;
+        }
+        if (s1.isEmpty() || s2.isEmpty()) {
+            return 0.0;
+        }
+
+        Set<Character> set1 = s1.chars().mapToObj(c -> (char) c).collect(java.util.stream.Collectors.toSet());
+        Set<Character> set2 = s2.chars().mapToObj(c -> (char) c).collect(java.util.stream.Collectors.toSet());
+
+        Set<Character> intersection = new java.util.HashSet<>(set1);
+        intersection.retainAll(set2);
+
+        Set<Character> union = new java.util.HashSet<>(set1);
+        union.addAll(set2);
+
+        return (double) intersection.size() / union.size();
     }
 }

@@ -14,11 +14,8 @@ public class Elevator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "latitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
-    private Double latitude;
-
-    @Column(name = "longitude", columnDefinition = "DECIMAL(10,7)", nullable = false)
-    private Double longitude;
+    @Column(name = "location", nullable = false)
+    private String location;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "facility_id", nullable = false)

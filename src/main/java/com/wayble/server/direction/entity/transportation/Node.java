@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.wayble.server.direction.entity.DirectionType;
+import com.wayble.server.direction.entity.type.DirectionType;
 
 @Entity
 @Getter

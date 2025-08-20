@@ -1,4 +1,4 @@
-package com.wayble.server.direction.entity;
+package com.wayble.server.direction.entity.type;
 
 public enum DirectionType {
     BUS, SUBWAY, WALK,
