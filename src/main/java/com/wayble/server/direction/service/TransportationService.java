@@ -1,6 +1,7 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
+import com.wayble.server.direction.dto.InternalStep;
 import com.wayble.server.direction.dto.TransportationGraphDto;
 import com.wayble.server.direction.dto.request.TransportationRequestDto;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
@@ -28,7 +29,7 @@ public class TransportationService {
     private final EdgeRepository edgeRepository;
     private final FacilityService facilityService;
     private final BusInfoService busInfoService;
-
+    
     private static final int TRANSFER_PENALTY = 10000; // 환승 시 추가되는 가중치 (m)
     private static final int STEP_PENALTY = 500; // 각 이동 단계마다 추가되는 기본 가중치 (m)
     private static final int METER_CONVERSION = 1000; // 킬로미터를 미터로 변환하는 상수
@@ -59,7 +60,7 @@ public class TransportationService {
         Node end = Node.createNode(-2L, destination.name(), DirectionType.TO_WAYPOINT,destination.latitude(), destination.longitude());
 
         // 3. 여러 경로 찾기
-        List<List<TransportationResponseDto.Step>> allRoutes = findMultipleTransportationRoutes(start, end);
+        List<List<InternalStep>> allRoutes = findMultipleTransportationRoutes(start, end);
 
         // 4. 페이징 처리
         int startIndex = (request.cursor() != null) ? request.cursor() : 0;
@@ -76,10 +77,14 @@ public class TransportationService {
 
         // 페이징된 경로들을 Route 객체로 변환
         List<TransportationResponseDto.Route> routeList = new ArrayList<>();
-        List<List<TransportationResponseDto.Step>> pagedRoutes = allRoutes.subList(startIndex, endIndex);
+        List<List<InternalStep>> pagedRoutes = allRoutes.subList(startIndex, endIndex);
         for (int i = 0; i < pagedRoutes.size(); i++) {
-            List<TransportationResponseDto.Step> route = pagedRoutes.get(i);
-            TransportationResponseDto.Route routeObj = createRoute(route, startIndex + i + 1);
+            List<InternalStep> internalRoute = pagedRoutes.get(i);
+            
+            // InternalStep을 TransportationResponseDto.Step으로 변환 (API 호출 포함)
+            List<TransportationResponseDto.Step> enrichedRoute = enrichRoutesWithServiceInfo(internalRoute);
+            
+            TransportationResponseDto.Route routeObj = createRoute(enrichedRoute, startIndex + i + 1);
             routeList.add(routeObj);
         }
 
@@ -90,7 +95,7 @@ public class TransportationService {
         return new TransportationResponseDto.Route(routeIndex, steps);
     }
 
-    private List<List<TransportationResponseDto.Step>> findMultipleTransportationRoutes(Node startTmp, Node endTmp){
+    private List<List<InternalStep>> findMultipleTransportationRoutes(Node startTmp, Node endTmp){
         List<Node> nodes = null;
         List<Edge> edges = null;
         
@@ -178,7 +183,7 @@ public class TransportationService {
 
             // 4. 그래프 빌드 및 여러 경로 찾기
             TransportationGraphDto graphData = buildGraph(nodes, edges, startTmp, endTmp);
-            List<List<TransportationResponseDto.Step>> result = findMultipleOptimalRoutes(
+            List<List<InternalStep>> result = findMultipleOptimalRoutes(
                 graphData.graph(), startTmp, endTmp, graphData.weightMap(), nodes, nearestToStart, nearestToEnd
             );
             
@@ -214,7 +219,7 @@ public class TransportationService {
         return new double[]{minLat, maxLat, minLon, maxLon};
     }
 
-    private List<List<TransportationResponseDto.Step>> findMultipleOptimalRoutes(
+    private List<List<InternalStep>> findMultipleOptimalRoutes(
             Map<Long, List<Edge>> graph, 
             Node startTmp, 
             Node endTmp, 
@@ -239,31 +244,31 @@ public class TransportationService {
         }
         
         // 2. 여러 경로 찾기
-        List<List<TransportationResponseDto.Step>> allRoutes = findMultipleRoutes(graph, startNode, endNode, weightMap, nodes);
+        List<List<InternalStep>> allRoutes = findMultipleRoutes(graph, startNode, endNode, weightMap, nodes);
         
         // 3. 경로 필터링 및 정렬
-        List<List<TransportationResponseDto.Step>> result = filterAndSortRoutes(allRoutes);
+        List<List<InternalStep>> result = filterAndSortRoutes(allRoutes);
         return result;
     }
 
-    private List<List<TransportationResponseDto.Step>> findMultipleRoutes(
+    private List<List<InternalStep>> findMultipleRoutes(
             Map<Long, List<Edge>> graph, 
             Node start, 
             Node end, 
             Map<Pair<Long, Long>, Integer> weightMap, 
             List<Node> nodes) {
         
-        List<List<TransportationResponseDto.Step>> routes = new ArrayList<>();
+        List<List<InternalStep>> routes = new ArrayList<>();
         
         // 1. 기본 다익스트라로 첫 번째 경로 찾기
-        List<TransportationResponseDto.Step> firstRoute = runDijkstra(graph, start, end, weightMap, nodes);
+        List<InternalStep> firstRoute = runDijkstra(graph, start, end, weightMap, nodes);
         if (!firstRoute.isEmpty()) {
             routes.add(firstRoute);
         }
         
         // 2. 효율적인 다중 경로 찾기 - 한 번의 탐색으로 여러 경로 생성
         if (!firstRoute.isEmpty()) {
-            List<List<TransportationResponseDto.Step>> alternativeRoutes = findAlternativeRoutesEfficiently(
+            List<List<InternalStep>> alternativeRoutes = findAlternativeRoutesEfficiently(
                 graph, start, end, weightMap, nodes, firstRoute
             );
             routes.addAll(alternativeRoutes);
@@ -272,15 +277,15 @@ public class TransportationService {
         return routes;
     }
 
-    private List<List<TransportationResponseDto.Step>> findAlternativeRoutesEfficiently(
+    private List<List<InternalStep>> findAlternativeRoutesEfficiently(
             Map<Long, List<Edge>> graph, 
             Node start, 
             Node end, 
             Map<Pair<Long, Long>, Integer> weightMap, 
             List<Node> nodes,
-            List<TransportationResponseDto.Step> firstRoute) {
+            List<InternalStep> firstRoute) {
         
-        List<List<TransportationResponseDto.Step>> alternativeRoutes = new ArrayList<>();
+        List<List<InternalStep>> alternativeRoutes = new ArrayList<>();
         
         // 첫 번째 경로에서 실제 사용된 엣지들을 추출
         Set<Pair<Long, Long>> usedEdges = extractActualEdgesFromRoute(firstRoute, graph);
@@ -291,7 +296,7 @@ public class TransportationService {
             Map<Pair<Long, Long>, Integer> penalizedWeightMap = createActualEdgePenalizedWeightMap(weightMap, usedEdges, i + 1);
             
             // 다익스트라로 새로운 경로 찾기
-            List<TransportationResponseDto.Step> newRoute = runDijkstra(graph, start, end, penalizedWeightMap, nodes);
+            List<InternalStep> newRoute = runDijkstra(graph, start, end, penalizedWeightMap, nodes);
             
             if (newRoute.isEmpty()) {
                 break;
@@ -316,10 +321,10 @@ public class TransportationService {
 
 
 
-    private Set<Pair<Long, Long>> extractActualEdgesFromRoute(List<TransportationResponseDto.Step> route, Map<Long, List<Edge>> graph) {
+    private Set<Pair<Long, Long>> extractActualEdgesFromRoute(List<InternalStep> route, Map<Long, List<Edge>> graph) {
         Set<Pair<Long, Long>> usedEdges = new HashSet<>();
         
-        for (TransportationResponseDto.Step step : route) {
+        for (InternalStep step : route) {
             String fromName = step.from();
             String toName = step.to();
             
@@ -361,15 +366,15 @@ public class TransportationService {
         return penalizedWeightMap;
     }
     
-    private boolean areRoutesIdentical(List<TransportationResponseDto.Step> route1, List<TransportationResponseDto.Step> route2) {
+    private boolean areRoutesIdentical(List<InternalStep> route1, List<InternalStep> route2) {
         // 두 경로가 완전히 동일한지 확인
         if (route1.size() != route2.size()) {
             return false;
         }
         
         for (int i = 0; i < route1.size(); i++) {
-            TransportationResponseDto.Step step1 = route1.get(i);
-            TransportationResponseDto.Step step2 = route2.get(i);
+            InternalStep step1 = route1.get(i);
+            InternalStep step2 = route2.get(i);
             
             if (step1.mode() != step2.mode() || 
                 !Objects.equals(step1.from(), step2.from()) || 
@@ -382,8 +387,8 @@ public class TransportationService {
         return true;
     }
 
-    private List<List<TransportationResponseDto.Step>> filterAndSortRoutes(List<List<TransportationResponseDto.Step>> routes) {
-        List<List<TransportationResponseDto.Step>> filteredRoutes = routes.stream()
+    private List<List<InternalStep>> filterAndSortRoutes(List<List<InternalStep>> routes) {
+        List<List<InternalStep>> filteredRoutes = routes.stream()
                 .filter(route -> {
                     // 대중교통 포함 여부 확인
                     boolean hasPublicTransport = route.stream()
@@ -398,7 +403,7 @@ public class TransportationService {
                     return transferCount < 3;
                 })
                 .sorted(Comparator
-                        .<List<TransportationResponseDto.Step>>comparingInt(this::calculateTransferCount)
+                        .<List<InternalStep>>comparingInt(this::calculateTransferCount)
                         .thenComparingInt(this::calculateWalkDistance))
                 .limit(MAX_ROUTES)
                 .collect(Collectors.toList());
@@ -406,7 +411,7 @@ public class TransportationService {
         return filteredRoutes;
     }
 
-    private int calculateWalkDistance(List<TransportationResponseDto.Step> route) {
+    private int calculateWalkDistance(List<InternalStep> route) {
         return route.stream()
                 .filter(step -> step.mode() == DirectionType.WALK)
                 .mapToInt(step -> {
@@ -529,7 +534,7 @@ public class TransportationService {
                 .collect(Collectors.toList());
     }
 
-    private List<TransportationResponseDto.Step> runDijkstra(Map<Long, List<Edge>> graph, Node start, Node end, Map<Pair<Long, Long>, Integer> weightMap, List<Node> nodes) {
+    private List<InternalStep> runDijkstra(Map<Long, List<Edge>> graph, Node start, Node end, Map<Pair<Long, Long>, Integer> weightMap, List<Node> nodes) {
         // 1. 초기화 - HashMap 대신 Array 사용으로 성능 향상
         Map<Long, Integer> distance = new HashMap<>();
         Map<Long, Edge> prevEdge = new HashMap<>();
@@ -683,9 +688,69 @@ public class TransportationService {
 
         return mergeConsecutiveRoutes(pathEdges, requestId);
     }
+    
+    private List<TransportationResponseDto.Step> enrichRoutesWithServiceInfo(List<InternalStep> steps) {
+        List<TransportationResponseDto.Step> enrichedSteps = new ArrayList<>();
+        
+        for (InternalStep step : steps) {
+                TransportationResponseDto.BusInfo busInfo = null;
+                TransportationResponseDto.SubwayInfo subwayInfo = null;
+                
+                if (step.mode() == DirectionType.BUS) {
+                    log.info("🚌 최종 경로 - 버스 정보 조회: from={}, to={}, routeId={}", step.from(), step.to(), step.routeId());
+                    
+                    if (step.routeId() != null && step.startNode() != null) {
+                        try {
+                            busInfo = busInfoService.getBusInfo(
+                                step.from(),
+                                step.routeId(),
+                                step.startNode().getLatitude(),
+                                step.startNode().getLongitude()
+                            );
+                        } catch (Exception e) {
+                            log.error("버스 정보 조회 실패: {}", e.getMessage());
+                        }
+                    }
+                } else if (step.mode() == DirectionType.SUBWAY) {
+                    log.info("🚇 최종 경로 - 지하철 정보 조회: from={}, to={}, routeId={}", step.from(), step.to(), step.routeId());
+                    if (step.routeId() != null && step.startNode() != null) {
+                        try {
+                            TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(step.startNode().getId(), step.routeId());
+                            subwayInfo = new TransportationResponseDto.SubwayInfo(
+                                nodeInfo.wheelchair(),
+                                nodeInfo.elevator(),
+                                nodeInfo.accessibleRestroom()
+                            );
+                        } catch (Exception e) {
+                            log.error("지하철 정보 조회 실패: {}", e.getMessage());
+                            subwayInfo = new TransportationResponseDto.SubwayInfo(
+                                new ArrayList<>(),
+                                new ArrayList<>(),
+                                false
+                            );
+                        }
+                    }
+                }
+                
+                // 새로운 Step 생성 (busInfo, subwayInfo 포함)
+                TransportationResponseDto.Step enrichedStep = new TransportationResponseDto.Step(
+                    step.mode(),
+                    step.moveInfo(),
+                    step.routeName(),
+                    step.moveNumber(),
+                    busInfo,
+                    subwayInfo,
+                    step.from(),
+                    step.to()
+                );
+                enrichedSteps.add(enrichedStep);
+            }
+            
+            return enrichedSteps;
+    }
 
-    private List<TransportationResponseDto.Step> mergeConsecutiveRoutes(List<Edge> pathEdges, long requestId) {
-        List<TransportationResponseDto.Step> mergedSteps = new ArrayList<>();
+    private List<InternalStep> mergeConsecutiveRoutes(List<Edge> pathEdges, long requestId) {
+        List<InternalStep> mergedSteps = new ArrayList<>();
         
         if (pathEdges.isEmpty()) {
             return mergedSteps;
@@ -739,8 +804,8 @@ public class TransportationService {
                     walkDistance = (int) (distanceKm * 1000); // km를 m로 변환
                 }
                 
-                mergedSteps.add(new TransportationResponseDto.Step(
-                    DirectionType.WALK, null, null, walkDistance, null, null, fromName, toName
+                mergedSteps.add(new InternalStep(
+                    DirectionType.WALK, null, null, walkDistance, null, null, fromName, toName, null, walkStartNode, walkEndNode
                 ));
                 i = j;
                 continue;
@@ -748,63 +813,24 @@ public class TransportationService {
             
             // 3. 교통수단 상세 정보 (moveInfo) 설정
             List<TransportationResponseDto.MoveInfo> moveInfoList = createMoveInfoList(pathEdges, i, j);
-            // busInfo / subwayInfo 설정
+            // busInfo / subwayInfo는 나중에 설정 (최종 경로 선택 후)
             TransportationResponseDto.BusInfo busInfo = null;
             TransportationResponseDto.SubwayInfo subwayInfo = null;
-            
-            if (currentType == DirectionType.BUS) {
-                try {
-                    if (currentEdge.getStartNode() != null && currentEdge.getRoute() != null) {
-
-                        busInfo = busInfoService.getBusInfo(
-                            fromName, 
-                            currentEdge.getRoute().getRouteId(), 
-                            currentEdge.getStartNode().getLatitude(), 
-                            currentEdge.getStartNode().getLongitude()
-                        );
-                        
-                        if (busInfo != null && 
-                            busInfo.isLowFloor() != null && !busInfo.isLowFloor().isEmpty() && 
-                            busInfo.dispatchInterval() != null &&
-                            busInfo.isLowFloor().stream().allMatch(floor -> !floor) &&
-                            busInfo.dispatchInterval() == 0) {
-                            return new ArrayList<>();
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("버스 정보 조회 실패: {}", e.getMessage());
-                }
-            } else if (currentType == DirectionType.SUBWAY) {
-                try {
-                    if (currentEdge.getStartNode() != null && currentEdge.getRoute() != null) {
-                        TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId(), currentEdge.getRoute().getRouteId());
-                        subwayInfo = new TransportationResponseDto.SubwayInfo(
-                            nodeInfo.wheelchair(), 
-                            nodeInfo.elevator(), 
-                            nodeInfo.accessibleRestroom()
-                        );
-                    } else {
-                        subwayInfo = new TransportationResponseDto.SubwayInfo(
-                            new ArrayList<>(),
-                            new ArrayList<>(),
-                            false
-                        );
-                    }
-                } catch (Exception e) {
-                    log.error("지하철 정보 조회 실패: {}", e.getMessage());
-                    subwayInfo = new TransportationResponseDto.SubwayInfo(
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        false
-                    );
-                }
-            }
 
             int moveNumber = j - i - 1;
             
             String routeName = getRouteName(pathEdges, i, j);
 
-            mergedSteps.add(new TransportationResponseDto.Step(
+            // routeId와 Node 정보 추출
+            Long routeId = null;
+            Node startNode = currentEdge.getStartNode();
+            Node endNode = pathEdges.get(j - 1).getEndNode();
+            
+            if (currentEdge.getRoute() != null) {
+                routeId = currentEdge.getRoute().getRouteId();
+            }
+            
+            mergedSteps.add(new InternalStep(
                 currentType,
                 moveInfoList,
                 routeName,
@@ -812,7 +838,10 @@ public class TransportationService {
                 busInfo,
                 subwayInfo,
                 fromName,
-                toName
+                toName,
+                routeId,
+                startNode,
+                endNode
             ));
             
             i = j;
@@ -822,16 +851,16 @@ public class TransportationService {
         return addTransferWalkSteps(mergedSteps, pathEdges);
     }
     
-    private List<TransportationResponseDto.Step> addTransferWalkSteps(List<TransportationResponseDto.Step> steps, List<Edge> pathEdges) {
-        List<TransportationResponseDto.Step> result = new ArrayList<>();
+    private List<InternalStep> addTransferWalkSteps(List<InternalStep> steps, List<Edge> pathEdges) {
+        List<InternalStep> result = new ArrayList<>();
         
         for (int i = 0; i < steps.size(); i++) {
-            TransportationResponseDto.Step currentStep = steps.get(i);
+            InternalStep currentStep = steps.get(i);
             result.add(currentStep);
             
             // 마지막 step이 아니고, 현재 step이 walk가 아닌 경우
             if (i < steps.size() - 1 && currentStep.mode() != DirectionType.WALK) {
-                TransportationResponseDto.Step nextStep = steps.get(i + 1);
+                InternalStep nextStep = steps.get(i + 1);
                 
                 // 다음 step도 walk가 아닌 경우 (bus -> subway, subway -> bus 등)
                 if (nextStep.mode() != DirectionType.WALK) {
@@ -842,7 +871,7 @@ public class TransportationService {
                     // 이전 step의 도착지와 다음 step의 출발지 사이의 직선거리 계산
                     int walkDistance = calculateTransferWalkDistance(transferFrom, transferTo, pathEdges);
                     
-                    TransportationResponseDto.Step walkStep = new TransportationResponseDto.Step(
+                    InternalStep walkStep = new InternalStep(
                         DirectionType.WALK,
                         null,
                         null,
@@ -850,7 +879,10 @@ public class TransportationService {
                         null,
                         null,
                         transferFrom,
-                        transferTo
+                        transferTo,
+                        null,
+                        null,
+                        null
                     );
                     
                     result.add(walkStep);
@@ -946,12 +978,12 @@ public class TransportationService {
                 .orElse(null);
     }
 
-    private int calculateTransferCount(List<TransportationResponseDto.Step> steps) {
+    private int calculateTransferCount(List<InternalStep> steps) {
         int transferCount = 0;
         DirectionType previousMode = null;
         String previousRouteName = null;
         
-        for (TransportationResponseDto.Step step : steps) {
+        for (InternalStep step : steps) {
             if (step.mode() != DirectionType.WALK && step.mode() != DirectionType.FROM_WAYPOINT && step.mode() != DirectionType.TO_WAYPOINT) {
                 if (previousMode != null) {
                     if (previousMode == step.mode() && 
