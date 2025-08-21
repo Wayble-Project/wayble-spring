@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Getter
@@ -39,4 +40,15 @@ public class Route {
     // 휠체어 정보
     @OneToMany(mappedBy = "route", fetch = FetchType.LAZY)
     private List<Wheelchair> wheelchairs;
+    
+    public static Route createRoute(Long routeId, String routeName, DirectionType routeType, Node startNode, Node endNode) {
+        return Route.builder()
+                .routeId(routeId)
+                .routeName(routeName)
+                .routeType(routeType)
+                .startNode(startNode)
+                .endNode(endNode)
+                .wheelchairs(new ArrayList<>())
+                .build();
+    }
 }
