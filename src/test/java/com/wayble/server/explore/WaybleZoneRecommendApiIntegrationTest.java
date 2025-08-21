@@ -76,7 +76,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
 
     private static final double RADIUS = 50.0;
 
-    private static final Long SAMPLES = 100L;
+    private static final Long SAMPLES = 10000L;
 
     private static final String baseUrl = "/api/v1/wayble-zones/recommend";
 
@@ -97,7 +97,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
             "노브랜드버거"
     ));
 
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         User testUser = User.createUserWithDetails(
                 "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
@@ -108,7 +108,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
         userId = testUser.getId();
         token = jwtTokenProvider.generateToken(userId, "ROLE_USER");
 
-        for (int i = 1; i <= SAMPLES / 2; i++) {
+        for (int i = 1; i <= SAMPLES / 3; i++) {
             Long zoneId = (long) (Math.random() * SAMPLES) + 1;
             if(!recommendLogDocumentRepository.existsByUserIdAndZoneId(userId, zoneId)) {
                 RecommendLogDocument recommendLogDocument = RecommendLogDocument
@@ -154,12 +154,12 @@ public class WaybleZoneRecommendApiIntegrationTest {
             waybleZoneDocumentRepository.save(waybleZoneDocument);
 
             User user = User.createUserWithDetails(
-                    "user" + i, "username" + i, UUID.randomUUID() + "@email", "password",
+                    "u" + i, "n" + i, UUID.randomUUID() + "@email", "password",
                     generateRandomBirthDate(), Gender.values()[i % 2], LoginType.KAKAO, UserType.DISABLED
             );
             userRepository.save(user);
 
-            int count = (int) (Math.random() * 30) + 1;
+            int count = (int) (Math.random() * 20) + 1;
             for (int j = 0; j < count; j++) {
                 Long zoneId = (long) (Math.random() * SAMPLES) + 1;
                 WaybleZoneVisitLog visitLogDocument = WaybleZoneVisitLog
@@ -176,7 +176,7 @@ public class WaybleZoneRecommendApiIntegrationTest {
         }
     }
 
-    @AfterAll
+    @AfterEach
     public void teardown() {
         waybleZoneDocumentRepository.deleteAll();
         waybleZoneVisitLogRepository.deleteAll();
@@ -204,6 +204,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @Test
     @DisplayName("추천 기록 저장 테스트")
     public void saveRecommendLogTest() throws Exception {
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl)
                         .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
@@ -213,11 +216,16 @@ public class WaybleZoneRecommendApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -241,6 +249,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @Test
     @DisplayName("추천 기능 테스트")
     public void recommendWaybleZone() throws Exception {
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl)
                         .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
@@ -250,11 +261,16 @@ public class WaybleZoneRecommendApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -282,6 +298,9 @@ public class WaybleZoneRecommendApiIntegrationTest {
     @Test
     @DisplayName("추천 결과 상위 N개 값 테스트")
     public void recommendWaybleZoneTop20() throws Exception {
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl)
                         .header("Authorization", "Bearer " + token)
                         .param("userId", String.valueOf(userId))
@@ -292,11 +311,16 @@ public class WaybleZoneRecommendApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms (상위 20개)");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 

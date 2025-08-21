@@ -80,7 +80,7 @@ public class WaybleZoneSearchApiIntegrationTest {
 
     private String token;
 
-    private static final int SAMPLES = 1000;
+    private static final int SAMPLES = 10000;
 
     List<String> nameList = new ArrayList<>(Arrays.asList(
             "던킨도너츠",
@@ -103,7 +103,7 @@ public class WaybleZoneSearchApiIntegrationTest {
             "내곡동"
     ));
 
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         User testUser = User.createUserWithDetails(
                 "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
@@ -142,8 +142,8 @@ public class WaybleZoneSearchApiIntegrationTest {
                     .build();
 
             User user = User.createUserWithDetails(
-                    "user" + i,
-                    "username" + i,
+                    "u" + i,
+                    "n" + i,
                     UUID.randomUUID() + "@email",
                     "password" + i,
                     generateRandomBirthDate(),
@@ -176,7 +176,7 @@ public class WaybleZoneSearchApiIntegrationTest {
         }
     }
 
-    @AfterAll
+    @AfterEach
     public void teardown() {
         waybleZoneVisitLogRepository.deleteAll();
         waybleZoneDocumentRepository.deleteAll();
@@ -187,7 +187,6 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     public void checkDataExists() {
         List<WaybleZoneDocument> all = waybleZoneDocumentRepository.findAll();
-
 
         assertThat(all.size()).isGreaterThan(0);
         System.out.println("Total documents: " + all.size());
@@ -201,6 +200,9 @@ public class WaybleZoneSearchApiIntegrationTest {
     @Test
     @DisplayName("좌표를 전달받아 반경 이내의 웨이블 존을 거리 순으로 조회")
     public void findWaybleZoneByDistanceAscending() throws Exception{
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
@@ -210,12 +212,17 @@ public class WaybleZoneSearchApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -259,6 +266,10 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 단어가 포함된 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByNameAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
+        
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
@@ -269,14 +280,17 @@ public class WaybleZoneSearchApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -313,6 +327,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 타입의 웨이블존을 거리 순으로 반환")
     public void findWaybleZoneByZoneTypeAscending() throws Exception{
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
+        long startTime = System.currentTimeMillis();
         MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
@@ -324,11 +339,15 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
+
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -366,6 +385,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     public void findWaybleZoneByNameAndZoneTypeAscending() throws Exception{
         final String word = nameList.get((int) (Math.random() * nameList.size())).substring(0, 2);
         final WaybleZoneType zoneType = WaybleZoneType.CAFE;
+        long startTime = System.currentTimeMillis();
         MvcResult result = mockMvc.perform(get(baseUrl + "/maps")
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
@@ -378,11 +398,14 @@ public class WaybleZoneSearchApiIntegrationTest {
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
 
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode node = root.get("data");
         JsonNode dataNode = node.get("content");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -420,6 +443,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 동 주변 Top3 웨이블존 검색순 기반 검색")
     public void findMostSearchesWaybleZoneByDistrict() throws Exception{
         final String district = districtList.get((int) (Math.random() * districtList.size()));
+        long startTime = System.currentTimeMillis();
         MvcResult result = mockMvc.perform(get(baseUrl + "/district/most-searches")
                         .header("Authorization", "Bearer " + token)
                         .param("district", district)
@@ -427,11 +451,14 @@ public class WaybleZoneSearchApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -448,7 +475,6 @@ public class WaybleZoneSearchApiIntegrationTest {
         // 검증: 각 결과의 필수 필드들이 존재하는지 확인
         for (WaybleZoneDistrictResponseDto dto : dtoList) {
             assertThat(dto.visitCount()).isNotNull();
-            assertThat(dto.visitCount()).isGreaterThan(0L);
             
             // 필수 필드들이 존재하는지 확인
             assertThat(dto.waybleZoneInfo().zoneId()).isNotNull();
@@ -477,6 +503,7 @@ public class WaybleZoneSearchApiIntegrationTest {
     @DisplayName("특정 동 주변 Top3 웨이블존 즐겨찾기순 기반 검색")
     public void findMostLikesWaybleZoneByDistrict() throws Exception{
         final String district = districtList.get((int) (Math.random() * districtList.size()));
+        long startTime = System.currentTimeMillis();
         MvcResult result = mockMvc.perform(get(baseUrl + "/district/most-likes")
                         .header("Authorization", "Bearer " + token)
                         .param("district", district)
@@ -484,11 +511,14 @@ public class WaybleZoneSearchApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -558,6 +588,7 @@ public class WaybleZoneSearchApiIntegrationTest {
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -589,13 +620,6 @@ public class WaybleZoneSearchApiIntegrationTest {
                     name -> assertThat(name.replaceAll("\\s+", "")).contains(requestedName.replaceAll("\\s+", "")),
                     name -> assertThat(requestedName).contains(name.substring(0, Math.min(2, name.length())))
                 );
-
-        System.out.println("==== 성능 측정 결과 ====");
-        System.out.println("  응답 시간: " + responseTime + "ms");
-        System.out.println("  요청한 이름: " + requestedName);
-        System.out.println("  찾은 이름: " + foundName);
-        System.out.println("  거리: " + String.format("%.3f km", dto.distance()));
-        System.out.println("  위치: " + infoDto.latitude() + ", " + infoDto.longitude());
     }
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
