@@ -2,6 +2,7 @@ package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.direction.dto.InternalStep;
+import com.wayble.server.direction.dto.NodeRef;
 import com.wayble.server.direction.dto.TransportationGraphDto;
 import com.wayble.server.direction.dto.request.TransportationRequestDto;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
@@ -45,6 +46,10 @@ public class TransportationService {
     
     // 공간 필터링
     private static final double SPATIAL_BUFFER_KM = 15.0; // 지작점/도착점 주변 15km
+
+    private NodeRef toNodeRef(Node node) {
+        return new NodeRef(node.getId(), node.getStationName(), node.getLatitude(), node.getLongitude());
+    }
 
     public TransportationResponseDto findRoutes(TransportationRequestDto request){
     
@@ -703,8 +708,8 @@ public class TransportationService {
                             busInfo = busInfoService.getBusInfo(
                                 step.from(),
                                 step.routeId(),
-                                step.startNode().getLatitude(),
-                                step.startNode().getLongitude()
+                                step.startNode().latitude(),
+                                step.startNode().longitude()
                             );
                         } catch (Exception e) {
                             log.error("버스 정보 조회 실패: {}", e.getMessage());
@@ -714,7 +719,7 @@ public class TransportationService {
                     log.info("🚇 최종 경로 - 지하철 정보 조회: from={}, to={}, routeId={}", step.from(), step.to(), step.routeId());
                     if (step.routeId() != null && step.startNode() != null) {
                         try {
-                            TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(step.startNode().getId(), step.routeId());
+                            TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(step.startNode().id(), step.routeId());
                             subwayInfo = new TransportationResponseDto.SubwayInfo(
                                 nodeInfo.wheelchair(),
                                 nodeInfo.elevator(),
@@ -804,7 +809,7 @@ public class TransportationService {
                 }
                 
                 mergedSteps.add(new InternalStep(
-                    DirectionType.WALK, null, null, walkDistance, null, null, fromName, toName, null, walkStartNode, walkEndNode
+                    DirectionType.WALK, null, null, walkDistance, null, null, fromName, toName, null, toNodeRef(walkStartNode), toNodeRef(walkEndNode)
                 ));
                 i = j;
                 continue;
@@ -839,8 +844,8 @@ public class TransportationService {
                 fromName,
                 toName,
                 routeId,
-                startNode,
-                endNode
+                toNodeRef(startNode),
+                toNodeRef(endNode)
             ));
             
             i = j;
