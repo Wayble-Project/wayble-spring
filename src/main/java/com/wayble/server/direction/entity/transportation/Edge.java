@@ -44,4 +44,14 @@ public class Edge {
                 .route(null)
                 .build();
     }
+    
+    public static Edge createEdgeWithRoute(Long id, Node startNode, Node endNode, DirectionType edgeType, Route route) {
+        return Edge.builder()
+                .id(id)
+                .edgeType(edgeType)
+                .startNode(startNode)
+                .endNode(endNode)
+                .route(route)
+                .build();
+    }
 }

@@ -9,10 +9,11 @@ import java.util.List;
 
 public interface NodeRepository extends JpaRepository<Node, Long> {
     
-    @Query("SELECT n FROM Node n WHERE " +
+    @Query("SELECT n.id, n.stationName, n.nodeType, n.latitude, n.longitude FROM Node n WHERE " +
            "n.latitude BETWEEN :minLat AND :maxLat AND " +
-           "n.longitude BETWEEN :minLon AND :maxLon")
-    List<Node> findNodesInBoundingBox(
+           "n.longitude BETWEEN :minLon AND :maxLon " +
+           "ORDER BY n.latitude, n.longitude")
+    List<Object[]> findNodesInBoundingBox(
             @Param("minLat") double minLat,
             @Param("maxLat") double maxLat,
             @Param("minLon") double minLon,

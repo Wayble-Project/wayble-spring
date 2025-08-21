@@ -16,6 +16,7 @@ import com.wayble.server.direction.repository.RouteRepository;
 import com.wayble.server.direction.repository.WheelchairInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.Builder;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -45,39 +46,43 @@ public class FacilityService {
         List<String> elevator = new ArrayList<>();
         Boolean accessibleRestroom = false;
 
-        Optional<Node> nodeOpt = nodeRepository.findById(nodeId);
         
-        if (nodeOpt.isPresent()) {
-            Node node = nodeOpt.get();
-            
-            if (routeId != null) {
-                List<Wheelchair> wheelchairs = wheelchairInfoRepository.findByRouteId(routeId);
-                for (Wheelchair wheelchairInfo : wheelchairs) {
-                    String location = wheelchairInfo.getWheelchairLocation();
-                    if (location != null && !location.trim().isEmpty()) {
-                        wheelchair.add(location.trim());
-                    }
+        if (routeId != null) {
+            List<String> wheelchairLocations = wheelchairInfoRepository.findWheelchairLocationsByRouteId(routeId);
+            for (String location : wheelchairLocations) {
+                if (location != null && !location.trim().isEmpty()) {
+                    wheelchair.add(location.trim());
                 }
             }
-            
-            Facility facility = facilityRepository.findByNodeId(nodeId).orElse(null);
-            if (facility != null) {
-                String stinCd = facility.getStinCd();
-                String railOprLsttCd = facility.getRailOprLsttCd();
-                String lnCd = facility.getLnCd();
+        }
+        
+        Optional<Object[]> facilityData = facilityRepository.findByNodeId(nodeId);
+        if (facilityData.isPresent()) {
+            Object[] data = facilityData.get();
+            String stinCd = (String) data[3]; // stinCd
+            String railOprLsttCd = (String) data[4]; // railOprLsttCd
+            String lnCd = (String) data[2]; // lnCd
                 
-                if (stinCd != null && railOprLsttCd != null && lnCd != null) {
-                    Map<String, Boolean> toiletInfo = getToiletInfo(facility);
-                    accessibleRestroom = toiletInfo.getOrDefault(stinCd, false);
+            if (stinCd != null && railOprLsttCd != null && lnCd != null) {
+                // Facility 객체 생성
+                Facility facility = Facility.builder()
+                    .id((Long) data[0])
+                    .stationName((String) data[1])
+                    .lnCd(lnCd)
+                    .railOprLsttCd(railOprLsttCd)
+                    .stinCd(stinCd)
+                    .build();
                     
-                    elevator = getElevatorInfo(facility, routeId);
-                } else {
-                    log.error("Facility 정보 누락 - nodeId: {}, stinCd: {}, railOprLsttCd: {}, lnCd: {}", 
-                        nodeId, stinCd, railOprLsttCd, lnCd);
-                }
+                Map<String, Boolean> toiletInfo = getToiletInfo(facility);
+                accessibleRestroom = toiletInfo.getOrDefault(stinCd, false);
+                
+                elevator = getElevatorInfo(facility, routeId);
             } else {
-                log.error("Facility 정보 없음 - nodeId: {}", nodeId);
+                log.error("Facility 정보 누락 - nodeId: {}, stinCd: {}, railOprLsttCd: {}, lnCd: {}", 
+                    nodeId, stinCd, railOprLsttCd, lnCd);
             }
+        } else {
+            log.error("Facility 정보 없음 - nodeId: {}", nodeId);
         }
 
         return new TransportationResponseDto.NodeInfo(

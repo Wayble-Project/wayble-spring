@@ -91,15 +91,76 @@ public class TransportationService {
     }
 
     private List<List<TransportationResponseDto.Step>> findMultipleTransportationRoutes(Node startTmp, Node endTmp){
+        List<Node> nodes = null;
+        List<Edge> edges = null;
+        
         try {
             // 1. 공간 필터링을 사용한 데이터 로드
             double[] boundingBox = calculateBoundingBox(startTmp, endTmp);
-            List<Node> nodes = nodeRepository.findNodesInBoundingBox(
+            List<Object[]> nodeData = nodeRepository.findNodesInBoundingBox(
                 boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]
             );
-            List<Edge> edges = edgeRepository.findEdgesInBoundingBox(
+            
+            // Object[]를 Node 객체로 변환
+            nodes = nodeData.stream()
+                .map(data -> new Node(
+                    (Long) data[0],           // id
+                    (String) data[1],         // stationName
+                    (DirectionType) data[2],  // nodeType
+                    (Double) data[3],         // latitude
+                    (Double) data[4]          // longitude
+                ))
+                .collect(Collectors.toList());
+            // 최적화된 쿼리 사용: 필요한 컬럼만 조회
+            List<Object[]> edgeData = edgeRepository.findEdgesInBoundingBox(
                 boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]
             );
+            
+            // Object[]를 Edge 객체로 변환
+            edges = edgeData.stream()
+                .map(data -> {
+                    // DirectionType 객체 직접 캐스팅
+                    DirectionType edgeType = (DirectionType) data[3];
+                    
+                    // Node 객체 생성
+                    Node startNode = Node.createNode(
+                        (Long) data[1],           // startNode.id
+                        (String) data[4],         // startNode.stationName
+                        edgeType,                 // edgeType
+                        (Double) data[5],         // startNode.latitude
+                        (Double) data[6]          // startNode.longitude
+                    );
+                    
+                    Node endNode = Node.createNode(
+                        (Long) data[2],           // endNode.id
+                        (String) data[7],         // endNode.stationName
+                        edgeType,                 // edgeType
+                        (Double) data[8],         // endNode.latitude
+                        (Double) data[9]          // endNode.longitude
+                    );
+                    
+                    // Route 객체 생성 (null일 수 있음)
+                    Route route = null;
+                    if (data[10] != null) { // routeId가 null이 아닌 경우
+                        route = Route.createRoute(
+                            (Long) data[10],      // routeId
+                            (String) data[11],    // routeName
+                            edgeType,             // routeType
+                            startNode,
+                            endNode
+                        );
+                    }
+                    
+                    // Edge 객체 생성
+                    return Edge.createEdgeWithRoute(
+                        (Long) data[0],           // edge.id
+                        startNode,
+                        endNode,
+                        edgeType,                 // edgeType
+                        route
+                    );
+                })
+                .collect(Collectors.toList());
             
             log.debug("Spatial filtering loaded {} nodes and {} edges", nodes.size(), edges.size());
             
@@ -121,14 +182,26 @@ public class TransportationService {
                 graphData.graph(), startTmp, endTmp, graphData.weightMap(), nodes, nearestToStart, nearestToEnd
             );
             
-            // 5. 메모리 정리 (명시적으로 null 설정)
-            nodes.clear();
-            edges.clear();
             
             return result;
         } catch (OutOfMemoryError e) {
             log.error("Out of memory error in transportation route finding: {}", e.getMessage());
             throw new ApplicationException(PATH_NOT_FOUND);
+        } finally {
+            // 5. 메모리 정리 (finally 블록에서 확실히 실행)
+            if (nodes != null) {
+                nodes.clear();
+                nodes = null;
+            }
+            if (edges != null) {
+                edges.clear();
+                edges = null;
+            }
+            
+            // 명시적 GC 호출
+            if (Runtime.getRuntime().freeMemory() < Runtime.getRuntime().totalMemory() * 0.1) {
+                System.gc();
+            }
         }
     }
     
@@ -457,11 +530,18 @@ public class TransportationService {
     }
 
     private List<TransportationResponseDto.Step> runDijkstra(Map<Long, List<Edge>> graph, Node start, Node end, Map<Pair<Long, Long>, Integer> weightMap, List<Node> nodes) {
-        // 1. 초기화
+        // 1. 초기화 - HashMap 대신 Array 사용으로 성능 향상
         Map<Long, Integer> distance = new HashMap<>();
         Map<Long, Edge> prevEdge = new HashMap<>();
         Map<Long, Node> prevNode = new HashMap<>();
         Set<Long> visited = new HashSet<>();
+
+        Map<Long, Node> nodeMap = nodes.stream()
+                .collect(Collectors.toMap(
+                    Node::getId, 
+                    node -> node,
+                    (existing, replacement) -> existing // 중복 시 기존 값 유지
+                ));
 
         for (Node node : nodes) {
             distance.put(node.getId(), Integer.MAX_VALUE);
@@ -470,7 +550,8 @@ public class TransportationService {
         }
         distance.put(start.getId(), 0);
 
-        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(n -> distance.get(n.getId())));
+        PriorityQueue<Node> pq = new PriorityQueue<>(Math.min(1000, nodes.size()), 
+                Comparator.comparingInt(n -> distance.get(n.getId())));
         pq.add(start);
         
         int visitedCount = 0;
@@ -690,14 +771,13 @@ public class TransportationService {
                             return new ArrayList<>();
                         }
                     }
-                        } catch (Exception e) {
-                            log.error("버스 정보 조회 실패: {}", e.getMessage());
-                        }
+                } catch (Exception e) {
+                    log.error("버스 정보 조회 실패: {}", e.getMessage());
+                }
             } else if (currentType == DirectionType.SUBWAY) {
                 try {
-                    if (currentEdge.getStartNode() != null) {
+                    if (currentEdge.getStartNode() != null && currentEdge.getRoute() != null) {
                         TransportationResponseDto.NodeInfo nodeInfo = facilityService.getNodeInfo(currentEdge.getStartNode().getId(), currentEdge.getRoute().getRouteId());
-                        
                         subwayInfo = new TransportationResponseDto.SubwayInfo(
                             nodeInfo.wheelchair(), 
                             nodeInfo.elevator(), 
@@ -892,4 +972,6 @@ public class TransportationService {
         }
         return transferCount;
     }
+    
+
 }

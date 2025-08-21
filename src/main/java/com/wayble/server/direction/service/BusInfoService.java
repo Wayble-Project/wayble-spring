@@ -35,8 +35,8 @@ public class BusInfoService {
 
         boolean isShuttleBus = false;
         if (busId != null) {
-            var route = routeRepository.findById(busId);
-            isShuttleBus = route.isPresent() && route.get().getRouteName().contains("마포");
+            var routeName = routeRepository.findRouteNameById(busId);
+            isShuttleBus = routeName.isPresent() && routeName.get().contains("마포");
         }
 
         try {
@@ -120,8 +120,8 @@ public class BusInfoService {
                 originalResponse.msgBody().itemList() != null) {
                 
                 // busId로 route 정보 조회
-                var route = routeRepository.findById(busId);
-                String projectRouteName = route.isPresent() ? route.get().getRouteName() : null;
+                var routeName = routeRepository.findRouteNameById(busId);
+                String projectRouteName = routeName.orElse(null);
                 
                 List<OpenDataResponse.Item> filteredItems = originalResponse.msgBody().itemList().stream()
                     .filter(item -> {
@@ -166,7 +166,10 @@ public class BusInfoService {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            return new ObjectMapper().readValue(response.body(), StationSearchResponse.class);
+            StationSearchResponse stationResponse = new ObjectMapper().readValue(response.body(), StationSearchResponse.class);
+            
+            log.debug("🔍 [DEBUG] StationSearch API Response: {}", stationResponse != null ? "SUCCESS" : "NULL");
+            return stationResponse;
 
         } catch (Exception e) {
             log.error("정류소 검색 중 예외 발생: {}", e.getMessage());

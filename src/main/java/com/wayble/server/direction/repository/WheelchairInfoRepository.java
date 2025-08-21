@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface WheelchairInfoRepository extends JpaRepository<Wheelchair, Long> {
     
-    @Query("SELECT w FROM Wheelchair w WHERE w.route.routeId = :routeId")
-    List<Wheelchair> findByRouteId(@Param("routeId") Long routeId);
+    @Query("SELECT w.wheelchairLocation FROM Wheelchair w WHERE w.route.routeId = :routeId")
+    List<String> findWheelchairLocationsByRouteId(@Param("routeId") Long routeId);
 }
