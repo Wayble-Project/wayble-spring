@@ -9,7 +9,9 @@ import com.wayble.server.direction.entity.transportation.Edge;
 import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.entity.transportation.Route;
 import com.wayble.server.direction.entity.type.DirectionType;
+import com.wayble.server.direction.repository.EdgeBoundingBoxProjection;
 import com.wayble.server.direction.repository.EdgeRepository;
+import com.wayble.server.direction.repository.NodeBoundingBoxProjection;
 import com.wayble.server.direction.repository.NodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,55 +104,52 @@ public class TransportationService {
         try {
             // 1. 공간 필터링을 사용한 데이터 로드
             double[] boundingBox = calculateBoundingBox(startTmp, endTmp);
-            List<Object[]> nodeData = nodeRepository.findNodesInBoundingBox(
+            List<NodeBoundingBoxProjection> nodeRows = nodeRepository.findNodesInBoundingBox(
                 boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]
             );
             
-            // Object[]를 Node 객체로 변환
-            nodes = nodeData.stream()
-                .map(data -> new Node(
-                    (Long) data[0],           // id
-                    (String) data[1],         // stationName
-                    (DirectionType) data[2],  // nodeType
-                    (Double) data[3],         // latitude
-                    (Double) data[4]          // longitude
+            // 프로젝션 인터페이스를 Node 객체로 변환
+            nodes = nodeRows.stream()
+                .map(row -> new Node(
+                    row.getId(),                 // id
+                    row.getStationName(),        // stationName
+                    row.getNodeType(),           // nodeType
+                    row.getLatitude(),           // latitude
+                    row.getLongitude()           // longitude
                 ))
                 .collect(Collectors.toList());
             // 최적화된 쿼리 사용: 필요한 컬럼만 조회
-            List<Object[]> edgeData = edgeRepository.findEdgesInBoundingBox(
+            List<EdgeBoundingBoxProjection> edgeRows = edgeRepository.findEdgesInBoundingBox(
                 boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]
             );
             
-            // Object[]를 Edge 객체로 변환
-            edges = edgeData.stream()
-                .map(data -> {
-                    // DirectionType 객체 직접 캐스팅
-                    DirectionType edgeType = (DirectionType) data[3];
-                    
+            // 프로젝션 인터페이스를 Edge 객체로 변환
+            edges = edgeRows.stream()
+                .map(row -> {
                     // Node 객체 생성
                     Node startNode = Node.createNode(
-                        (Long) data[1],           // startNode.id
-                        (String) data[4],         // startNode.stationName
-                        edgeType,                 // edgeType
-                        (Double) data[5],         // startNode.latitude
-                        (Double) data[6]          // startNode.longitude
+                        row.getStartNodeId(),           // startNode.id
+                        row.getStartStationName(),      // startNode.stationName
+                        row.getEdgeType(),              // edgeType
+                        row.getStartLatitude(),         // startNode.latitude
+                        row.getStartLongitude()         // startNode.longitude
                     );
                     
                     Node endNode = Node.createNode(
-                        (Long) data[2],           // endNode.id
-                        (String) data[7],         // endNode.stationName
-                        edgeType,                 // edgeType
-                        (Double) data[8],         // endNode.latitude
-                        (Double) data[9]          // endNode.longitude
+                        row.getEndNodeId(),             // endNode.id
+                        row.getEndStationName(),        // endNode.stationName
+                        row.getEdgeType(),              // edgeType
+                        row.getEndLatitude(),           // endNode.latitude
+                        row.getEndLongitude()           // endNode.longitude
                     );
                     
                     // Route 객체 생성 (null일 수 있음)
                     Route route = null;
-                    if (data[10] != null) { // routeId가 null이 아닌 경우
+                    if (row.getRouteId() != null) { // routeId가 null이 아닌 경우
                         route = Route.createRoute(
-                            (Long) data[10],      // routeId
-                            (String) data[11],    // routeName
-                            edgeType,             // routeType
+                            row.getRouteId(),           // routeId
+                            row.getRouteName(),         // routeName
+                            row.getEdgeType(),          // routeType
                             startNode,
                             endNode
                         );
@@ -158,10 +157,10 @@ public class TransportationService {
                     
                     // Edge 객체 생성
                     return Edge.createEdgeWithRoute(
-                        (Long) data[0],           // edge.id
+                        row.getEdgeId(),                // edge.id
                         startNode,
                         endNode,
-                        edgeType,                 // edgeType
+                        row.getEdgeType(),              // edgeType
                         route
                     );
                 })
