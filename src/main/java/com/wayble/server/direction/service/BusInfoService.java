@@ -10,21 +10,18 @@ import com.wayble.server.direction.external.opendata.dto.StationSearchResponse;
 import com.wayble.server.direction.repository.RouteRepository;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
-import java.time.Duration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class BusInfoService {
 
-    private final HttpClient httpClient;
+    private final WebClient openDataWebClient;
     private final OpenDataProperties openDataProperties;
     private final RouteRepository routeRepository;
 
@@ -98,22 +95,25 @@ public class BusInfoService {
         try {
             String serviceKey = openDataProperties.encodedKey();
 
-            String uri = openDataProperties.baseUrl() + 
+            String fullUri = openDataProperties.baseUrl() + 
                     openDataProperties.endpoints().arrivals() +
                     "?serviceKey=" + serviceKey +
                     "&arsId=" + stationId +
                     "&resultType=json";
             
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uri))
+
+            OpenDataResponse originalResponse = openDataWebClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(openDataProperties.endpoints().arrivals())
+                            .queryParam("serviceKey", serviceKey)
+                            .queryParam("arsId", stationId)
+                            .queryParam("resultType", "json")
+                            .build())
                     .header("Accept", openDataProperties.accept())
-                    .GET()
-                    .timeout(Duration.ofSeconds(openDataProperties.timeout()))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            OpenDataResponse originalResponse = new ObjectMapper().readValue(response.body(), OpenDataResponse.class);
+                    .retrieve()
+                    .bodyToMono(OpenDataResponse.class)
+                    .block();
             
             // busId가 맞는 버스만 필터링
             if (busId != null && originalResponse != null && originalResponse.msgBody() != null && 
@@ -151,24 +151,37 @@ public class BusInfoService {
         try {
             String serviceKey = openDataProperties.encodedKey();
 
-            String uri = openDataProperties.baseUrl() + 
+            String fullUri = openDataProperties.baseUrl() + 
                     openDataProperties.endpoints().stationByName() +
                     "?serviceKey=" + serviceKey +
                     "&stSrch=" + stationName +
                     "&resultType=json";
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uri))
+
+
+            String rawResponse = openDataWebClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(openDataProperties.endpoints().stationByName())
+                            .queryParam("serviceKey", serviceKey)
+                            .queryParam("stSrch", stationName)
+                            .queryParam("resultType", "json")
+                            .build())
                     .header("Accept", openDataProperties.accept())
-                    .GET()
-                    .timeout(Duration.ofSeconds(openDataProperties.timeout()))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            StationSearchResponse stationResponse = new ObjectMapper().readValue(response.body(), StationSearchResponse.class);
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
             
-            log.debug("🔍 [DEBUG] StationSearch API Response: {}", stationResponse != null ? "SUCCESS" : "NULL");
+            StationSearchResponse stationResponse = null;
+            if (rawResponse != null) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    stationResponse = objectMapper.readValue(rawResponse, StationSearchResponse.class);
+                } catch (Exception e) {
+                    log.error("JSON 파싱 실패: {}", e.getMessage());
+                }
+            }
+            
             return stationResponse;
 
         } catch (Exception e) {
