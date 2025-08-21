@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -46,9 +47,17 @@ public class BusInfoService {
                 return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
             }
 
-            // 2. 여러 정류소가 나올 때, 가장 가까운 정류소 찾기
-            StationSearchResponse.StationItem closestStation = findClosestStation(
-                    stationSearchResponse.msgBody().itemList(), x, y, busId);
+            // 2. 정류소가 1개면 바로 선택, 여러 개면 가장 가까운 정류소 찾기
+            List<StationSearchResponse.StationItem> stationList = stationSearchResponse.msgBody().itemList();
+            StationSearchResponse.StationItem closestStation;
+            
+            if (stationList.size() == 1) {
+                // 정류소가 1개뿐이면 불필요한 거리 계산 및 API 호출 없이 바로 선택
+                closestStation = stationList.get(0);
+            } else {
+                // 여러 정류소가 있을 때만 findClosestStation 호출
+                closestStation = findClosestStation(stationList, x, y, busId);
+            }
 
             if (closestStation == null) {
                 log.warn("가장 가까운 정류소를 찾을 수 없습니다: {}", stationName);
@@ -102,7 +111,8 @@ public class BusInfoService {
                     "&resultType=json";
             
 
-            OpenDataResponse originalResponse = openDataWebClient
+            // 먼저 raw 응답을 확인
+            String rawResponse = openDataWebClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path(openDataProperties.endpoints().arrivals())
@@ -112,8 +122,25 @@ public class BusInfoService {
                             .build())
                     .header("Accept", openDataProperties.accept())
                     .retrieve()
-                    .bodyToMono(OpenDataResponse.class)
+                    .onStatus(status -> status.isError(), response -> {
+                        return response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    log.error("공공데이터 API 호출 오류: {}", body);
+                                    return Mono.error(new RuntimeException("API 호출 실패: " + response.statusCode()));
+                                });
+                    })
+                    .bodyToMono(String.class)
                     .block();
+                       
+            OpenDataResponse originalResponse = null;
+            if (rawResponse != null) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    originalResponse = objectMapper.readValue(rawResponse, OpenDataResponse.class);
+                } catch (Exception e) {
+                    log.error("JSON 파싱 실패: {}", e.getMessage());
+                }
+            }
             
             // busId가 맞는 버스만 필터링
             if (busId != null && originalResponse != null && originalResponse.msgBody() != null && 
@@ -169,6 +196,13 @@ public class BusInfoService {
                             .build())
                     .header("Accept", openDataProperties.accept())
                     .retrieve()
+                    .onStatus(status -> status.isError(), response -> {
+                        return response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    log.error("공공데이터 API 호출 오류: {}", body);
+                                    return Mono.error(new RuntimeException("API 호출 실패: " + response.statusCode()));
+                                });
+                    })
                     .bodyToMono(String.class)
                     .block();
             
@@ -196,13 +230,50 @@ public class BusInfoService {
             return null;
         }
 
-        // routeId가 있으면 해당 버스가 운행되는 정류소를 우선적으로 찾기
+        // 1. 먼저 모든 정류소를 거리순으로 정렬
+        List<StationSearchResponse.StationItem> sortedStations = new ArrayList<>();
+        for (StationSearchResponse.StationItem station : stations) {
+            try {
+                String tmXStr = station.tmX();
+                String tmYStr = station.tmY();
+                
+                if (tmXStr == null || tmYStr == null || tmXStr.trim().isEmpty() || tmYStr.trim().isEmpty() ||
+                    "null".equalsIgnoreCase(tmXStr.trim()) || "null".equalsIgnoreCase(tmYStr.trim())) {
+                    continue;
+                }
+                
+                double stationX = Double.parseDouble(tmXStr);
+                double stationY = Double.parseDouble(tmYStr);
+                double distance = Math.sqrt(Math.pow(stationX - x, 2) + Math.pow(stationY - y, 2));
+                
+                // 거리 정보를 포함한 Wrapper 클래스 대신 정렬용 로직 사용
+                sortedStations.add(station);
+            } catch (NumberFormatException e) {
+                log.warn("정류소 좌표 파싱 실패 - {}: tmX={}, tmY={}", station.stNm(), station.tmX(), station.tmY());
+                continue;
+            }
+        }
+        
+        // 거리순으로 정렬
+        sortedStations.sort((s1, s2) -> {
+            try {
+                double d1 = Math.sqrt(Math.pow(Double.parseDouble(s1.tmX()) - x, 2) + Math.pow(Double.parseDouble(s1.tmY()) - y, 2));
+                double d2 = Math.sqrt(Math.pow(Double.parseDouble(s2.tmX()) - x, 2) + Math.pow(Double.parseDouble(s2.tmY()) - y, 2));
+                return Double.compare(d1, d2);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        });
+
+        // 2. routeId가 있으면 가장 가까운 상위 3개 정류소에서만 해당 버스가 운행되는지 확인
         if (routeId != null) {
             var route = routeRepository.findById(routeId);
             String projectRouteName = route.isPresent() ? route.get().getRouteName() : null;
             
             if (projectRouteName != null) {
-                for (StationSearchResponse.StationItem station : stations) {
+                int maxStationsToCheck = Math.min(3, sortedStations.size()); // 최대 3개만 확인
+                for (int i = 0; i < maxStationsToCheck; i++) {
+                    StationSearchResponse.StationItem station = sortedStations.get(i);
                     try {
                         // 각 정류소에서 버스 정보 조회
                         OpenDataResponse busResponse = fetchArrivals(station.arsId(), null);
@@ -223,43 +294,7 @@ public class BusInfoService {
             }
         }
 
-        // 해당 버스가 운행되는 정류소가 없으면 기존 로직으로 가장 가까운 정류소 선택
-        StationSearchResponse.StationItem closestStation = null;
-        double minDistance = Double.MAX_VALUE;
-
-        for (StationSearchResponse.StationItem station : stations) {
-            try {
-                // tmX, tmY가 숫자인지 확인하고 파싱
-                String tmXStr = station.tmX();
-                String tmYStr = station.tmY();
-                
-                if (tmXStr == null || tmYStr == null || tmXStr.trim().isEmpty() || tmYStr.trim().isEmpty()) {
-                    log.warn("정류소 좌표가 null이거나 비어있음: {}", station.stNm());
-                    continue;
-                }
-                
-                // 추가 null 체크
-                if ("null".equalsIgnoreCase(tmXStr.trim()) || "null".equalsIgnoreCase(tmYStr.trim())) {
-                    log.warn("정류소 좌표가 'null' 문자열: {}", station.stNm());
-                    continue;
-                }
-                
-                double stationX = Double.parseDouble(tmXStr);
-                double stationY = Double.parseDouble(tmYStr);
-                
-                double distance = Math.sqrt(Math.pow(stationX - x, 2) + Math.pow(stationY - y, 2));
-                
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestStation = station;
-                }
-            } catch (NumberFormatException e) {
-                log.warn("정류소 좌표 파싱 실패 - {}: tmX={}, tmY={}, error={}", 
-                        station.stNm(), station.tmX(), station.tmY(), e.getMessage());
-                continue;
-            }
-        }
-
-        return closestStation;
+        // 해당 버스가 운행되는 정류소가 없으면 가장 가까운 정류소 선택
+        return sortedStations.isEmpty() ? null : sortedStations.get(0);
     }
 }
