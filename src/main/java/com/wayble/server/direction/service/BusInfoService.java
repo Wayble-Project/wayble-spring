@@ -10,37 +10,36 @@ import com.wayble.server.direction.external.opendata.dto.StationSearchResponse;
 import com.wayble.server.direction.repository.RouteRepository;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
-import java.time.Duration;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class BusInfoService {
 
-    private final HttpClient httpClient;
+    private final WebClient openDataWebClient;
     private final OpenDataProperties openDataProperties;
     private final RouteRepository routeRepository;
 
     public TransportationResponseDto.BusInfo getBusInfo(String stationName, Long busId, Double x, Double y) {
-        // 나중에 서비스키 문제 해결되면 이 함수 호출 제거
-        return createDummyBusInfo(stationName, busId, x, y);
         
-        // 실제 API 호출 코드 (현재 주석 처리)
-        /*
         List<Boolean> isLowFloor = new ArrayList<>();
         Integer dispatchInterval = null;
 
+        // 나중에 서비스키 문제 해결되면 이 함수 호출 제거
+        return createDummyBusInfo(stationName, busId, x, y);
+
+        
+        /*
         boolean isShuttleBus = false;
         if (busId != null) {
-            var route = routeRepository.findById(busId);
-            isShuttleBus = route.isPresent() && route.get().getRouteName().contains("마포");
+            var routeName = routeRepository.findRouteNameById(busId);
+            isShuttleBus = routeName.isPresent() && routeName.get().contains("마포");
         }
 
         try {
@@ -53,20 +52,28 @@ public class BusInfoService {
                 return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
             }
 
-            // 2. 여러 정류소가 나올 때, 가장 가까운 정류소 찾기
-            StationSearchResponse.StationItem closestStation = findClosestStation(
-                    stationSearchResponse.msgBody().itemList(), x, y);
+            // 2. 정류소가 1개면 바로 선택, 여러 개면 가장 가까운 정류소 찾기
+            List<StationSearchResponse.StationItem> stationList = stationSearchResponse.msgBody().itemList();
+            StationSearchResponse.StationItem closestStation;
+            
+            if (stationList.size() == 1) {
+                // 정류소가 1개뿐이면 불필요한 거리 계산 및 API 호출 없이 바로 선택
+                closestStation = stationList.get(0);
+            } else {
+                // 여러 정류소가 있을 때만 findClosestStation 호출
+                closestStation = findClosestStation(stationList, x, y, busId);
+            }
 
             if (closestStation == null) {
                 log.warn("가장 가까운 정류소를 찾을 수 없습니다: {}", stationName);
                 return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
             }
-
+            
             // 3. 정류소 ID로 버스 도착 정보 조회
-            OpenDataResponse openDataResponse = fetchArrivals(Long.parseLong(closestStation.stId()), busId);
+            OpenDataResponse openDataResponse = fetchArrivals(closestStation.arsId(), busId);
             if (openDataResponse == null || openDataResponse.msgBody() == null || 
                 openDataResponse.msgBody().itemList() == null) {
-                log.warn("버스 도착 정보를 찾을 수 없습니다: {}", closestStation.stId());
+                log.warn("정류소 {}의 버스 도착 정보를 찾을 수 없습니다: {}", stationName, closestStation.arsId());
                 return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
             }
             
@@ -89,20 +96,19 @@ public class BusInfoService {
                 
                 count++;
             }
-
+        
         } catch (Exception e) {
             log.error("버스 정보 조회 중 오류 발생: {}", e.getMessage());
             return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
         }
 
         return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
-        */
+               */
         
     }
 
     // 나중에 이 함수 제거
     private TransportationResponseDto.BusInfo createDummyBusInfo(String stationName, Long busId, Double x, Double y) {
-        log.info("🎭 더미 BusInfo 생성 - stationName: {}, busId: {}, x: {}, y: {}", stationName, busId, x, y);
         
         // 셔틀버스 여부 확인 (기존 로직 유지)
         boolean isShuttleBus = false;
@@ -122,33 +128,63 @@ public class BusInfoService {
         return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
     }
 
-    private OpenDataResponse fetchArrivals(Long stationId, Long busId) {
+    private OpenDataResponse fetchArrivals(String stationId, Long busId) {
         try {
             String serviceKey = openDataProperties.encodedKey();
 
-            String uri = openDataProperties.baseUrl() + 
+            String fullUri = openDataProperties.baseUrl() + 
                     openDataProperties.endpoints().arrivals() +
                     "?serviceKey=" + serviceKey +
-                    "&stId=" + stationId +
+                    "&arsId=" + stationId +
                     "&resultType=json";
             
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uri))
+
+            // 먼저 raw 응답을 확인
+            String rawResponse = openDataWebClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(openDataProperties.endpoints().arrivals())
+                            .queryParam("serviceKey", serviceKey)
+                            .queryParam("arsId", stationId)
+                            .queryParam("resultType", "json")
+                            .build())
                     .header("Accept", openDataProperties.accept())
-                    .GET()
-                    .timeout(Duration.ofSeconds(openDataProperties.timeout()))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            OpenDataResponse originalResponse = new ObjectMapper().readValue(response.body(), OpenDataResponse.class);
+                    .retrieve()
+                    .onStatus(status -> status.isError(), response -> {
+                        return response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    log.error("공공데이터 API 호출 오류: {}", body);
+                                    return Mono.error(new RuntimeException("API 호출 실패: " + response.statusCode()));
+                                });
+                    })
+                    .bodyToMono(String.class)
+                    .block();
+                       
+            OpenDataResponse originalResponse = null;
+            if (rawResponse != null) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    originalResponse = objectMapper.readValue(rawResponse, OpenDataResponse.class);
+                } catch (Exception e) {
+                    log.error("JSON 파싱 실패: {}", e.getMessage());
+                }
+            }
             
             // busId가 맞는 버스만 필터링
             if (busId != null && originalResponse != null && originalResponse.msgBody() != null && 
                 originalResponse.msgBody().itemList() != null) {
                 
+                // busId로 route 정보 조회
+                var routeName = routeRepository.findRouteNameById(busId);
+                String projectRouteName = routeName.orElse(null);
+                
                 List<OpenDataResponse.Item> filteredItems = originalResponse.msgBody().itemList().stream()
-                    .filter(item -> busId.toString().equals(item.busRouteId()))
+                    .filter(item -> {
+                        if (projectRouteName == null || item.rtNm() == null) {
+                            return false;
+                        }
+                        return projectRouteName.contains(item.rtNm()) || item.rtNm().contains(projectRouteName);
+                    })
                     .collect(Collectors.toList());
                 
                 return new OpenDataResponse(
@@ -170,22 +206,45 @@ public class BusInfoService {
         try {
             String serviceKey = openDataProperties.encodedKey();
 
-            String uri = openDataProperties.baseUrl() + 
+            String fullUri = openDataProperties.baseUrl() + 
                     openDataProperties.endpoints().stationByName() +
                     "?serviceKey=" + serviceKey +
                     "&stSrch=" + stationName +
                     "&resultType=json";
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uri))
+
+
+            String rawResponse = openDataWebClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(openDataProperties.endpoints().stationByName())
+                            .queryParam("serviceKey", serviceKey)
+                            .queryParam("stSrch", stationName)
+                            .queryParam("resultType", "json")
+                            .build())
                     .header("Accept", openDataProperties.accept())
-                    .GET()
-                    .timeout(Duration.ofSeconds(openDataProperties.timeout()))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            return new ObjectMapper().readValue(response.body(), StationSearchResponse.class);
+                    .retrieve()
+                    .onStatus(status -> status.isError(), response -> {
+                        return response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    log.error("공공데이터 API 호출 오류: {}", body);
+                                    return Mono.error(new RuntimeException("API 호출 실패: " + response.statusCode()));
+                                });
+                    })
+                    .bodyToMono(String.class)
+                    .block();
+            
+            StationSearchResponse stationResponse = null;
+            if (rawResponse != null) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    stationResponse = objectMapper.readValue(rawResponse, StationSearchResponse.class);
+                } catch (Exception e) {
+                    log.error("JSON 파싱 실패: {}", e.getMessage());
+                }
+            }
+            
+            return stationResponse;
 
         } catch (Exception e) {
             log.error("정류소 검색 중 예외 발생: {}", e.getMessage());
@@ -193,42 +252,77 @@ public class BusInfoService {
         }
     }
 
-    private StationSearchResponse.StationItem findClosestStation(List<StationSearchResponse.StationItem> stations, Double x, Double y) {
+    private StationSearchResponse.StationItem findClosestStation(List<StationSearchResponse.StationItem> stations, Double x, Double y, Long routeId) {
         if (stations == null || stations.isEmpty()) {
             log.warn("❌ 정류소 목록이 비어있음");
             return null;
         }
 
-        StationSearchResponse.StationItem closestStation = null;
-        double minDistance = Double.MAX_VALUE;
-
+        // 1. 먼저 모든 정류소를 거리순으로 정렬
+        List<StationSearchResponse.StationItem> sortedStations = new ArrayList<>();
         for (StationSearchResponse.StationItem station : stations) {
             try {
-                // tmX, tmY가 숫자인지 확인하고 파싱
                 String tmXStr = station.tmX();
                 String tmYStr = station.tmY();
                 
-                if (tmXStr == null || tmYStr == null || tmXStr.trim().isEmpty() || tmYStr.trim().isEmpty()) {
-                    log.warn("정류소 좌표가 null이거나 비어있음: {}", station.stNm());
+                if (tmXStr == null || tmYStr == null || tmXStr.trim().isEmpty() || tmYStr.trim().isEmpty() ||
+                    "null".equalsIgnoreCase(tmXStr.trim()) || "null".equalsIgnoreCase(tmYStr.trim())) {
                     continue;
                 }
                 
                 double stationX = Double.parseDouble(tmXStr);
                 double stationY = Double.parseDouble(tmYStr);
-                
                 double distance = Math.sqrt(Math.pow(stationX - x, 2) + Math.pow(stationY - y, 2));
                 
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestStation = station;
-                }
+                // 거리 정보를 포함한 Wrapper 클래스 대신 정렬용 로직 사용
+                sortedStations.add(station);
             } catch (NumberFormatException e) {
-                log.warn("정류소 좌표 파싱 실패 - {}: tmX={}, tmY={}, error={}", 
-                        station.stNm(), station.tmX(), station.tmY(), e.getMessage());
+                log.warn("정류소 좌표 파싱 실패 - {}: tmX={}, tmY={}", station.stNm(), station.tmX(), station.tmY());
                 continue;
             }
         }
+        
+        // 거리순으로 정렬
+        sortedStations.sort((s1, s2) -> {
+            try {
+                double d1 = Math.sqrt(Math.pow(Double.parseDouble(s1.tmX()) - x, 2) + Math.pow(Double.parseDouble(s1.tmY()) - y, 2));
+                double d2 = Math.sqrt(Math.pow(Double.parseDouble(s2.tmX()) - x, 2) + Math.pow(Double.parseDouble(s2.tmY()) - y, 2));
+                return Double.compare(d1, d2);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        });
 
-        return closestStation;
+        // 2. routeId가 있으면 가장 가까운 상위 3개 정류소에서만 해당 버스가 운행되는지 확인
+        if (routeId != null) {
+            var route = routeRepository.findById(routeId);
+            String projectRouteName = route.isPresent() ? route.get().getRouteName() : null;
+            
+            if (projectRouteName != null) {
+                int maxStationsToCheck = Math.min(3, sortedStations.size()); // 최대 3개만 확인
+                for (int i = 0; i < maxStationsToCheck; i++) {
+                    StationSearchResponse.StationItem station = sortedStations.get(i);
+                    try {
+                        // 각 정류소에서 버스 정보 조회
+                        OpenDataResponse busResponse = fetchArrivals(station.arsId(), null);
+                        if (busResponse != null && busResponse.msgBody() != null && busResponse.msgBody().itemList() != null) {
+                            for (OpenDataResponse.Item item : busResponse.msgBody().itemList()) {
+                                if (item.rtNm() != null && 
+                                    (projectRouteName.contains(item.rtNm()) || item.rtNm().contains(projectRouteName))) {
+
+                                    return station;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.warn("정류소 {}에서 버스 정보 조회 실패: {}", station.stNm(), e.getMessage());
+                        continue;
+                    }
+                }
+            }
+        }
+
+        // 해당 버스가 운행되는 정류소가 없으면 가장 가까운 정류소 선택
+        return sortedStations.isEmpty() ? null : sortedStations.get(0);
     }
 }

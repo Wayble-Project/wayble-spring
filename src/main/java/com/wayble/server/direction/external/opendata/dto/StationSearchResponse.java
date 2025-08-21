@@ -13,6 +13,7 @@ public record StationSearchResponse( // 버스 정류장 id를 검색하는 엔�
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record StationItem(
+            String arsId,
             String stId,
             String stNm,
             String tmX,
