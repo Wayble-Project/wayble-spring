@@ -10,7 +10,5 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface FacilityRepository extends JpaRepository<Facility, Long> {
-    @Query("SELECT f.id, f.stationName, f.lnCd, f.railOprLsttCd, f.stinCd FROM Facility f " +
-           "WHERE f.id = :nodeId")
-    Optional<Object[]> findByNodeId(@Param("nodeId") Long nodeId);
+    Optional<Facility> findByNodeId(@Param("nodeId") Long nodeId);
 }

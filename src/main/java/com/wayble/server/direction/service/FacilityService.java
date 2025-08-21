@@ -56,33 +56,24 @@ public class FacilityService {
             }
         }
         
-        Optional<Object[]> facilityData = facilityRepository.findByNodeId(nodeId);
-        if (facilityData.isPresent()) {
-            Object[] data = facilityData.get();
-            String stinCd = (String) data[3]; // stinCd
-            String railOprLsttCd = (String) data[4]; // railOprLsttCd
-            String lnCd = (String) data[2]; // lnCd
+        Optional<Facility> facilityOpt = facilityRepository.findByNodeId(nodeId);
+        if (facilityOpt.isPresent()) {
+            Facility facility = facilityOpt.get();
+            String stinCd = facility.getStinCd();
+            String railOprLsttCd = facility.getRailOprLsttCd();
+            String lnCd = facility.getLnCd();
                 
             if (stinCd != null && railOprLsttCd != null && lnCd != null) {
-                // Facility 객체 생성
-                Facility facility = Facility.builder()
-                    .id((Long) data[0])
-                    .stationName((String) data[1])
-                    .lnCd(lnCd)
-                    .railOprLsttCd(railOprLsttCd)
-                    .stinCd(stinCd)
-                    .build();
-                    
                 Map<String, Boolean> toiletInfo = getToiletInfo(facility);
                 accessibleRestroom = toiletInfo.getOrDefault(stinCd, false);
                 
                 elevator = getElevatorInfo(facility, routeId);
             } else {
-                log.error("Facility 정보 누락 - nodeId: {}, stinCd: {}, railOprLsttCd: {}, lnCd: {}", 
+                log.warn("Facility 정보 누락 - nodeId: {}, stinCd: {}, railOprLsttCd: {}, lnCd: {}", 
                     nodeId, stinCd, railOprLsttCd, lnCd);
             }
         } else {
-            log.error("Facility 정보 없음 - nodeId: {}", nodeId);
+            log.debug("Facility 정보 없음 - nodeId: {}", nodeId);
         }
 
         return new TransportationResponseDto.NodeInfo(
