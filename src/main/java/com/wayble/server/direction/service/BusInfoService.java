@@ -31,6 +31,11 @@ public class BusInfoService {
         List<Boolean> isLowFloor = new ArrayList<>();
         Integer dispatchInterval = null;
 
+        // 나중에 서비스키 문제 해결되면 이 함수 호출 제거
+        return createDummyBusInfo(stationName, busId, x, y);
+
+        
+        /*
         boolean isShuttleBus = false;
         if (busId != null) {
             var routeName = routeRepository.findRouteNameById(busId);
@@ -97,6 +102,29 @@ public class BusInfoService {
             return new TransportationResponseDto.BusInfo(isShuttleBus, new ArrayList<>(), null);
         }
 
+        return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
+               */
+        
+    }
+
+    // 나중에 이 함수 제거
+    private TransportationResponseDto.BusInfo createDummyBusInfo(String stationName, Long busId, Double x, Double y) {
+        
+        // 셔틀버스 여부 확인 (기존 로직 유지)
+        boolean isShuttleBus = false;
+        if (busId != null) {
+            var route = routeRepository.findById(busId);
+            isShuttleBus = route.isPresent() && route.get().getRouteName().contains("마포");
+        }
+        
+        // 랜덤 더미 데이터 생성
+        List<Boolean> isLowFloor = new ArrayList<>();
+        isLowFloor.add(Math.random() < 0.7);
+        isLowFloor.add(Math.random() < 0.5);
+        
+        Integer dispatchInterval = (int) (Math.random() * 15) + 1;
+        
+        
         return new TransportationResponseDto.BusInfo(isShuttleBus, isLowFloor, dispatchInterval);
     }
 
