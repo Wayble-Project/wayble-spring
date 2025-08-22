@@ -2,7 +2,7 @@ package com.wayble.server.explore.service;
 
 import com.wayble.server.explore.dto.facility.WaybleFacilityConditionDto;
 import com.wayble.server.explore.dto.facility.WaybleFacilityResponseDto;
-import com.wayble.server.explore.repository.facility.WaybleFacilityQuerySearchMysqlRepository;
+//import com.wayble.server.explore.repository.facility.WaybleFacilityQuerySearchMysqlRepository;
 import com.wayble.server.explore.repository.facility.WaybleFacilityQuerySearchRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
