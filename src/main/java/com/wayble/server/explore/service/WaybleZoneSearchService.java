@@ -1,6 +1,7 @@
 package com.wayble.server.explore.service;
 
 import com.wayble.server.explore.dto.search.response.WaybleZoneDistrictResponseDto;
+//import com.wayble.server.explore.repository.search.WaybleZoneQuerySearchMysqlRepository;
 import com.wayble.server.explore.repository.search.WaybleZoneQuerySearchRepository;
 import com.wayble.server.explore.dto.search.request.WaybleZoneSearchConditionDto;
 import com.wayble.server.explore.dto.search.response.WaybleZoneSearchResponseDto;
@@ -17,6 +18,8 @@ import java.util.List;
 public class WaybleZoneSearchService {
 
     private final WaybleZoneQuerySearchRepository waybleZoneQuerySearchRepository;
+
+    //private final WaybleZoneQuerySearchMysqlRepository waybleZoneQuerySearchRepository;
 
     private final WaybleZoneRepository waybleZoneRepository;
 

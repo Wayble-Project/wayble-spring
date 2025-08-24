@@ -69,7 +69,7 @@ public class WaybleZoneService {
         if (f == null) throw new ApplicationException(WaybleZoneErrorCase.WAYBLE_ZONE_FACILITY_NOT_FOUND);
 
         var images = zone.getWaybleZoneImageList();
-        String imageUrl = images.stream().findFirst().map(WaybleZoneImage::getImageUrl).orElse(null);
+        //String imageUrl = images.stream().findFirst().map(WaybleZoneImage::getImageUrl).orElse(null);
         List<String> photoUrls = images.stream().map(WaybleZoneImage::getImageUrl).toList();
 
         Map<String, WaybleZoneDetailResponseDto.BusinessHourDto> businessHours = new LinkedHashMap<>();
@@ -94,7 +94,7 @@ public class WaybleZoneService {
                 .rating(zone.getRating())
                 .reviewCount(zone.getReviewCount())
                 .contactNumber(zone.getContactNumber())
-                .imageUrl(imageUrl)
+                .imageUrl(zone.getMainImageUrl())
                 .photos(photoUrls)
                 .facilities(FacilityDto.builder()
                         .hasSlope(f.isHasSlope())
