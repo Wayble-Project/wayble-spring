@@ -7,7 +7,9 @@ import com.wayble.server.common.config.security.jwt.JwtTokenProvider;
 import com.wayble.server.explore.dto.facility.WaybleFacilityResponseDto;
 import com.wayble.server.explore.entity.FacilityType;
 import com.wayble.server.explore.entity.WaybleFacilityDocument;
+import com.wayble.server.explore.entity.WaybleFacilityMySQL;
 import com.wayble.server.explore.repository.facility.WaybleFacilityDocumentRepository;
+import com.wayble.server.explore.repository.facility.WaybleFacilityMySQLRepository;
 import com.wayble.server.user.entity.Gender;
 import com.wayble.server.user.entity.LoginType;
 import com.wayble.server.user.entity.User;
@@ -51,6 +53,9 @@ public class WaybleFacilityApiIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
+    private WaybleFacilityMySQLRepository waybleFacilityMySQLRepository;
+
+    @Autowired
     private WaybleFacilityDocumentRepository waybleFacilityDocumentRepository;
 
     private static final double LATITUDE = 37.5435480;
@@ -59,7 +64,7 @@ public class WaybleFacilityApiIntegrationTest {
 
     private static final double RADIUS = 20.0;
 
-    private static final int SAMPLES = 100;
+    private static final int SAMPLES = 1000;
 
     private static final String baseUrl = "/api/v1/facilities/search";
 
@@ -67,7 +72,7 @@ public class WaybleFacilityApiIntegrationTest {
 
     private String token;
 
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         User testUser = User.createUserWithDetails(
                 "testUser", "testUsername", UUID.randomUUID() + "@email", "password",
@@ -95,12 +100,30 @@ public class WaybleFacilityApiIntegrationTest {
             
             waybleFacilityDocumentRepository.save(rampDocument);
             waybleFacilityDocumentRepository.save(elevatorDocument);
+
+            WaybleFacilityMySQL ramp = WaybleFacilityMySQL.
+                    builder()
+                    .longitude(points.get("longitude"))
+                    .latitude(points.get("latitude"))
+                    .facilityType(FacilityType.RAMP)
+                    .build();
+
+            WaybleFacilityMySQL elevator = WaybleFacilityMySQL.
+                    builder()
+                    .longitude(points.get("longitude"))
+                    .latitude(points.get("latitude"))
+                    .facilityType(FacilityType.ELEVATOR)
+                    .build();
+
+            waybleFacilityMySQLRepository.save(ramp);
+            waybleFacilityMySQLRepository.save(elevator);
         }
     }
 
-    @AfterAll
+    @AfterEach
     public void teardown() {
         waybleFacilityDocumentRepository.deleteAll();
+        waybleFacilityMySQLRepository.deleteAll();
         userRepository.deleteById(userId);
     }
 
@@ -121,6 +144,9 @@ public class WaybleFacilityApiIntegrationTest {
     @Test
     @DisplayName("좌표를 전달받아 가까운 경사로 조회 테스트")
     public void findNearbyRampFacilities() throws Exception {
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl)
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
@@ -130,11 +156,16 @@ public class WaybleFacilityApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms (경사로 조회)");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 
@@ -179,6 +210,9 @@ public class WaybleFacilityApiIntegrationTest {
     @Test
     @DisplayName("좌표를 전달받아 가까운 엘리베이터 조회 테스트")
     public void findNearbyElevatorFacilities() throws Exception {
+        // 성능 측정 시작
+        long startTime = System.currentTimeMillis();
+        
         MvcResult result = mockMvc.perform(get(baseUrl)
                         .header("Authorization", "Bearer " + token)
                         .param("latitude",  String.valueOf(LATITUDE))
@@ -188,11 +222,16 @@ public class WaybleFacilityApiIntegrationTest {
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
+        
+        // 성능 측정 종료
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String json = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         JsonNode root = objectMapper.readTree(json);
         JsonNode dataNode = root.get("data");
 
+        System.out.println("==== 성능 측정 결과 ====\n  응답 시간: " + responseTime + "ms (엘리베이터 조회)");
         System.out.println("==== 응답 결과 ====");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(json)));
 

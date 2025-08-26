@@ -1,6 +1,7 @@
 package com.wayble.server.explore.dto.common;
 
 import com.wayble.server.explore.entity.EsWaybleZoneFacility;
+import com.wayble.server.wayblezone.entity.WaybleZoneFacility;
 import lombok.Builder;
 
 @Builder

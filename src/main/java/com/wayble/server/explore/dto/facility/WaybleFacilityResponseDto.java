@@ -1,6 +1,7 @@
 package com.wayble.server.explore.dto.facility;
 
 import com.wayble.server.explore.entity.FacilityType;
+import com.wayble.server.explore.entity.WaybleFacilityMySQL;
 import com.wayble.server.explore.entity.WaybleFacilityDocument;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,6 +19,14 @@ public record WaybleFacilityResponseDto(
                 .latitude(facilityDocument.getLocation().getLat())
                 .longitude(facilityDocument.getLocation().getLon())
                 .facilityType(facilityDocument.getFacilityType())
+                .build();
+    }
+    
+    public static WaybleFacilityResponseDto fromEntity(WaybleFacilityMySQL waybleFacilityMySQL) {
+        return WaybleFacilityResponseDto.builder()
+                .latitude(waybleFacilityMySQL.getLatitude())
+                .longitude(waybleFacilityMySQL.getLongitude())
+                .facilityType(waybleFacilityMySQL.getFacilityType())
                 .build();
     }
 }
