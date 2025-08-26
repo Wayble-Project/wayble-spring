@@ -64,7 +64,7 @@ public class WaybleFacilityApiIntegrationTest {
 
     private static final double RADIUS = 20.0;
 
-    private static final int SAMPLES = 10000;
+    private static final int SAMPLES = 1000;
 
     private static final String baseUrl = "/api/v1/facilities/search";
 

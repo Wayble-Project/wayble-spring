@@ -4,6 +4,7 @@ import com.wayble.server.explore.entity.RecommendLogDocument;
 import com.wayble.server.explore.entity.WaybleZoneDocument;
 import com.wayble.server.explore.repository.RecommendLogDocumentRepository;
 import com.wayble.server.explore.repository.WaybleZoneDocumentRepository;
+import com.wayble.server.explore.repository.recommend.WaybleZoneQueryRecommendMysqlRepository;
 import com.wayble.server.explore.repository.recommend.WaybleZoneQueryRecommendRepository;
 import com.wayble.server.common.exception.ApplicationException;
 import com.wayble.server.explore.dto.recommend.WaybleZoneRecommendResponseDto;
@@ -25,6 +26,8 @@ import java.util.UUID;
 public class WaybleZoneRecommendService {
 
     private final WaybleZoneQueryRecommendRepository waybleZoneRecommendRepository;
+
+    //private final WaybleZoneQueryRecommendMysqlRepository waybleZoneRecommendRepository;
 
     private final RecommendLogDocumentRepository recommendLogDocumentRepository;
 
