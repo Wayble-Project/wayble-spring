@@ -1,6 +1,6 @@
 package com.wayble.server.direction.entity.transportation;
 
-import com.wayble.server.direction.entity.DirectionType;
+import com.wayble.server.direction.entity.type.DirectionType;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,6 +42,16 @@ public class Edge {
                 .startNode(startNode)
                 .endNode(endNode)
                 .route(null)
+                .build();
+    }
+    
+    public static Edge createEdgeWithRoute(Long id, Node startNode, Node endNode, DirectionType edgeType, Route route) {
+        return Edge.builder()
+                .id(id)
+                .edgeType(edgeType)
+                .startNode(startNode)
+                .endNode(endNode)
+                .route(route)
                 .build();
     }
 }

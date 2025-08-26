@@ -16,7 +16,6 @@ import java.util.List;
 @Table(name = "facility")
 public class Facility {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="stationName")

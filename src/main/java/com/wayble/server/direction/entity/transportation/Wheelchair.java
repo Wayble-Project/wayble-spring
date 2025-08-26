@@ -8,16 +8,17 @@ import lombok.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "elevator")
-public class Elevator {
+@Table(name = "wheelchair")
+public class Wheelchair {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "location", nullable = false)
-    private String location;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "facility_id", nullable = false)
-    private Facility facility;
+    @JoinColumn(name = "route_id", nullable = false)
+    private Route route;
+
+    @Column(name = "wheelchair_location", nullable = false)
+    private String wheelchairLocation; // 1-4 등
+
 }

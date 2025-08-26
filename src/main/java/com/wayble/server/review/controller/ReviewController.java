@@ -1,5 +1,6 @@
 package com.wayble.server.review.controller;
 
+import com.wayble.server.auth.resolver.CurrentUser;
 import com.wayble.server.common.response.CommonResponse;
 import com.wayble.server.review.dto.ReviewRegisterDto;
 import com.wayble.server.review.dto.ReviewResponseDto;
@@ -10,10 +11,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Parameter;
 
 import java.util.List;
 
@@ -37,12 +37,10 @@ public class ReviewController {
     })
     public CommonResponse<String> registerReview(
             @PathVariable Long waybleZoneId,
-            @RequestBody @Valid ReviewRegisterDto dto,
-
-            // TODO: 로그인 구현 후 Authorization 헤더 필수로 변경 필요
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
+            @Parameter(hidden = true) @CurrentUser Long userId,
+            @RequestBody @Valid ReviewRegisterDto dto
     ) {
-        reviewService.registerReview(waybleZoneId, dto, authorizationHeader);
+        reviewService.registerReview(waybleZoneId, userId, dto);
         return CommonResponse.success("리뷰가 등록되었습니다.");
     }
 
