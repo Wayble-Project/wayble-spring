@@ -13,4 +13,8 @@ public class HaversineUtil {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
     }
+
+    public static double haversineKm(double lat1, double lon1, double lat2, double lon2) {
+        return haversine(lat1, lon1, lat2, lon2) / 1000.0;
+    }
 }

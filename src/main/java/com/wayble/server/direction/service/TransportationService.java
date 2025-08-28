@@ -1,19 +1,21 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.direction.dto.InternalStep;
-import com.wayble.server.direction.dto.NodeRef;
-import com.wayble.server.direction.dto.TransportationGraphDto;
+import com.wayble.server.direction.dto.internal.InternalStep;
+import com.wayble.server.direction.dto.internal.NodeRef;
+import com.wayble.server.direction.dto.internal.TransportationGraphDto;
 import com.wayble.server.direction.dto.request.TransportationRequestDto;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.entity.transportation.Edge;
 import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.entity.transportation.Route;
 import com.wayble.server.direction.entity.type.DirectionType;
-import com.wayble.server.direction.repository.EdgeBoundingBoxProjection;
-import com.wayble.server.direction.repository.EdgeRepository;
-import com.wayble.server.direction.repository.NodeBoundingBoxProjection;
-import com.wayble.server.direction.repository.NodeRepository;
+import com.wayble.server.direction.repository.transportation.EdgeBoundingBoxProjection;
+import com.wayble.server.direction.repository.transportation.EdgeRepository;
+import com.wayble.server.direction.repository.transportation.NodeBoundingBoxProjection;
+import com.wayble.server.direction.repository.transportation.NodeRepository;
+import com.wayble.server.direction.service.util.HaversineUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -65,7 +67,7 @@ public class TransportationService {
             origin = request.origin();
             destination = request.destination();
             // 1. 거리 검증 (30km 제한)
-            double distance = haversine(origin.latitude(), origin.longitude(), 
+            double distance = HaversineUtil.haversineKm(origin.latitude(), origin.longitude(), 
                                       destination.latitude(), destination.longitude());
             if (distance >= DISTANCE_CONSTRAINT) {
                 throw new ApplicationException(DISTANCE_TOO_FAR);
@@ -494,7 +496,7 @@ public class TransportationService {
 
             graph.get(startId).add(edge);
             
-            int weight = (int)(haversine(
+            int weight = (int)(HaversineUtil.haversineKm(
                     start.getLatitude(), start.getLongitude(),
                     end.getLatitude(), end.getLongitude()
             ) * METER_CONVERSION);
@@ -523,7 +525,7 @@ public class TransportationService {
             Edge walkEdge = Edge.createEdge(-1L, startNode, candidate, DirectionType.WALK);
             graph.get(startNode.getId()).add(walkEdge);
             
-            int weight = (int)(haversine(
+            int weight = (int)(HaversineUtil.haversineKm(
                     startNode.getLatitude(), startNode.getLongitude(),
                     candidate.getLatitude(), candidate.getLongitude()
             ) * METER_CONVERSION);
@@ -540,7 +542,7 @@ public class TransportationService {
             }
             graph.get(candidate.getId()).add(walkEdge);
             
-            int weight = (int)(haversine(
+            int weight = (int)(HaversineUtil.haversineKm(
                     candidate.getLatitude(), candidate.getLongitude(),
                     endNode.getLatitude(), endNode.getLongitude()
             ) * METER_CONVERSION);
@@ -567,11 +569,11 @@ public class TransportationService {
                     }
                     
                     // 정확한 거리 계산
-                    double distance = haversine(lat, lon, node.getLatitude(), node.getLongitude()) * METER_CONVERSION;
+                    double distance = HaversineUtil.haversineKm(lat, lon, node.getLatitude(), node.getLongitude()) * METER_CONVERSION;
                     return distance <= maxDistanceMeters;
                 })
                 .sorted(Comparator.comparingDouble(node -> 
-                        haversine(lat, lon, node.getLatitude(), node.getLongitude())))
+                        HaversineUtil.haversineKm(lat, lon, node.getLatitude(), node.getLongitude())))
                 .limit(MAX_NEARBY_NODES)
                 .collect(Collectors.toList());
     }
@@ -633,7 +635,7 @@ public class TransportationService {
                 for (Node nearbyNode : nearbyNodes) {
                     if (visited.contains(nearbyNode.getId())) continue;
                     
-                    double walkDistance = haversine(
+                    double walkDistance = HaversineUtil.haversineKm(
                             curr.getLatitude(), curr.getLongitude(),
                             nearbyNode.getLatitude(), nearbyNode.getLongitude()
                     ) * METER_CONVERSION;
@@ -668,7 +670,7 @@ public class TransportationService {
 
                 Pair<Long, Long> key = Pair.of(edge.getStartNode().getId(), edge.getEndNode().getId());
                 int baseWeight = weightMap.getOrDefault(key,
-                        (int)(haversine(
+                        (int)(HaversineUtil.haversineKm(
                                 edge.getStartNode().getLatitude(), edge.getStartNode().getLongitude(),
                                 edge.getEndNode().getLatitude(), edge.getEndNode().getLongitude()
                         ) * METER_CONVERSION)
@@ -843,7 +845,7 @@ public class TransportationService {
                 Node walkEndNode = pathEdges.get(j - 1).getEndNode();
                 
                 if (walkStartNode != null && walkEndNode != null) {
-                    double distanceKm = haversine(
+                    double distanceKm = HaversineUtil.haversineKm(
                         walkStartNode.getLatitude(), walkStartNode.getLongitude(),
                         walkEndNode.getLatitude(), walkEndNode.getLongitude()
                     );
@@ -964,7 +966,7 @@ public class TransportationService {
         }
         
         if (fromNode != null && toNode != null) {
-            double distanceKm = haversine(
+            double distanceKm = HaversineUtil.haversineKm(
                 fromNode.getLatitude(), fromNode.getLongitude(),
                 toNode.getLatitude(), toNode.getLongitude()
             );
@@ -999,28 +1001,12 @@ public class TransportationService {
         return null;
     }
     
-    public static double haversine(
-            double lat1, double lon1,
-            double lat2, double lon2
-    ) {
-        final int R = 6_371; // 지구 반지름 (km)
-        double φ1 = Math.toRadians(lat1);
-        double φ2 = Math.toRadians(lat2);
-        double Δφ = Math.toRadians(lat2 - lat1);
-        double Δλ = Math.toRadians(lon2 - lon1);
 
-        double a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2)
-                + Math.cos(φ1) * Math.cos(φ2)
-                * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // km 단위 거리 반환
-    }
 
     private Node findNearestNode(List<Node> nodes, double lat, double lon) {
         return nodes.stream()
                 .min(Comparator.comparingDouble(n ->
-                        haversine(lat, lon, n.getLatitude(), n.getLongitude())))
+                        HaversineUtil.haversineKm(lat, lon, n.getLatitude(), n.getLongitude())))
                 .orElse(null);
     }
 
