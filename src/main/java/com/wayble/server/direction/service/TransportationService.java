@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import static com.wayble.server.direction.exception.DirectionErrorCase.PATH_NOT_FOUND;
 import static com.wayble.server.direction.exception.DirectionErrorCase.DISTANCE_TOO_FAR;
+import static com.wayble.server.direction.exception.DirectionErrorCase.NO_NEARBY_STATIONS;
+import static com.wayble.server.direction.exception.DirectionErrorCase.SYSTEM_ERROR;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -208,7 +210,7 @@ public class TransportationService {
             Node nearestToEnd = findNearestNode(nodes, endTmp.getLatitude(), endTmp.getLongitude());
             
             if (nearestToStart == null || nearestToEnd == null) {
-                throw new ApplicationException(PATH_NOT_FOUND);
+                throw new ApplicationException(NO_NEARBY_STATIONS);
             }
             
             // 3. 임시 노드 추가
@@ -223,9 +225,9 @@ public class TransportationService {
             
             
             return result;
-        } catch (OutOfMemoryError e) {
-            log.error("Out of memory error in transportation route finding: {}", e.getMessage());
-            throw new ApplicationException(PATH_NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Unexpected error in transportation route finding: {}", e.getMessage(), e);
+            throw e;
         } finally {
             // 5. 메모리 정리 (finally 블록에서 확실히 실행)
             if (nodes != null) {
@@ -521,6 +523,9 @@ public class TransportationService {
         
         // 2. 출발지에서 인근 정류장으로 도보 연결
         List<Node> startCandidates = findNearbyNodes(nodes, startTmp.getLatitude(), startTmp.getLongitude(), ORIGIN_DESTINATION_WALK_DISTANCE);
+        if (startCandidates.isEmpty()) {
+            throw new ApplicationException(NO_NEARBY_STATIONS);
+        }
         for (Node candidate : startCandidates) {
             Edge walkEdge = Edge.createEdge(-1L, startNode, candidate, DirectionType.WALK);
             graph.get(startNode.getId()).add(walkEdge);
@@ -534,6 +539,9 @@ public class TransportationService {
         
         // 3. 인근 정류장에서 도착지로 도보 연결
         List<Node> endCandidates = findNearbyNodes(nodes, endTmp.getLatitude(), endTmp.getLongitude(), ORIGIN_DESTINATION_WALK_DISTANCE);
+        if (endCandidates.isEmpty()) {
+            throw new ApplicationException(NO_NEARBY_STATIONS);
+        }
         for (Node candidate : endCandidates) {
             Edge walkEdge = Edge.createEdge(-2L, candidate, endNode, DirectionType.WALK);
             
@@ -1005,6 +1013,10 @@ public class TransportationService {
 
     private Node findNearestNode(List<Node> nodes, double lat, double lon) {
         return nodes.stream()
+                .filter(node -> {
+                    double distance = HaversineUtil.haversineKm(lat, lon, node.getLatitude(), node.getLongitude()) * 1000; // m 단위
+                    return distance <= ORIGIN_DESTINATION_WALK_DISTANCE; // 1000m 이내
+                })
                 .min(Comparator.comparingDouble(n ->
                         HaversineUtil.haversineKm(lat, lon, n.getLatitude(), n.getLongitude())))
                 .orElse(null);
