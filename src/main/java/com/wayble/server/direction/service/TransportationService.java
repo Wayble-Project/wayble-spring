@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import static com.wayble.server.direction.exception.DirectionErrorCase.PATH_NOT_FOUND;
 import static com.wayble.server.direction.exception.DirectionErrorCase.DISTANCE_TOO_FAR;
 import static com.wayble.server.direction.exception.DirectionErrorCase.NO_NEARBY_STATIONS;
-import static com.wayble.server.direction.exception.DirectionErrorCase.SYSTEM_ERROR;
 @Slf4j
 @Service
 @RequiredArgsConstructor

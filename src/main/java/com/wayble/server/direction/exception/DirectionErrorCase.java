@@ -13,8 +13,7 @@ public enum DirectionErrorCase implements ErrorCase {
 
     PATH_NOT_FOUND(400, 4003, "해당하는 경로를 찾을 수 없습니다."),
     DISTANCE_TOO_FAR(400, 4004, "거리가 30km 이상입니다."),
-    SYSTEM_ERROR(500, 4005, "길찾기 시스템에 오류가 발생했습니다."),
-    NO_NEARBY_STATIONS(400, 4006, "주변에 정류장이 없습니다.");
+    NO_NEARBY_STATIONS(400, 4005, "주변에 정류장이 없습니다.");
 
     private final Integer httpStatusCode;
     private final Integer errorCode;
