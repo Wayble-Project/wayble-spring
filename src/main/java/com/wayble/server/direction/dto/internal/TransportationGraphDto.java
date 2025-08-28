@@ -1,4 +1,4 @@
-package com.wayble.server.direction.dto;
+package com.wayble.server.direction.dto.internal;
 
 import com.wayble.server.direction.entity.transportation.Edge;
 import org.springframework.data.util.Pair;

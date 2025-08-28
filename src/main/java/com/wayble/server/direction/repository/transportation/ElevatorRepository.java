@@ -1,4 +1,4 @@
-package com.wayble.server.direction.repository;
+package com.wayble.server.direction.repository.transportation;
 
 import com.wayble.server.direction.entity.transportation.Elevator;
 import com.wayble.server.direction.entity.transportation.Facility;

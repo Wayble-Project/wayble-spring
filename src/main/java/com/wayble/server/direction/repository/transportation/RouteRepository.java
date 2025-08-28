@@ -1,4 +1,4 @@
-package com.wayble.server.direction.repository;
+package com.wayble.server.direction.repository.transportation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

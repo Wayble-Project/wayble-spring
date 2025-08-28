@@ -1,4 +1,4 @@
-package com.wayble.server.direction.dto;
+package com.wayble.server.direction.dto.internal;
 
 import java.util.List;
 

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wayble.server.direction.external.opendata.OpenDataProperties;
 import com.wayble.server.direction.external.opendata.dto.OpenDataResponse;
 import com.wayble.server.direction.external.opendata.dto.StationSearchResponse;
-import com.wayble.server.direction.repository.RouteRepository;
+import com.wayble.server.direction.repository.transportation.RouteRepository;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
 
 import java.net.URI;
