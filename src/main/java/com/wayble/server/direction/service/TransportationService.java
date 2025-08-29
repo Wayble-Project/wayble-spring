@@ -1,19 +1,21 @@
 package com.wayble.server.direction.service;
 
 import com.wayble.server.common.exception.ApplicationException;
-import com.wayble.server.direction.dto.InternalStep;
-import com.wayble.server.direction.dto.NodeRef;
-import com.wayble.server.direction.dto.TransportationGraphDto;
+import com.wayble.server.direction.dto.internal.InternalStep;
+import com.wayble.server.direction.dto.internal.NodeRef;
+import com.wayble.server.direction.dto.internal.TransportationGraphDto;
 import com.wayble.server.direction.dto.request.TransportationRequestDto;
 import com.wayble.server.direction.dto.response.TransportationResponseDto;
 import com.wayble.server.direction.entity.transportation.Edge;
 import com.wayble.server.direction.entity.transportation.Node;
 import com.wayble.server.direction.entity.transportation.Route;
 import com.wayble.server.direction.entity.type.DirectionType;
-import com.wayble.server.direction.repository.EdgeBoundingBoxProjection;
-import com.wayble.server.direction.repository.EdgeRepository;
-import com.wayble.server.direction.repository.NodeBoundingBoxProjection;
-import com.wayble.server.direction.repository.NodeRepository;
+import com.wayble.server.direction.repository.transportation.EdgeBoundingBoxProjection;
+import com.wayble.server.direction.repository.transportation.EdgeRepository;
+import com.wayble.server.direction.repository.transportation.NodeBoundingBoxProjection;
+import com.wayble.server.direction.repository.transportation.NodeRepository;
+import com.wayble.server.direction.service.util.HaversineUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.wayble.server.direction.exception.DirectionErrorCase.PATH_NOT_FOUND;
 import static com.wayble.server.direction.exception.DirectionErrorCase.DISTANCE_TOO_FAR;
+import static com.wayble.server.direction.exception.DirectionErrorCase.NO_NEARBY_STATIONS;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -52,50 +55,78 @@ public class TransportationService {
     }
 
     public TransportationResponseDto findRoutes(TransportationRequestDto request){
-    
-        TransportationRequestDto.Location origin = request.origin();
-        TransportationRequestDto.Location destination = request.destination();
-        // 1. 거리 검증 (30km 제한)
-        double distance = haversine(origin.latitude(), origin.longitude(), 
-                                  destination.latitude(), destination.longitude());
-        if (distance >= DISTANCE_CONSTRAINT) {
-            throw new ApplicationException(DISTANCE_TOO_FAR);
-        }
+        List<List<InternalStep>> allRoutes = null;
+        List<List<InternalStep>> pagedRoutes = null;
+        List<TransportationResponseDto.Route> routeList = null;
+        TransportationRequestDto.Location origin = null;
+        TransportationRequestDto.Location destination = null;
+        Node start = null;
+        Node end = null;
+        TransportationResponseDto.PageInfo pageInfo = null;
+        
+        try {
+            origin = request.origin();
+            destination = request.destination();
+            // 1. 거리 검증 (30km 제한)
+            double distance = HaversineUtil.haversineKm(origin.latitude(), origin.longitude(), 
+                                      destination.latitude(), destination.longitude());
+            if (distance >= DISTANCE_CONSTRAINT) {
+                throw new ApplicationException(DISTANCE_TOO_FAR);
+            }
 
-        // 2. 임시 노드 생성
-        Node start = Node.createNode(-1L, origin.name(), DirectionType.FROM_WAYPOINT ,origin.latitude(), origin.longitude());
-        Node end = Node.createNode(-2L, destination.name(), DirectionType.TO_WAYPOINT,destination.latitude(), destination.longitude());
+            // 2. 임시 노드 생성
+            start = Node.createNode(-1L, origin.name(), DirectionType.FROM_WAYPOINT ,origin.latitude(), origin.longitude());
+            end = Node.createNode(-2L, destination.name(), DirectionType.TO_WAYPOINT,destination.latitude(), destination.longitude());
 
-        // 3. 여러 경로 찾기
-        List<List<InternalStep>> allRoutes = findMultipleTransportationRoutes(start, end);
+            // 3. 여러 경로 찾기
+            allRoutes = findMultipleTransportationRoutes(start, end);
 
-        // 4. 페이징 처리
-        int startIndex = (request.cursor() != null) ? request.cursor() : 0;
-        int pageSize = (request.size() != null) ? request.size() : 5; // 기본값 5로 설정
-        int endIndex = Math.min(startIndex + pageSize, allRoutes.size());
-        boolean hasNext = endIndex < allRoutes.size();
-        Integer nextCursor = hasNext ? endIndex : null;
-        TransportationResponseDto.PageInfo pageInfo = new TransportationResponseDto.PageInfo(nextCursor, hasNext);
+            // 4. 페이징 처리
+            int startIndex = (request.cursor() != null) ? request.cursor() : 0;
+            int pageSize = (request.size() != null) ? request.size() : 5; // 기본값 5로 설정
+            int endIndex = Math.min(startIndex + pageSize, allRoutes.size());
+            boolean hasNext = endIndex < allRoutes.size();
+            Integer nextCursor = hasNext ? endIndex : null;
+            pageInfo = new TransportationResponseDto.PageInfo(nextCursor, hasNext);
 
-        // 경로를 찾지 못한 경우 처리
-        if (allRoutes.isEmpty()) {
-            throw new ApplicationException(PATH_NOT_FOUND);
-        }
+            // 경로를 찾지 못한 경우 처리
+            if (allRoutes.isEmpty()) {
+                throw new ApplicationException(PATH_NOT_FOUND);
+            }
 
-        // 페이징된 경로들을 Route 객체로 변환
-        List<TransportationResponseDto.Route> routeList = new ArrayList<>();
-        List<List<InternalStep>> pagedRoutes = allRoutes.subList(startIndex, endIndex);
-        for (int i = 0; i < pagedRoutes.size(); i++) {
-            List<InternalStep> internalRoute = pagedRoutes.get(i);
+            // 페이징된 경로들을 Route 객체로 변환
+            routeList = new ArrayList<>();
+            pagedRoutes = allRoutes.subList(startIndex, endIndex);
             
-            // InternalStep을 TransportationResponseDto.Step으로 변환 (API 호출 포함)
-            List<TransportationResponseDto.Step> enrichedRoute = enrichRoutesWithServiceInfo(internalRoute);
+            for (int i = 0; i < pagedRoutes.size(); i++) {
+                List<InternalStep> internalRoute = pagedRoutes.get(i);
+                
+                List<TransportationResponseDto.Step> enrichedRoute = enrichRoutesWithServiceInfo(internalRoute);
+                
+                TransportationResponseDto.Route routeObj = createRoute(enrichedRoute, startIndex + i + 1);
+                routeList.add(routeObj);
+            }
             
-            TransportationResponseDto.Route routeObj = createRoute(enrichedRoute, startIndex + i + 1);
-            routeList.add(routeObj);
+            TransportationResponseDto result = new TransportationResponseDto(routeList, pageInfo);
+            
+            return result;
+        } finally {
+            // 메모리 정리 
+            if (allRoutes != null) {
+                allRoutes.clear();
+                allRoutes = null;
+            }
+            if (pagedRoutes != null) {
+                pagedRoutes = null;
+            }
+            routeList = null;
+            
+            origin = null;
+            destination = null;
+            start = null;
+            end = null;
+            pageInfo = null;
         }
-
-        return new TransportationResponseDto(routeList, pageInfo);
     }
 
     private TransportationResponseDto.Route createRoute(List<TransportationResponseDto.Step> steps, int routeIndex) {
@@ -178,7 +209,7 @@ public class TransportationService {
             Node nearestToEnd = findNearestNode(nodes, endTmp.getLatitude(), endTmp.getLongitude());
             
             if (nearestToStart == null || nearestToEnd == null) {
-                throw new ApplicationException(PATH_NOT_FOUND);
+                throw new ApplicationException(NO_NEARBY_STATIONS);
             }
             
             // 3. 임시 노드 추가
@@ -193,9 +224,9 @@ public class TransportationService {
             
             
             return result;
-        } catch (OutOfMemoryError e) {
-            log.error("Out of memory error in transportation route finding: {}", e.getMessage());
-            throw new ApplicationException(PATH_NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Unexpected error in transportation route finding: {}", e.getMessage(), e);
+            throw e;
         } finally {
             // 5. 메모리 정리 (finally 블록에서 확실히 실행)
             if (nodes != null) {
@@ -316,6 +347,16 @@ public class TransportationService {
             usedEdges.addAll(newUsedEdges);
 
             alternativeRoutes.add(newRoute);
+            
+            // 메모리 정리
+            if (newUsedEdges != null) {
+                newUsedEdges.clear();
+                newUsedEdges = null;
+            }
+            if (penalizedWeightMap != null) {
+                penalizedWeightMap.clear();
+                penalizedWeightMap = null;
+            }
         }
         
         return alternativeRoutes;
@@ -456,7 +497,7 @@ public class TransportationService {
 
             graph.get(startId).add(edge);
             
-            int weight = (int)(haversine(
+            int weight = (int)(HaversineUtil.haversineKm(
                     start.getLatitude(), start.getLongitude(),
                     end.getLatitude(), end.getLongitude()
             ) * METER_CONVERSION);
@@ -481,11 +522,14 @@ public class TransportationService {
         
         // 2. 출발지에서 인근 정류장으로 도보 연결
         List<Node> startCandidates = findNearbyNodes(nodes, startTmp.getLatitude(), startTmp.getLongitude(), ORIGIN_DESTINATION_WALK_DISTANCE);
+        if (startCandidates.isEmpty()) {
+            throw new ApplicationException(NO_NEARBY_STATIONS);
+        }
         for (Node candidate : startCandidates) {
             Edge walkEdge = Edge.createEdge(-1L, startNode, candidate, DirectionType.WALK);
             graph.get(startNode.getId()).add(walkEdge);
             
-            int weight = (int)(haversine(
+            int weight = (int)(HaversineUtil.haversineKm(
                     startNode.getLatitude(), startNode.getLongitude(),
                     candidate.getLatitude(), candidate.getLongitude()
             ) * METER_CONVERSION);
@@ -494,6 +538,9 @@ public class TransportationService {
         
         // 3. 인근 정류장에서 도착지로 도보 연결
         List<Node> endCandidates = findNearbyNodes(nodes, endTmp.getLatitude(), endTmp.getLongitude(), ORIGIN_DESTINATION_WALK_DISTANCE);
+        if (endCandidates.isEmpty()) {
+            throw new ApplicationException(NO_NEARBY_STATIONS);
+        }
         for (Node candidate : endCandidates) {
             Edge walkEdge = Edge.createEdge(-2L, candidate, endNode, DirectionType.WALK);
             
@@ -502,7 +549,7 @@ public class TransportationService {
             }
             graph.get(candidate.getId()).add(walkEdge);
             
-            int weight = (int)(haversine(
+            int weight = (int)(HaversineUtil.haversineKm(
                     candidate.getLatitude(), candidate.getLongitude(),
                     endNode.getLatitude(), endNode.getLongitude()
             ) * METER_CONVERSION);
@@ -529,11 +576,11 @@ public class TransportationService {
                     }
                     
                     // 정확한 거리 계산
-                    double distance = haversine(lat, lon, node.getLatitude(), node.getLongitude()) * METER_CONVERSION;
+                    double distance = HaversineUtil.haversineKm(lat, lon, node.getLatitude(), node.getLongitude()) * METER_CONVERSION;
                     return distance <= maxDistanceMeters;
                 })
                 .sorted(Comparator.comparingDouble(node -> 
-                        haversine(lat, lon, node.getLatitude(), node.getLongitude())))
+                        HaversineUtil.haversineKm(lat, lon, node.getLatitude(), node.getLongitude())))
                 .limit(MAX_NEARBY_NODES)
                 .collect(Collectors.toList());
     }
@@ -559,8 +606,10 @@ public class TransportationService {
         }
         distance.put(start.getId(), 0);
 
+        // PriorityQueue 크기 제한
+        final Map<Long, Integer> finalDistance = distance;
         PriorityQueue<Node> pq = new PriorityQueue<>(Math.min(1000, nodes.size()), 
-                Comparator.comparingInt(n -> distance.get(n.getId())));
+                Comparator.comparingInt(n -> finalDistance.getOrDefault(n.getId(), Integer.MAX_VALUE)));
         pq.add(start);
         
         int visitedCount = 0;
@@ -593,7 +642,7 @@ public class TransportationService {
                 for (Node nearbyNode : nearbyNodes) {
                     if (visited.contains(nearbyNode.getId())) continue;
                     
-                    double walkDistance = haversine(
+                    double walkDistance = HaversineUtil.haversineKm(
                             curr.getLatitude(), curr.getLongitude(),
                             nearbyNode.getLatitude(), nearbyNode.getLongitude()
                     ) * METER_CONVERSION;
@@ -628,7 +677,7 @@ public class TransportationService {
 
                 Pair<Long, Long> key = Pair.of(edge.getStartNode().getId(), edge.getEndNode().getId());
                 int baseWeight = weightMap.getOrDefault(key,
-                        (int)(haversine(
+                        (int)(HaversineUtil.haversineKm(
                                 edge.getStartNode().getLatitude(), edge.getStartNode().getLongitude(),
                                 edge.getEndNode().getLatitude(), edge.getEndNode().getLongitude()
                         ) * METER_CONVERSION)
@@ -690,7 +739,9 @@ public class TransportationService {
             current = prevNode.get(current.getId());
         }
 
-        return mergeConsecutiveRoutes(pathEdges, requestId);
+        List<InternalStep> result = mergeConsecutiveRoutes(pathEdges, requestId);
+        
+        return result;
     }
     
     private List<TransportationResponseDto.Step> enrichRoutesWithServiceInfo(List<InternalStep> steps) {
@@ -801,7 +852,7 @@ public class TransportationService {
                 Node walkEndNode = pathEdges.get(j - 1).getEndNode();
                 
                 if (walkStartNode != null && walkEndNode != null) {
-                    double distanceKm = haversine(
+                    double distanceKm = HaversineUtil.haversineKm(
                         walkStartNode.getLatitude(), walkStartNode.getLongitude(),
                         walkEndNode.getLatitude(), walkEndNode.getLongitude()
                     );
@@ -922,7 +973,7 @@ public class TransportationService {
         }
         
         if (fromNode != null && toNode != null) {
-            double distanceKm = haversine(
+            double distanceKm = HaversineUtil.haversineKm(
                 fromNode.getLatitude(), fromNode.getLongitude(),
                 toNode.getLatitude(), toNode.getLongitude()
             );
@@ -957,28 +1008,16 @@ public class TransportationService {
         return null;
     }
     
-    public static double haversine(
-            double lat1, double lon1,
-            double lat2, double lon2
-    ) {
-        final int R = 6_371; // 지구 반지름 (km)
-        double φ1 = Math.toRadians(lat1);
-        double φ2 = Math.toRadians(lat2);
-        double Δφ = Math.toRadians(lat2 - lat1);
-        double Δλ = Math.toRadians(lon2 - lon1);
 
-        double a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2)
-                + Math.cos(φ1) * Math.cos(φ2)
-                * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // km 단위 거리 반환
-    }
 
     private Node findNearestNode(List<Node> nodes, double lat, double lon) {
         return nodes.stream()
+                .filter(node -> {
+                    double distance = HaversineUtil.haversineKm(lat, lon, node.getLatitude(), node.getLongitude()) * 1000; // m 단위
+                    return distance <= ORIGIN_DESTINATION_WALK_DISTANCE; // 1000m 이내
+                })
                 .min(Comparator.comparingDouble(n ->
-                        haversine(lat, lon, n.getLatitude(), n.getLongitude())))
+                        HaversineUtil.haversineKm(lat, lon, n.getLatitude(), n.getLongitude())))
                 .orElse(null);
     }
 

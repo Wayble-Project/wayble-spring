@@ -1,4 +1,4 @@
-package com.wayble.server.direction.dto;
+package com.wayble.server.direction.dto.internal;
 
 public record NodeRef(
     Long id, 

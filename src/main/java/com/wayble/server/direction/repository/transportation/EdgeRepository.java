@@ -1,7 +1,8 @@
-package com.wayble.server.direction.repository;
+package com.wayble.server.direction.repository.transportation;
 
 import com.wayble.server.direction.entity.transportation.Edge;
-import com.wayble.server.direction.repository.EdgeBoundingBoxProjection;
+import com.wayble.server.direction.repository.transportation.EdgeBoundingBoxProjection;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

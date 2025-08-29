@@ -8,12 +8,12 @@ import com.wayble.server.direction.entity.transportation.Elevator;
 
 import com.wayble.server.direction.external.kric.dto.KricToiletRawItem;
 import com.wayble.server.direction.external.kric.dto.KricToiletRawResponse;
+import com.wayble.server.direction.repository.transportation.ElevatorRepository;
+import com.wayble.server.direction.repository.transportation.FacilityRepository;
+import com.wayble.server.direction.repository.transportation.NodeRepository;
+import com.wayble.server.direction.repository.transportation.RouteRepository;
+import com.wayble.server.direction.repository.transportation.WheelchairInfoRepository;
 
-import com.wayble.server.direction.repository.ElevatorRepository;
-import com.wayble.server.direction.repository.FacilityRepository;
-import com.wayble.server.direction.repository.NodeRepository;
-import com.wayble.server.direction.repository.RouteRepository;
-import com.wayble.server.direction.repository.WheelchairInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Builder;
